@@ -30,9 +30,7 @@ public class ConnectionPool {
         p.setMinIdle(10);
         p.setLogAbandoned(true);
         p.setRemoveAbandoned(true);
-        p.setJdbcInterceptors(
-                "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;"+
-                        "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer");
+        p.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;"+"org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer");
         dataSource = new DataSource();
         dataSource.setPoolProperties(p);
 
