@@ -44,4 +44,34 @@ public class UserDAO {
         }
         return isSuccess;
     }
+
+    public boolean emailExists(String Email){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT * FROM users WHERE email = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,Email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                status = true;
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
 }

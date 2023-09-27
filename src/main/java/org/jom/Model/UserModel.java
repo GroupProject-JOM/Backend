@@ -64,4 +64,10 @@ public class UserModel {
         boolean status = userDAO.register(this);
         return  status;
     }
+
+    public boolean EmailExists(){
+        UserDAO userDAO = new UserDAO();
+        boolean status = userDAO.emailExists(this.email);
+        return  status;
+    }
 }
