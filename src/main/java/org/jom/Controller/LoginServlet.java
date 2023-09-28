@@ -42,7 +42,7 @@ public class LoginServlet extends HttpServlet {
             if(user.getId() != 0){
                 response.setStatus(HttpServletResponse.SC_OK);
                 if(user.getPassword().equals(login.getPassword())) {
-                    out.write("{\"message\": \"Login successfully\"}");
+                    out.write("{\"message\": \"Login successfully\",\"page\":\""+ user.getRole() +"\"}");
                     System.out.println("Login successful");
                 }else{
                     out.write("{\"message\": \"Wrong Password\"}");

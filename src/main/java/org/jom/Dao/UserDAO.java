@@ -13,7 +13,7 @@ public class UserDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "INSERT INTO users (first_name,last_name,email,password,phone,add_line_1,add_line_2,add_line_3) VALUES (?,?,?,?,?,?,?,?)";
+            String sql = "INSERT INTO users (first_name,last_name,email,password,phone,add_line_1,add_line_2,add_line_3,role) VALUES (?,?,?,?,?,?,?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1,user.getFirst_name());
             preparedStatement.setString(2,user.getLast_name());
@@ -23,6 +23,7 @@ public class UserDAO {
             preparedStatement.setString(6,user.getAdd_line_1());
             preparedStatement.setString(7,user.getAdd_line_2());
             preparedStatement.setString(8,user.getAdd_line_3());
+            preparedStatement.setString(9,user.getRole());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
@@ -97,6 +98,7 @@ public class UserDAO {
                 user.setAdd_line_1(resultSet.getString(7));
                 user.setAdd_line_2(resultSet.getString(8));
                 user.setAdd_line_3(resultSet.getString(9));
+                user.setRole(resultSet.getString(10));
             }
 
             resultSet.close();
