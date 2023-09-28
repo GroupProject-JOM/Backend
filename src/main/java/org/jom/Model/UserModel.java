@@ -3,6 +3,7 @@ package org.jom.Model;
 import org.jom.Dao.UserDAO;
 
 public class UserModel {
+    private int id;
     private String first_name;
     private String last_name;
     private String email;
@@ -11,6 +12,9 @@ public class UserModel {
     private String add_line_1;
     private String add_line_2;
     private String add_line_3;
+
+    public UserModel() {
+    }
 
     public UserModel(String first_name, String last_name, String email, String password, String phone, String add_line_1, String add_line_2, String add_line_3) {
         this.first_name = first_name;
@@ -21,6 +25,42 @@ public class UserModel {
         this.add_line_1 = add_line_1;
         this.add_line_2 = add_line_2;
         this.add_line_3 = add_line_3;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setFirst_name(String first_name) {
+        this.first_name = first_name;
+    }
+
+    public void setLast_name(String last_name) {
+        this.last_name = last_name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setAdd_line_1(String add_line_1) {
+        this.add_line_1 = add_line_1;
+    }
+
+    public void setAdd_line_2(String add_line_2) {
+        this.add_line_2 = add_line_2;
+    }
+
+    public void setAdd_line_3(String add_line_3) {
+        this.add_line_3 = add_line_3;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getFirst_name() {

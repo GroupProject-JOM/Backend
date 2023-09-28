@@ -52,7 +52,7 @@ public class UserDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM users WHERE email = ?";
+            String sql = "SELECT email FROM users WHERE email = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1,Email);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -73,5 +73,43 @@ public class UserDAO {
             }
         }
         return status;
+    }
+
+    public static UserModel getUser(String Email){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        UserModel user = new UserModel();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT * FROM users WHERE email = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,Email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                user.setId(resultSet.getInt(1));
+                user.setFirst_name(resultSet.getString(2));
+                user.setLast_name(resultSet.getString(3));
+                user.setEmail(resultSet.getString(4));
+                user.setPassword(resultSet.getString(5));
+                user.setPhone(resultSet.getString(6));
+                user.setAdd_line_1(resultSet.getString(7));
+                user.setAdd_line_2(resultSet.getString(8));
+                user.setAdd_line_3(resultSet.getString(9));
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return user;
     }
 }
