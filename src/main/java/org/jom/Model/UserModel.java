@@ -12,11 +12,12 @@ public class UserModel {
     private String add_line_1;
     private String add_line_2;
     private String add_line_3;
+    private String role;
 
     public UserModel() {
     }
 
-    public UserModel(String first_name, String last_name, String email, String password, String phone, String add_line_1, String add_line_2, String add_line_3) {
+    public UserModel(String first_name, String last_name, String email, String password, String phone, String add_line_1, String add_line_2, String add_line_3,String role) {
         this.first_name = first_name;
         this.last_name = last_name;
         this.email = email;
@@ -25,6 +26,7 @@ public class UserModel {
         this.add_line_1 = add_line_1;
         this.add_line_2 = add_line_2;
         this.add_line_3 = add_line_3;
+        this.role=role;
     }
 
     public void setId(int id) {
@@ -57,6 +59,10 @@ public class UserModel {
 
     public void setAdd_line_3(String add_line_3) {
         this.add_line_3 = add_line_3;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public int getId() {
@@ -93,6 +99,10 @@ public class UserModel {
 
     public String getAdd_line_3() {
         return add_line_3;
+    }
+
+    public String getRole() {
+        return role;
     }
 
     public void setPassword(String password) {

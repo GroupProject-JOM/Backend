@@ -64,6 +64,10 @@ public class RegisterServlet extends HttpServlet {
                 return;
             }
 
+            if(user.getRole() == null){
+                user.setRole("supplier");
+            }
+
             // Email validation
             String regex = "[a-z0-9]+@[a-z]+\\.[a-z]{2,3}";
             Pattern pattern = Pattern.compile(regex);
