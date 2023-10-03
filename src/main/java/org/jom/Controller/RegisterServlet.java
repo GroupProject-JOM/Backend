@@ -80,7 +80,7 @@ public class RegisterServlet extends HttpServlet {
             }
 
             if(user.EmailExists()){
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
                 out.write("{\"message\": \"email3\"}");
                 System.out.println("Email already exists");
                 return;
