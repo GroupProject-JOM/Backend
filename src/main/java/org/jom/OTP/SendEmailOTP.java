@@ -39,7 +39,7 @@ public class SendEmailOTP {
             message.setText("your OTP is: " + otpvalue);
             // send message
             Transport.send(message);
-            System.out.println("message sent successfully");
+            System.out.println("Email otp sent successfully");
             return otpvalue;
         }
 

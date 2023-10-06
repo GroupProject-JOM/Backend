@@ -6,10 +6,10 @@ import org.jom.Model.UserModel;
 import java.sql.*;
 
 public class UserDAO {
-    public boolean register(UserModel user){
+    public int register(UserModel user){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
-        boolean isSuccess = false;
+        int userId = 0;
 
         try {
             connection = connectionPool.dataSource.getConnection();
@@ -29,7 +29,7 @@ public class UserDAO {
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
 
             if (resultSet.next()) {
-                isSuccess = true;
+                userId = resultSet.getInt(1);
             }
 
             resultSet.close();
@@ -43,7 +43,7 @@ public class UserDAO {
             } catch (Exception ignore) {
             }
         }
-        return isSuccess;
+        return userId;
     }
 
     public boolean emailExists(String Email){
@@ -76,7 +76,7 @@ public class UserDAO {
         return status;
     }
 
-    public static UserModel getUser(String Email){
+    public static UserModel getUserByEmail(String Email){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         UserModel user = new UserModel();
@@ -113,5 +113,66 @@ public class UserDAO {
             }
         }
         return user;
+    }
+
+    public static UserModel getUserById(int id){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        UserModel user = new UserModel();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT * FROM users WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                user.setId(resultSet.getInt(1));
+                user.setFirst_name(resultSet.getString(2));
+                user.setLast_name(resultSet.getString(3));
+                user.setEmail(resultSet.getString(4));
+                user.setPassword(resultSet.getString(5));
+                user.setPhone(resultSet.getString(6));
+                user.setAdd_line_1(resultSet.getString(7));
+                user.setAdd_line_2(resultSet.getString(8));
+                user.setAdd_line_3(resultSet.getString(9));
+                user.setRole(resultSet.getString(10));
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return user;
+    }
+
+    public static void setValidity(int id){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE users SET validity = '1' WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,id);
+            preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
     }
 }

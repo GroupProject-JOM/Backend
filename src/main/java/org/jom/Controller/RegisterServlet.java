@@ -8,7 +8,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.*;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +19,7 @@ public class RegisterServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
+
         try {
             Gson gson = new Gson();
             // json data to user object
@@ -80,19 +83,20 @@ public class RegisterServlet extends HttpServlet {
             }
 
             if(user.EmailExists()){
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
                 out.write("{\"message\": \"email3\"}");
                 System.out.println("Email already exists");
                 return;
             }
 
             // All validations are passed then register
-            if(user.Register()){
+            user.Register();
+
+            if(user.getId() != 0){
                 response.setStatus(HttpServletResponse.SC_OK);
-//                SendEmailOTP sendEmailOTP = new SendEmailOTP();
-//                int otp = SendEmailOTP.SendOTP(user.getEmail());
                 out.write("{\"message\": \"Registration successfully\",");
-                out.write("\"email\": \""+ user.getEmail()+ "\",");
+                out.write("\"id\": \""+ user.getId() + "\",");
+                out.write("\"email\": \""+ user.getEmail() + "\",");
                 out.write("\"phone\": \""+ user.getPhone() +"\"}");
                 System.out.println("Registration successful");
             }else{
