@@ -99,6 +99,7 @@ public class UserDAO {
                 user.setAdd_line_2(resultSet.getString(8));
                 user.setAdd_line_3(resultSet.getString(9));
                 user.setRole(resultSet.getString(10));
+                user.setValidity(resultSet.getInt(11));
             }
 
             resultSet.close();

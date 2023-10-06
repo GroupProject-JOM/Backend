@@ -29,6 +29,7 @@ public class UserModel {
         this.add_line_2 = add_line_2;
         this.add_line_3 = add_line_3;
         this.role = role;
+        this.validity = 0;
     }
 
     public void setId(int id) {

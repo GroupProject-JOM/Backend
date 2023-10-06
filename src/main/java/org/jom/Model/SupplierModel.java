@@ -4,7 +4,6 @@ import org.jom.Dao.Supplier.SupplierDAO;
 
 public class SupplierModel {
     private int id;
-    private int estate_id;
     private int user_id;
 
     public SupplierModel(int user_id) {
@@ -20,13 +19,6 @@ public class SupplierModel {
         this.id = id;
     }
 
-    public int getEstate_id() {
-        return estate_id;
-    }
-
-    public void setEstate_id(int estate_id) {
-        this.estate_id = estate_id;
-    }
 
     public int getUser_id() {
         return user_id;
