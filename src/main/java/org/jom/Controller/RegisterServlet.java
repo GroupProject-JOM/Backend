@@ -1,5 +1,6 @@
 package org.jom.Controller;
 
+import org.jom.Model.SupplierModel;
 import org.jom.Model.UserModel;
 import com.google.gson.Gson;
 import org.jom.OTP.SendEmailOTP;
@@ -93,12 +94,28 @@ public class RegisterServlet extends HttpServlet {
             user.Register();
 
             if(user.getId() != 0){
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"message\": \"Registration successfully\",");
-                out.write("\"id\": \""+ user.getId() + "\",");
-                out.write("\"email\": \""+ user.getEmail() + "\",");
-                out.write("\"phone\": \""+ user.getPhone() +"\"}");
-                System.out.println("Registration successful");
+                if(user.getRole().equals("supplier")){
+                    SupplierModel supplier = new SupplierModel(user.getId());
+                    supplier.createSupplier();
+
+                    if(supplier.getId() != 0){
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"message\": \"Registration successfully\",");
+                        out.write("\"id\": \""+ user.getId() + "\",");
+                        out.write("\"sId\": \""+ supplier.getId() + "\",");
+                        out.write("\"email\": \""+ user.getEmail() + "\",");
+                        out.write("\"phone\": \""+ user.getPhone() +"\"}");
+                        System.out.println("Registration successful");
+                    }else{
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        out.write("{\"message\": \"Registration unsuccessfully\"}");
+                        System.out.println("Registration incorrect");
+                    }
+                }
+                else{
+                    // TODO other roles as well
+                }
+
             }else{
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.write("{\"message\": \"Registration unsuccessfully\"}");

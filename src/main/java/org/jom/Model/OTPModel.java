@@ -13,6 +13,7 @@ public class OTPModel {
     }
 
     public OTPModel(int userId, String userEmail, int otp) {
+        this.id = 0;
         this.userId = userId;
         this.userEmail = userEmail;
         this.otp = otp;
