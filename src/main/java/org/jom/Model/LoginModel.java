@@ -21,7 +21,7 @@ public class LoginModel {
 
     public UserModel getUser(){
         UserDAO userDAO = new UserDAO();
-        UserModel user = userDAO.getUser(this.username);
+        UserModel user = userDAO.getUserByEmail(this.username);
         return  user;
     }
 }

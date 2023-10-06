@@ -40,17 +40,26 @@ public class LoginServlet extends HttpServlet {
 //            System.out.println(user.getAdd_line_3());
 
             if(user.getId() != 0){
-                response.setStatus(HttpServletResponse.SC_OK);
-                if(user.getPassword().equals(login.getPassword())) {
-                    out.write("{\"message\": \"Login successfully\",\"page\":\""+ user.getRole() +"\"}");
-                    System.out.println("Login successful");
+                if(user.getValidity() != 0) {
+                    if (user.getPassword().equals(login.getPassword())) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\"}");
+                        System.out.println("Login successful");
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                        out.write("{\"message\": \"password\"}");
+                        System.out.println("Wrong password");
+                    }
                 }else{
-                    out.write("{\"message\": \"Wrong Password\"}");
-                    System.out.println("Wrong password");
+                    // TODO hadle
+                    System.out.println("User not validated");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"message\": \"validate\"}");
+                    System.out.println("Login incorrect");
                 }
             }else{
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"message\": \"Invalid Email\"}");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"username\"}");
                 System.out.println("Login incorrect");
             }
 

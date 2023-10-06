@@ -13,6 +13,7 @@ public class UserModel {
     private String add_line_2;
     private String add_line_3;
     private String role;
+    private int validity;
 
     public UserModel() {
     }
@@ -65,6 +66,12 @@ public class UserModel {
         this.role = role;
     }
 
+    public void setValidity(int validity) {
+        this.validity = validity;
+        UserDAO userDAO = new UserDAO();
+        userDAO.setValidity(this.id);
+    }
+
     public int getId() {
         return id;
     }
@@ -105,14 +112,17 @@ public class UserModel {
         return role;
     }
 
+    public int getValidity() {
+        return validity;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public boolean Register(){
+    public void Register(){
         UserDAO userDAO = new UserDAO();
-        boolean status = userDAO.register(this);
-        return  status;
+        this.id = userDAO.register(this);
     }
 
     public boolean EmailExists(){
