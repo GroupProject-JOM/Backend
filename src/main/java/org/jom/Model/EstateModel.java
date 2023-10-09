@@ -17,6 +17,14 @@ public class EstateModel {
         this.area = area;
     }
 
+    public EstateModel(int id, String estate_name, String estate_location, String area, int supplier_id) {
+        this.id = id;
+        this.supplier_id = supplier_id;
+        this.estate_name = estate_name;
+        this.estate_location = estate_location;
+        this.area = area;
+    }
+
     public int getId() {
         return id;
     }

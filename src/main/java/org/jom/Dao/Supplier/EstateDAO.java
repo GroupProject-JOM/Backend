@@ -4,6 +4,8 @@ import org.jom.Database.ConnectionPool;
 import org.jom.Model.EstateModel;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EstateDAO {
     public int addEstate(EstateModel estate){
@@ -39,5 +41,43 @@ public class EstateDAO {
             }
         }
         return estateId;
+    }
+
+    public List<EstateModel> getAll(int id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<EstateModel> estates = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT * FROM estates WHERE supplier_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int estate_id = resultSet.getInt(1);
+                String estate_name = resultSet.getString(2);
+                String estate_location = resultSet.getString(3);
+                String estate_area = resultSet.getString(4);
+                int supplier_id = resultSet.getInt(5);
+
+                EstateModel estate = new EstateModel(estate_id,estate_name,estate_location,estate_area,supplier_id);
+                estates.add(estate);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return estates;
     }
 }
