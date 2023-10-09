@@ -43,7 +43,7 @@ public class LoginServlet extends HttpServlet {
                 if(user.getValidity() != 0) {
                     if (user.getPassword().equals(login.getPassword())) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\"}");
+                        out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\",\"name\":\"" + user.getFirst_name() + "\"}");
                         System.out.println("Login successful");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
