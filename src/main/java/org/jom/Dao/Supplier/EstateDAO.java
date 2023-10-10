@@ -8,6 +8,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EstateDAO {
+    public EstateModel getEstate(int sId,int id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        EstateModel estate = new EstateModel();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT * FROM estates WHERE supplier_id = ? AND id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,sId);
+            preparedStatement.setInt(2,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                estate.setId(resultSet.getInt(1));
+                estate.setEstate_name(resultSet.getString(2));
+                estate.setEstate_location(resultSet.getString(3));
+                estate.setArea(resultSet.getString(4));
+                estate.setSupplier_id(resultSet.getInt(5));
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return estate;
+    }
+
     public int addEstate(EstateModel estate){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
