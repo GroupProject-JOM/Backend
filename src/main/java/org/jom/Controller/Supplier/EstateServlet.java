@@ -89,4 +89,41 @@ public class EstateServlet extends HttpServlet {
         }
     }
 
+    //update estate
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        try {
+            Gson gson = new Gson();
+            // json data to user object
+            BufferedReader bufferedReader = request.getReader();
+            EstateModel estate = gson.fromJson(bufferedReader, EstateModel.class);
+
+            if(estate.getSupplier_id() == 0){
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                System.out.println("UnAuthorized");
+                return;
+            }
+            // TODO backend validations and user exists
+
+
+            if(estate.updateEstate()){
+
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"message\": \"Estate Updated successfully\"}");
+                System.out.println("Estate Update successfully");
+            }else{
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"Estate is not updated\"}");
+                System.out.println("Estate is not Updated");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
+
 }
