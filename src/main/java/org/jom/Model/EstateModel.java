@@ -2,12 +2,17 @@ package org.jom.Model;
 
 import org.jom.Dao.Supplier.EstateDAO;
 
+import java.util.List;
+
 public class EstateModel {
     private int id;
     private int supplier_id;
     private String estate_name;
     private String estate_location;
     private  String area;
+
+    public EstateModel() {
+    }
 
     public EstateModel(int supplier_id, String estate_name, String estate_location, String area) {
         this.id = 0;

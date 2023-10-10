@@ -3,8 +3,6 @@ package org.jom.Controller.Supplier;
 import com.google.gson.Gson;
 import org.jom.Dao.Supplier.EstateDAO;
 import org.jom.Model.EstateModel;
-import org.jom.Model.LoginModel;
-import org.jom.Model.UserModel;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,6 +15,41 @@ import java.util.List;
 
 @WebServlet("/estate")
 public class EstateServlet extends HttpServlet {
+    // Get single estates
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        int supplier_id = Integer.parseInt(request.getParameter("sId"));
+        int estate_id = Integer.parseInt(request.getParameter("id"));
+
+        try {
+            EstateDAO estateDAO = new EstateDAO();
+            EstateModel estate = estateDAO.getEstate(supplier_id,estate_id);
+
+            Gson gson = new Gson();
+            // Object array to json
+            String object = gson.toJson(estate);
+
+            if(estate.getId() !=0){
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"estate\": "+ object +"}");
+                System.out.println("Send Estate");
+            }else{
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                out.write("{\"estate\": \"No estate\"}");
+                System.out.println("No Estate");
+            }
+                // TODO handle
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
+
     // Add new estate
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
@@ -56,36 +89,4 @@ public class EstateServlet extends HttpServlet {
         }
     }
 
-    // Get all estates
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        try {
-            int supplier_id =1;
-            EstateDAO estateDAO = new EstateDAO();
-            List<EstateModel> estates = estateDAO.getAll(supplier_id);
-
-            Gson gson = new Gson();
-            // Object array to json
-            String objectArray = gson.toJson(estates);
-
-            if(estates.size() != 0){
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"size\": "+ estates.size() +",\"list\":"+ objectArray+"}");
-                System.out.println("View all");
-            }else if(estates.size() == 0){
-                response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                out.write("{\"size\": \"0\"}");
-                System.out.println("No Estates");
-            }else{
-                // TODO handle
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        } finally {
-            out.close();
-        }
-    }
 }
