@@ -82,6 +82,8 @@ public class OTPDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             preparedStatement.executeUpdate();
+            //int status =
+            // then check value
 
             preparedStatement.close();
 
