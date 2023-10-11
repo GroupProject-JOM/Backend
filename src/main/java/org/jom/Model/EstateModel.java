@@ -74,4 +74,9 @@ public class EstateModel {
         EstateDAO estateDAO = new EstateDAO();
         this.id = estateDAO.addEstate(this);
     }
+
+    public boolean updateEstate(){
+        EstateDAO estateDAO = new EstateDAO();
+        return estateDAO.updateEstate(this);
+    }
 }

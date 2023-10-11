@@ -116,4 +116,65 @@ public class EstateDAO {
         }
         return estates;
     }
+
+    public boolean updateEstate(EstateModel estate){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE estates SET name=?,location=?,area=? WHERE supplier_id = ? AND id = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,estate.getEstate_name());
+            preparedStatement.setString(2,estate.getEstate_location());
+            preparedStatement.setString(3,estate.getArea());
+            preparedStatement.setInt(4,estate.getSupplier_id());
+            preparedStatement.setInt(5,estate.getId());
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
+
+    public boolean deleteEstate(int sId,int id){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "DELETE FROM estates WHERE supplier_id = ? AND id = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,sId);
+            preparedStatement.setInt(2,id);
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
 }
