@@ -136,7 +136,35 @@ public class EstateDAO {
             if(x !=0){
                 status = true;
             }
-            System.out.println(x);
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
+
+    public boolean deleteEstate(int sId,int id){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "DELETE FROM estates WHERE supplier_id = ? AND id = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,sId);
+            preparedStatement.setInt(2,id);
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
             preparedStatement.close();
 
         } catch (SQLException e) {

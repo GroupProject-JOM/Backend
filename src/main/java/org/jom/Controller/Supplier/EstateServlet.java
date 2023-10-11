@@ -3,6 +3,7 @@ package org.jom.Controller.Supplier;
 import com.google.gson.Gson;
 import org.jom.Dao.Supplier.EstateDAO;
 import org.jom.Model.EstateModel;
+import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -118,6 +119,35 @@ public class EstateServlet extends HttpServlet {
                 out.write("{\"message\": \"Estate is not updated\"}");
                 System.out.println("Estate is not Updated");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
+
+    // delete estate
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        int supplier_id = Integer.parseInt(request.getParameter("sId"));
+        int estate_id = Integer.parseInt(request.getParameter("id"));
+
+        try {
+            EstateDAO estateDAO = new EstateDAO();
+
+            if(estateDAO.deleteEstate(supplier_id,estate_id)) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"message\": \"Delete Estate\"}");
+                System.out.println("Delete Estate");
+            }else {
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                out.write("{\"message\": \"Unable to Delete Estate\"}");
+                System.out.println("Estate not deleted");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
