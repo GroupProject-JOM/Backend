@@ -17,6 +17,14 @@ public class AccountModel {
         this.name = name;
     }
 
+    public AccountModel(int id, int supplier_id, String account_number, String bank, String name) {
+        this.id = id;
+        this.supplier_id = supplier_id;
+        this.account_number = account_number;
+        this.bank = bank;
+        this.name = name;
+    }
+
     public int getId() {
         return id;
     }
