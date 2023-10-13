@@ -1,6 +1,8 @@
 package org.jom.Controller.Supplier;
 
 import com.google.gson.Gson;
+import org.jom.Dao.Supplier.AccountDAO;
+import org.jom.Dao.Supplier.EstateDAO;
 import org.jom.Model.AccountModel;
 import org.jom.Model.EstateModel;
 
@@ -14,6 +16,7 @@ import java.io.PrintWriter;
 
 @WebServlet("/account")
 public class AccountServlet extends HttpServlet {
+    // add account
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -36,6 +39,41 @@ public class AccountServlet extends HttpServlet {
                 out.write("{\"message\": \"Account is not added\"}");
                 System.out.println("Account is not added");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
+
+    // Get single account
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        int supplier_id = Integer.parseInt(request.getParameter("sId"));
+        int account_id = Integer.parseInt(request.getParameter("id"));
+
+        try {
+            AccountDAO accountDAO = new AccountDAO();
+            AccountModel account = accountDAO.getAccount(supplier_id,account_id);
+
+            Gson gson = new Gson();
+            // Object array to json
+            String object = gson.toJson(account);
+
+            if(account.getId() !=0){
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"account\": "+ object +"}");
+                System.out.println("Send Account");
+            }else{
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                out.write("{\"account\": \"No account\"}");
+                System.out.println("No Account");
+            }
+            // TODO handle
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

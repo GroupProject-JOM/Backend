@@ -9,16 +9,18 @@ public class AccountModel {
     private String bank;
     private  String name;
 
-    public AccountModel(int supplier_id, String account_number, String bank, String name) {
-        this.id = 0;
+    public AccountModel() {
+    }
+    public AccountModel(int id, int supplier_id, String account_number, String bank, String name) {
+        this.id = id;
         this.supplier_id = supplier_id;
         this.account_number = account_number;
         this.bank = bank;
         this.name = name;
     }
 
-    public AccountModel(int id, int supplier_id, String account_number, String bank, String name) {
-        this.id = id;
+    public AccountModel(int supplier_id, String account_number, String bank, String name) {
+        this.id = 0;
         this.supplier_id = supplier_id;
         this.account_number = account_number;
         this.bank = bank;
