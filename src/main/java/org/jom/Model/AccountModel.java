@@ -27,7 +27,6 @@ public class AccountModel {
         this.name = name;
     }
 
-
     public int getId() {
         return id;
     }
