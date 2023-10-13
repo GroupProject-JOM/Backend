@@ -2,7 +2,6 @@ package org.jom.Dao.Supplier;
 
 import org.jom.Database.ConnectionPool;
 import org.jom.Model.AccountModel;
-import org.jom.Model.EstateModel;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -80,5 +79,41 @@ public class AccountDAO {
             }
         }
         return accounts;
+    }
+
+    public AccountModel getAccount(int sId,int id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        AccountModel account = new AccountModel();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT * FROM accounts WHERE supplier_id_ = ? AND id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,sId);
+            preparedStatement.setInt(2,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                account.setId(resultSet.getInt(1));
+                account.setName(resultSet.getString(2));
+                account.setAccount_number(resultSet.getString(3));
+                account.setBank(resultSet.getString(4));
+                account.setSupplier_id(resultSet.getInt(5));
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return account;
     }
 }

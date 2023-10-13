@@ -9,6 +9,8 @@ public class AccountModel {
     private String bank;
     private  String name;
 
+    public AccountModel() {
+    }
     public AccountModel(int id, int supplier_id, String account_number, String bank, String name) {
         this.id = id;
         this.supplier_id = supplier_id;
@@ -24,6 +26,7 @@ public class AccountModel {
         this.bank = bank;
         this.name = name;
     }
+
 
     public int getId() {
         return id;

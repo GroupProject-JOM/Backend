@@ -16,7 +16,7 @@ import java.util.List;
 
 @WebServlet("/estate")
 public class EstateServlet extends HttpServlet {
-    // Get single estates
+    // Get single estate
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
