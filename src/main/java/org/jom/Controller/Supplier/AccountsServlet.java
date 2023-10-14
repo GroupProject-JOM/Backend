@@ -1,7 +1,9 @@
 package org.jom.Controller.Supplier;
 
 import com.google.gson.Gson;
+import org.jom.Dao.Supplier.AccountDAO;
 import org.jom.Dao.Supplier.EstateDAO;
+import org.jom.Model.AccountModel;
 import org.jom.Model.EstateModel;
 
 import javax.servlet.annotation.WebServlet;
@@ -12,10 +14,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet("/estates")
-public class EstatesServlet extends HttpServlet {
-
-    // Get all estates
+@WebServlet("/accounts")
+public class AccountsServlet extends HttpServlet {
+    // Get all accounts
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -23,21 +24,21 @@ public class EstatesServlet extends HttpServlet {
         int supplier_id = Integer.parseInt(request.getParameter("sId"));
 
         try {
-            EstateDAO estateDAO = new EstateDAO();
-            List<EstateModel> estates = estateDAO.getAll(supplier_id);
+            AccountDAO accountDAO = new AccountDAO();
+            List<AccountModel> accounts = accountDAO.getAll(supplier_id);
 
             Gson gson = new Gson();
             // Object array to json
-            String objectArray = gson.toJson(estates);
+            String objectArray = gson.toJson(accounts);
 
-            if(estates.size() != 0){
+            if(accounts.size() != 0){
                 response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"size\": "+ estates.size() +",\"list\":"+ objectArray+"}");
-                System.out.println("View all Estates");
-            }else if(estates.size() == 0){
+                out.write("{\"size\": "+ accounts.size() +",\"list\":"+ objectArray+"}");
+                System.out.println("View all Accounts");
+            }else if(accounts.size() == 0){
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 out.write("{\"size\": \"0\"}");
-                System.out.println("No Estates");
+                System.out.println("No Accounts");
             }else{
                 // TODO handle
             }

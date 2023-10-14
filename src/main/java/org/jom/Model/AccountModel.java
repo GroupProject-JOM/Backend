@@ -1,6 +1,7 @@
 package org.jom.Model;
 
 import org.jom.Dao.Supplier.AccountDAO;
+import org.jom.Dao.Supplier.EstateDAO;
 
 public class AccountModel {
     private int id;
@@ -8,6 +9,16 @@ public class AccountModel {
     private String account_number;
     private String bank;
     private  String name;
+
+    public AccountModel() {
+    }
+    public AccountModel(int id, int supplier_id, String account_number, String bank, String name) {
+        this.id = id;
+        this.supplier_id = supplier_id;
+        this.account_number = account_number;
+        this.bank = bank;
+        this.name = name;
+    }
 
     public AccountModel(int supplier_id, String account_number, String bank, String name) {
         this.id = 0;
@@ -60,5 +71,9 @@ public class AccountModel {
     public void addAccount(){
         AccountDAO accountDAO = new AccountDAO();
         this.id = accountDAO.addAccount(this);
+    }
+    public boolean updateAccount(){
+        AccountDAO accountDAO = new AccountDAO();
+        return accountDAO.updateAccount(this);
     }
 }
