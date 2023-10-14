@@ -2,6 +2,7 @@ package org.jom.Dao.Supplier;
 
 import org.jom.Database.ConnectionPool;
 import org.jom.Model.AccountModel;
+import org.jom.Model.EstateModel;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -115,5 +116,66 @@ public class AccountDAO {
             }
         }
         return account;
+    }
+
+    public boolean updateAccount(AccountModel account){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE accounts SET name=?,account_num=?,bank=? WHERE supplier_id_ = ? AND id = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,account.getName());
+            preparedStatement.setString(2,account.getAccount_number());
+            preparedStatement.setString(3,account.getBank());
+            preparedStatement.setInt(4,account.getSupplier_id());
+            preparedStatement.setInt(5,account.getId());
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
+
+    public boolean deleteAccount(int sId,int id){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "DELETE FROM accounts WHERE supplier_id_ = ? AND id = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,sId);
+            preparedStatement.setInt(2,id);
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
     }
 }
