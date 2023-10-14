@@ -1,6 +1,7 @@
 package org.jom.Model;
 
 import org.jom.Dao.Supplier.AccountDAO;
+import org.jom.Dao.Supplier.EstateDAO;
 
 public class AccountModel {
     private int id;
@@ -70,5 +71,9 @@ public class AccountModel {
     public void addAccount(){
         AccountDAO accountDAO = new AccountDAO();
         this.id = accountDAO.addAccount(this);
+    }
+    public boolean updateAccount(){
+        AccountDAO accountDAO = new AccountDAO();
+        return accountDAO.updateAccount(this);
     }
 }
