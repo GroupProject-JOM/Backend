@@ -1,8 +1,7 @@
-package org.jom.Controller.Supplier;
+package org.jom.Controller.Supplier.Collection;
 
 import com.google.gson.Gson;
-import org.jom.Model.CollectionModel;
-import org.jom.Model.EstateModel;
+import org.jom.Model.Collection.CollectionModel;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,6 +29,7 @@ public class CollectionServlet extends HttpServlet {
                 System.out.println("UnAuthorized");
                 return;
             }
+
             // TODO backend validations and user exists
 
 
@@ -37,7 +37,7 @@ public class CollectionServlet extends HttpServlet {
 
             if(collection.getId() != 0){
                 response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"message\": \"Supply request added successfully\"}");
+                out.write("{\"message\": \"Supply request added successfully\",\"id\":\""+collection.getId()+"\"}");
                 System.out.println("Supply request added successfully");
             }else{
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

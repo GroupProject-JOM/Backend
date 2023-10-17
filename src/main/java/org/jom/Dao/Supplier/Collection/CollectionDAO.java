@@ -1,8 +1,7 @@
-package org.jom.Dao.Supplier;
+package org.jom.Dao.Supplier.Collection;
 
 import org.jom.Database.ConnectionPool;
-import org.jom.Model.CollectionModel;
-import org.jom.Model.EstateModel;
+import org.jom.Model.Collection.CollectionModel;
 
 import java.sql.*;
 
