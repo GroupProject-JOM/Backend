@@ -1,7 +1,6 @@
-package org.jom.Model;
+package org.jom.Model.Collection;
 
-import org.jom.Dao.Supplier.CollectionDAO;
-import org.jom.Dao.Supplier.EstateDAO;
+import org.jom.Dao.Supplier.Collection.CollectionDAO;
 
 public class CollectionModel {
     private int id;
