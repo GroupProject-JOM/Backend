@@ -1,6 +1,7 @@
 package org.jom.Controller;
 
 import com.google.gson.Gson;
+import org.jom.Dao.Supplier.SupplierDAO;
 import org.jom.Model.LoginModel;
 import org.jom.Model.UserModel;
 
@@ -42,8 +43,13 @@ public class LoginServlet extends HttpServlet {
             if(user.getId() != 0){
                 if(user.getValidity() != 0) {
                     if (user.getPassword().equals(login.getPassword())) {
+                        int id = 0;
+                        if(user.getRole().equals("supplier")){
+                            SupplierDAO supplierDAO = new SupplierDAO();
+                            id = supplierDAO.getSupplier(user.getId());
+                        }
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\",\"name\":\"" + user.getFirst_name() + "\"}");
+                        out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\",\"name\":\"" + user.getFirst_name() + "\",\"sId\":\""+ id +"\"}");
                         System.out.println("Login successful");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
