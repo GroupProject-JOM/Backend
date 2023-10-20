@@ -9,7 +9,12 @@ public class CollectionModel {
     private int final_amount;
     private String payment_method;
     private String supply_method;
-    private int status; // 0 - Request not completed
+    private int status;
+    // 0 - Request not completed
+    // 1 - pending approval
+    // 2 - Ready to pick-up
+    // 3 - reject
+    // 4 - paid
 
     public CollectionModel(int supplier_id, int initial_amount, String payment_method, String supply_method) {
         this.supplier_id = supplier_id;
