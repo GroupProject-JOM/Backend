@@ -16,15 +16,17 @@ public class YardDAO {
             connection = connectionPool.dataSource.getConnection();
             String sql;
             if(yard.getAccount_id() == 0){
-                sql = "INSERT INTO deliveries (supp_id,collec_id) VALUES (?,?)";
+                sql = "INSERT INTO deliveries (delivery_date,delivery_time,supp_id,collec_id) VALUES (?,?,?,?)";
             }else {
-                sql = "INSERT INTO deliveries (supp_id,collec_id,acc_id) VALUES (?,?,?)";
+                sql = "INSERT INTO deliveries (delivery_date,delivery_time,supp_id,collec_id,acc_id) VALUES (?,?,?,?,?)";
             }
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setInt(1,yard.getSupplier_id());
-            preparedStatement.setInt(2,yard.getCollection_id());
+            preparedStatement.setString(1,yard.getDate());
+            preparedStatement.setString(2,yard.getTime());
+            preparedStatement.setInt(3,yard.getSupplier_id());
+            preparedStatement.setInt(4,yard.getCollection_id());
             if(yard.getAccount_id() != 0){
-                preparedStatement.setInt(3,yard.getAccount_id());
+                preparedStatement.setInt(5,yard.getAccount_id());
             }
 
             preparedStatement.execute();
