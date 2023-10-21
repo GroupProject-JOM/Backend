@@ -21,12 +21,12 @@ public class SupplyDAO {
             String sql = "SELECT c.id,p.pickup_date ,p.pickup_time , c.init_amount ,c.status \n" +
                     "FROM collections c\n" +
                     "INNER JOIN pickups p ON c.id = p.collection_id\n" +
-                    "WHERE c.sup_id = ?\n" +
+                    "WHERE c.sup_id = ? AND c.status<4\n" +
                     "UNION\n" +
                     "SELECT c.id,d.delivery_date,d.delivery_time,c.init_amount ,c.status\n" +
                     "FROM collections c\n" +
                     "INNER JOIN deliveries d ON c.id = d.collec_id\n" +
-                    "WHERE c.sup_id = ?;";
+                    "WHERE c.sup_id = ? AND c.status<4;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             preparedStatement.setInt(2,id);
