@@ -18,12 +18,18 @@ public class SupplyDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT pickups.id , pickups.pickup_date, pickups.pickup_time, collections.init_amount ,collections.status\n" +
-                    "FROM collections\n" +
-                    "INNER JOIN pickups\n" +
-                    "ON collections.id = pickups.collection_id AND collections.sup_id = ? ;";
+            String sql = "SELECT c.id,p.pickup_date ,p.pickup_time , c.init_amount ,c.status \n" +
+                    "FROM collections c\n" +
+                    "INNER JOIN pickups p ON c.id = p.collection_id\n" +
+                    "WHERE c.sup_id = ?\n" +
+                    "UNION\n" +
+                    "SELECT c.id,d.delivery_date,d.delivery_time,c.init_amount ,c.status\n" +
+                    "FROM collections c\n" +
+                    "INNER JOIN deliveries d ON c.id = d.collec_id\n" +
+                    "WHERE c.sup_id = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
+            preparedStatement.setInt(2,id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {

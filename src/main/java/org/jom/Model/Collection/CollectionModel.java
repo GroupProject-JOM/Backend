@@ -14,7 +14,8 @@ public class CollectionModel {
     // 1 - pending approval
     // 2 - Ready to pick-up
     // 3 - reject
-    // 4 - paid
+    // 4 - pending payment
+    // 5 - paid
 
     public CollectionModel(int supplier_id, int initial_amount, String payment_method, String supply_method) {
         this.supplier_id = supplier_id;
