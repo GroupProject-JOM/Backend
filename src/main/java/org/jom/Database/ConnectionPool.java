@@ -7,7 +7,7 @@ public class ConnectionPool {
     private static ConnectionPool connectionPool = null;
     public DataSource dataSource;
 
-    /*singleton object*/
+    //singleton object
     private ConnectionPool(){
 
         PoolProperties p = new PoolProperties();

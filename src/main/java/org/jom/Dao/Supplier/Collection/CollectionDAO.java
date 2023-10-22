@@ -1,29 +1,33 @@
-package org.jom.Dao.Supplier;
+package org.jom.Dao.Supplier.Collection;
 
 import org.jom.Database.ConnectionPool;
 import org.jom.Model.AccountModel;
-import org.jom.Model.EstateModel;
-import org.jom.Model.SupplierModel;
+import org.jom.Model.Collection.CollectionModel;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class SupplierDAO {
-    public int createSupplier(int user_id){
+public class CollectionDAO {
+    public int addCollection(CollectionModel collection){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
-        int supplier_id = 0;
+        int collectionId = 0;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "INSERT INTO suppliers (user_id) VALUES (?)";
+            String sql = "INSERT INTO collections (init_amount,p_method,s_method,sup_id) VALUES (?,?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setInt(1,user_id);
+            preparedStatement.setInt(1,collection.getInitial_amount());
+            preparedStatement.setString(2,collection.getPayment_method());
+            preparedStatement.setString(3,collection.getSupply_method());
+            preparedStatement.setInt(4,collection.getSupplier_id());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
 
             if (resultSet.next()) {
-                supplier_id = resultSet.getInt(1);
+                collectionId = resultSet.getInt(1);
             }
 
             resultSet.close();
@@ -37,27 +41,25 @@ public class SupplierDAO {
             } catch (Exception ignore) {
             }
         }
-        return supplier_id;
+        return collectionId;
     }
 
-    public int getSupplier(int id) {
+    public boolean updateStatus(int status,int id){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
-
-        int supplier_id = 0;
+        boolean isSuccess = false;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM suppliers WHERE user_id = ?";
+            String sql = "UPDATE collections SET status=? WHERE id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,id);
-            ResultSet resultSet = preparedStatement.executeQuery();
+            preparedStatement.setInt(1,status);
+            preparedStatement.setInt(2,id);
 
-            while (resultSet.next()) {
-                supplier_id = resultSet.getInt(1);
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                isSuccess = true;
             }
-
-            resultSet.close();
             preparedStatement.close();
 
         } catch (SQLException e) {
@@ -68,6 +70,6 @@ public class SupplierDAO {
             } catch (Exception ignore) {
             }
         }
-        return supplier_id;
+        return isSuccess;
     }
 }
