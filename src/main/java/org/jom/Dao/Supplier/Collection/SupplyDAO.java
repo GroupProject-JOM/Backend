@@ -18,15 +18,15 @@ public class SupplyDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT c.id,p.pickup_date ,p.pickup_time , c.init_amount ,c.status \n" +
+            String sql = "SELECT c.id,p.pickup_date ,p.pickup_time , c.init_amount ,c.status,c.final_amount,c.value \n" +
                     "FROM collections c\n" +
                     "INNER JOIN pickups p ON c.id = p.collection_id\n" +
-                    "WHERE c.sup_id = ? AND c.status<4\n" +
+                    "WHERE c.sup_id = ?\n" +
                     "UNION\n" +
-                    "SELECT c.id,d.delivery_date,d.delivery_time,c.init_amount ,c.status\n" +
+                    "SELECT c.id,d.delivery_date,d.delivery_time,c.init_amount ,c.status,c.final_amount,c.value\n" +
                     "FROM collections c\n" +
                     "INNER JOIN deliveries d ON c.id = d.collec_id\n" +
-                    "WHERE c.sup_id = ? AND c.status<4;";
+                    "WHERE c.sup_id = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             preparedStatement.setInt(2,id);
@@ -38,8 +38,10 @@ public class SupplyDAO {
                 String time = resultSet.getString(3);
                 int initial_amount = resultSet.getInt(4);
                 int status = resultSet.getInt(5);
+                int final_amoount = resultSet.getInt(6);
+                int value = resultSet.getInt(7);
 
-                SupplyModel supply = new SupplyModel(collection_id,date,time,initial_amount,status);
+                SupplyModel supply = new SupplyModel(collection_id,date,time,initial_amount,status,final_amoount,value);
                 supplies.add(supply);
             }
 

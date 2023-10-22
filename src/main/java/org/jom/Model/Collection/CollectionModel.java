@@ -7,6 +7,7 @@ public class CollectionModel {
     private int supplier_id;
     private int initial_amount;
     private int final_amount;
+    private int value;
     private String payment_method;
     private String supply_method;
     private int status;
@@ -74,6 +75,14 @@ public class CollectionModel {
 
     public void setSupply_method(String supply_method) {
         this.supply_method = supply_method;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
     }
 
     public void setStatus(int status) {

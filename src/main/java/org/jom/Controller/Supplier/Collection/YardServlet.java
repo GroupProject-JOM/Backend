@@ -2,7 +2,6 @@ package org.jom.Controller.Supplier.Collection;
 
 import com.google.gson.Gson;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
-import org.jom.Model.Collection.PickupModel;
 import org.jom.Model.Collection.YardModel;
 
 import javax.servlet.annotation.WebServlet;

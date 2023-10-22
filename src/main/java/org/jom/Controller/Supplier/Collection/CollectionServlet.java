@@ -1,10 +1,7 @@
 package org.jom.Controller.Supplier.Collection;
 
 import com.google.gson.Gson;
-import org.jom.Dao.Supplier.AccountDAO;
-import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
-import org.jom.Model.AccountModel;
 import org.jom.Model.Collection.CollectionModel;
 import org.jom.Model.Collection.SupplyModel;
 
@@ -75,7 +72,7 @@ public class CollectionServlet extends HttpServlet {
             if (supplies.size() != 0) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"size\": " + supplies.size() + ",\"list\":" + objectArray + "}");
-                System.out.println("Ongoing table supplies");
+                System.out.println("Supplier dashboard tables contents");
             } else if (supplies.size() == 0) {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 out.write("{\"size\": \"0\"}");
