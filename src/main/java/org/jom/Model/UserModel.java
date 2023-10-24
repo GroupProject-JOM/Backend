@@ -70,8 +70,6 @@ public class UserModel {
 
     public void setValidity(int validity) {
         this.validity = validity;
-        UserDAO userDAO = new UserDAO();
-        userDAO.setValidity(this.id);
     }
 
     public int getId() {
@@ -131,5 +129,11 @@ public class UserModel {
         UserDAO userDAO = new UserDAO();
         boolean status = userDAO.emailExists(this.email);
         return  status;
+    }
+
+    public void updateValidity(int validity){
+        UserDAO userDAO = new UserDAO();
+        userDAO.updateValidity(this.id);
+        this.setValidity(1);
     }
 }

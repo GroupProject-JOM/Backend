@@ -72,7 +72,7 @@ public class OTPDAO {
         return record;
     }
 
-    public static void setValidity(int id){
+    public static void updateValidity(int id){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
 

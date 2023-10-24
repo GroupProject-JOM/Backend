@@ -45,8 +45,8 @@ public class ValidateEmailOTPServlet extends HttpServlet {
         //check if emails are correct
         if(user.getValidity() != 1 ) {
             if(otp == record.getOtp()){
-                user.setValidity(1);
-                record.setValidity(0);
+                user.updateValidity(1);
+                record.updateValidity(0);
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"message\": \"OTP Validated\"}");
                 System.out.println("Otp validated");

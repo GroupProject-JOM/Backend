@@ -57,12 +57,15 @@ public class OTPModel {
 
     public void setValidity(int validity) {
         this.validity = validity;
-        OTPDAO otpDao = new OTPDAO();
-        otpDao.setValidity(this.id);
     }
     public void saveOTP(){
         OTPDAO otpDao = new OTPDAO();
         this.id = otpDao.saveOTP(this);
 
+    }
+    public void updateValidity(int validity){
+        OTPDAO otpDao = new OTPDAO();
+        otpDao.updateValidity(this.id);
+        this.setValidity(0);
     }
 }
