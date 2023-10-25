@@ -31,4 +31,9 @@ public class SupplierModel {
         SupplierDAO supplierDAO = new SupplierDAO();
         this.id = supplierDAO.createSupplier(this.user_id);
     }
+
+    public void getSupplier(){
+        SupplierDAO supplierDAO = new SupplierDAO();
+        this.id = supplierDAO.getSupplier(this.user_id);
+    }
 }
