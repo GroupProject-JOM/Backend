@@ -1,9 +1,10 @@
 package org.jom.Controller;
 
+import com.google.gson.Gson;
 import org.jom.Dao.OTPDAO;
+import org.jom.Dao.Supplier.AccountDAO;
 import org.jom.Dao.UserDAO;
-import org.jom.Model.OTPModel;
-import org.jom.Model.UserModel;
+import org.jom.Model.*;
 import org.jom.OTP.SendEmailOTP;
 import org.json.JSONObject;
 
@@ -59,5 +60,38 @@ public class ValidateEmailOTPServlet extends HttpServlet {
             // TODO handle error user already validated
         }
 
+    }
+
+    // Send relevant user id for email
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        String email = request.getParameter("email");
+
+        try {
+            LoginModel loginModel = new LoginModel(email);
+            UserModel user = loginModel.getUser();
+
+            SupplierModel supplier = new SupplierModel(user.getId());
+            supplier.getSupplier();
+
+            if(user.getId() !=0){
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"id\": "+ user.getId() +",\"sId\": \""+ supplier.getId() + "\"}");
+                System.out.println("Send id and sId");
+            }else{
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                out.write("{\"Id\": \"No user in this email\"}");
+                System.out.println("No User");
+            }
+            // TODO handle
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
     }
 }
