@@ -1,6 +1,7 @@
 package org.jom.Model;
 
 import org.jom.Dao.OutletDAO;
+import org.jom.Dao.Supplier.AccountDAO;
 
 public class OutletModel {
     private int id;
@@ -92,5 +93,9 @@ public class OutletModel {
     public void addOutlet(){
         OutletDAO outletDAO = new OutletDAO();
         this.id = outletDAO.addOutlet(this);
+    }
+    public boolean updateOutlet(){
+        OutletDAO outletDAO = new OutletDAO();
+        return outletDAO.updateOutlet(this);
     }
 }
