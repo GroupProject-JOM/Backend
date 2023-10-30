@@ -85,26 +85,27 @@ public class OutletDAO {
         return outlets;
     }
 
-    public AccountModel getAccount(int sId,int id) {
+    public OutletModel getOutlet(int id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
 
-        AccountModel account = new AccountModel();
+        OutletModel outlet = new OutletModel();
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM accounts WHERE supplier_id_ = ? AND id = ?";
+            String sql = "SELECT * FROM outlets WHERE id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,sId);
-            preparedStatement.setInt(2,id);
+            preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                account.setId(resultSet.getInt(1));
-                account.setName(resultSet.getString(2));
-                account.setAccount_number(resultSet.getString(3));
-                account.setBank(resultSet.getString(4));
-                account.setSupplier_id(resultSet.getInt(5));
+                outlet.setId(resultSet.getInt(1));
+                outlet.setName(resultSet.getString(2));
+                outlet.setEmail(resultSet.getString(3));
+                outlet.setPhone(resultSet.getString(4));
+                outlet.setAddress1(resultSet.getString(5));
+                outlet.setStreet(resultSet.getString(6));
+                outlet.setCity(resultSet.getString(7));
             }
 
             resultSet.close();
@@ -118,7 +119,7 @@ public class OutletDAO {
             } catch (Exception ignore) {
             }
         }
-        return account;
+        return outlet;
     }
 
     public boolean updateAccount(AccountModel account){
