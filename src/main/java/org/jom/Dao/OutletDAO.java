@@ -28,7 +28,6 @@ public class OutletDAO {
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
-
             if (resultSet.next()) {
                 outletId = resultSet.getInt(1);
             }
@@ -47,28 +46,29 @@ public class OutletDAO {
         return outletId;
     }
 
-    public List<AccountModel> getAll(int id) {
+    public List<OutletModel> getAll() {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
 
-        ArrayList<AccountModel> accounts = new ArrayList<>();
+        ArrayList<OutletModel> outlets = new ArrayList<>();
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM accounts WHERE supplier_id_ = ?";
+            String sql = "SELECT * FROM outlets";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int account_id = resultSet.getInt(1);
-                String holder_name = resultSet.getString(2);
-                String account_number = resultSet.getString(3);
-                String bank = resultSet.getString(4);
-                int supplier_id = resultSet.getInt(5);
+                int id = resultSet.getInt(1);
+                String name = resultSet.getString(2);
+                String email = resultSet.getString(3);
+                String phone = resultSet.getString(4);
+                String address1 = resultSet.getString(5);
+                String street = resultSet.getString(6);
+                String city = resultSet.getString(7);
 
-                AccountModel account = new AccountModel(account_id,supplier_id,holder_name,account_number,bank);
-                accounts.add(account);
+                OutletModel outlet = new OutletModel(id,name,email,phone,address1,street,city);
+                outlets.add(outlet);
             }
 
             resultSet.close();
@@ -82,7 +82,7 @@ public class OutletDAO {
             } catch (Exception ignore) {
             }
         }
-        return accounts;
+        return outlets;
     }
 
     public AccountModel getAccount(int sId,int id) {
