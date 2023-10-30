@@ -156,17 +156,16 @@ public class OutletDAO {
         return status;
     }
 
-    public boolean deleteAccount(int sId,int id){
+    public boolean deleteOutlet(int id){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "DELETE FROM accounts WHERE supplier_id_ = ? AND id = ? ";
+            String sql = "DELETE FROM outlets WHERE id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,sId);
-            preparedStatement.setInt(2,id);
+            preparedStatement.setInt(1,id);
 
             int x = preparedStatement.executeUpdate();
             if(x !=0){
