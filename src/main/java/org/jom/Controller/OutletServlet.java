@@ -114,4 +114,32 @@ public class OutletServlet extends HttpServlet {
             out.close();
         }
     }
+
+    // delete outlet
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        int outlet_id = Integer.parseInt(request.getParameter("id"));
+
+        try {
+            OutletDAO outletDAO = new OutletDAO();
+
+            if(outletDAO.deleteOutlet(outlet_id)) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"message\": \"Delete Outlet\"}");
+                System.out.println("Delete Outlet");
+            }else {
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                out.write("{\"message\": \"Unable to Delete Outlet\"}");
+                System.out.println("Outlet not deleted");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
 }
