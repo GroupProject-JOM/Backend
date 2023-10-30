@@ -20,6 +20,9 @@ public class OutletModel {
         this.city = city;
     }
 
+    public OutletModel() {
+    }
+
     public OutletModel(int id, String name, String email, String phone, String address1, String street, String city) {
         this.id = id;
         this.name = name;

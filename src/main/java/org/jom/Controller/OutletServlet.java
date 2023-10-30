@@ -1,6 +1,9 @@
 package org.jom.Controller;
 
 import com.google.gson.Gson;
+import org.jom.Dao.OutletDAO;
+import org.jom.Dao.Supplier.AccountDAO;
+import org.jom.Model.AccountModel;
 import org.jom.Model.EstateModel;
 import org.jom.Model.OutletModel;
 
@@ -39,6 +42,40 @@ public class OutletServlet extends HttpServlet {
                 out.write("{\"message\": \"Outlet is not added\"}");
                 System.out.println("Outlet is not added");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
+
+    // Get single outlet
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        int outlet_id = Integer.parseInt(request.getParameter("id"));
+
+        try {
+            OutletDAO outletDAO = new OutletDAO();
+            OutletModel outlet = outletDAO.getOutlet(outlet_id);
+
+            Gson gson = new Gson();
+            // Object array to json
+            String object = gson.toJson(outlet);
+
+            if(outlet.getId() !=0){
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"outlet\": "+ object +"}");
+                System.out.println("Send Outlet");
+            }else{
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                out.write("{\"outlet\": \"No outlet\"}");
+                System.out.println("No Outlet");
+            }
+            // TODO handle
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
