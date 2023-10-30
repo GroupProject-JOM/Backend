@@ -83,4 +83,35 @@ public class OutletServlet extends HttpServlet {
             out.close();
         }
     }
+
+    //update outlet
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        try {
+            Gson gson = new Gson();
+            // json data to user object
+            BufferedReader bufferedReader = request.getReader();
+            OutletModel outlet = gson.fromJson(bufferedReader, OutletModel.class);
+
+            // TODO backend validations and user exists
+
+
+            if(outlet.updateOutlet()){
+
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"message\": \"Outlet Updated successfully\"}");
+                System.out.println("Outlet Update successfully");
+            }else{
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"Outlet is not updated\"}");
+                System.out.println("Outlet is not Updated");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
 }

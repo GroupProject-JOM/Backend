@@ -122,20 +122,22 @@ public class OutletDAO {
         return outlet;
     }
 
-    public boolean updateAccount(AccountModel account){
+    public boolean updateOutlet(OutletModel outlet){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE accounts SET name=?,account_num=?,bank=? WHERE supplier_id_ = ? AND id = ? ";
+            String sql = "UPDATE outlets SET name=?,email=?,phone=?,address1=?,street=?,city=? WHERE id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1,account.getName());
-            preparedStatement.setString(2,account.getAccount_number());
-            preparedStatement.setString(3,account.getBank());
-            preparedStatement.setInt(4,account.getSupplier_id());
-            preparedStatement.setInt(5,account.getId());
+            preparedStatement.setString(1,outlet.getName());
+            preparedStatement.setString(2,outlet.getEmail());
+            preparedStatement.setString(3,outlet.getPhone());
+            preparedStatement.setString(4,outlet.getAddress1());
+            preparedStatement.setString(5,outlet.getStreet());
+            preparedStatement.setString(6,outlet.getCity());
+            preparedStatement.setInt(7,outlet.getId());
 
             int x = preparedStatement.executeUpdate();
             if(x !=0){
