@@ -32,14 +32,8 @@ public class LoginServlet extends HttpServlet {
             System.out.println(login.getPassword());
             System.out.println();
             System.out.println(user.getId());
-//            System.out.println(user.getFirst_name());
-//            System.out.println(user.getLast_name());
             System.out.println(user.getEmail());
             System.out.println(user.getPassword());
-//            System.out.println(user.getPhone());
-//            System.out.println(user.getAdd_line_1());
-//            System.out.println(user.getAdd_line_2());
-//            System.out.println(user.getAdd_line_3());
 
             if(user.getId() != 0){
                 if(user.getValidity() != 0) {
