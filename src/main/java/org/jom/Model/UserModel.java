@@ -18,7 +18,15 @@ public class UserModel {
     public UserModel() {
     }
 
-    public UserModel(String first_name, String last_name, String email, String password, String phone, String add_line_1, String add_line_2, String add_line_3,String role) {
+    public UserModel(int id, String first_name, String phone, String add_line_3, String role) {
+        this.id = id;
+        this.first_name = first_name;
+        this.phone = phone;
+        this.add_line_3 = add_line_3;
+        this.role = role;
+    }
+
+    public UserModel(String first_name, String last_name, String email, String password, String phone, String add_line_1, String add_line_2, String add_line_3, String role) {
         this.id = 0;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -123,6 +131,10 @@ public class UserModel {
     public void Register(){
         UserDAO userDAO = new UserDAO();
         this.id = userDAO.register(this);
+        EmployeeRegister();
+    }
+
+    public void EmployeeRegister() {
     }
 
     public boolean EmailExists(){
@@ -136,4 +148,5 @@ public class UserModel {
         userDAO.updateValidity(this.id);
         this.setValidity(1);
     }
+
 }

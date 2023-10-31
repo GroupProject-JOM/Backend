@@ -1,0 +1,156 @@
+package org.jom.Controller;
+
+import com.google.gson.Gson;
+import org.jom.Dao.EmployeeDAO;
+import org.jom.Dao.OutletDAO;
+import org.jom.Model.EmployeeModel;
+import org.jom.Model.OutletModel;
+import org.jom.Model.SupplierModel;
+import org.jom.Model.UserModel;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@WebServlet("/employee")
+public class EmployeeServlet extends HttpServlet {
+    // add employee
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        try {
+            Gson gson = new Gson();
+            // json data to user object
+            BufferedReader bufferedReader = request.getReader();
+            EmployeeModel employee = gson.fromJson(bufferedReader, EmployeeModel.class);
+
+            // Check input field is empty
+            if(employee.getFirst_name().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"fname\"}");
+                return ;
+            }if(employee.getLast_name().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"lname\"}");
+                return;
+            }
+            if(employee.getEmail().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"email1\"}");
+                return;
+            }
+            if(employee.getPhone().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"phone\"}");
+                return;
+            }
+            if(employee.getAdd_line_1().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"address1\"}");
+                return;
+            }
+            if(employee.getAdd_line_2().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"address2\"}");
+                return;
+            }
+            if(employee.getAdd_line_3().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"address3\"}");
+                return;
+            }
+            if(employee.getRole().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"role\"}");
+                return;
+            }
+            if(employee.getDob().equals(null)){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"dob\"}");
+                return;
+            }
+            if(employee.getNic().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"nic\"}");
+                return;
+            }
+
+            // Email validation
+            String regex = "[a-z0-9]+@[a-z]+\\.[a-z]{2,3}";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(employee.getEmail());
+            if(!matcher.matches()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"email2\"}");
+                System.out.println("Invalid email");
+                return;
+            }
+
+            if(employee.EmailExists()){
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                out.write("{\"message\": \"email3\"}");
+                System.out.println("Email already exists");
+                return;
+            }
+
+            // All validations are passed then register
+            employee.Register();
+
+            if(employee.geteId() != 0){
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out.write("{\"message\": \"Registration successfully\"}");
+                    System.out.println("Registration successful");
+            }else{
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"Registration unsuccessfully\"}");
+                System.out.println("Registration incorrect");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
+
+    // Get single employee
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        int employee_id = Integer.parseInt(request.getParameter("id"));
+
+        try {
+            EmployeeDAO employeeDAO = new EmployeeDAO();
+            EmployeeModel employee = employeeDAO.getEmployee(employee_id);
+
+            Gson gson = new Gson();
+            // Object array to json
+            String object = gson.toJson(employee);
+
+            if(employee.geteId() !=0){
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"employee\": "+ object +"}");
+                System.out.println("Send employee");
+            }else{
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                out.write("{\"employee\": \"No employee\"}");
+                System.out.println("No employee");
+            }
+            // TODO handle
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
+}
