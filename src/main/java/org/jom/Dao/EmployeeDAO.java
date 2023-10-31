@@ -1,35 +1,173 @@
 package org.jom.Dao;
 
 import org.jom.Database.ConnectionPool;
+import org.jom.Model.EmployeeModel;
+import org.jom.Model.EstateModel;
+import org.jom.Model.OutletModel;
 import org.jom.Model.UserModel;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class UserDAO {
-    public int register(UserModel user){
+public class EmployeeDAO {
+    public int register(EmployeeModel employee){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
-        int userId = 0;
+        int employeeId = 0;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "INSERT INTO users (first_name,last_name,email,password,phone,add_line_1,add_line_2,add_line_3,role) VALUES (?,?,?,?,?,?,?,?,?)";
+            String sql = "INSERT INTO employees (dob,nic,user_id_) VALUES (?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1,user.getFirst_name());
-            preparedStatement.setString(2,user.getLast_name());
-            preparedStatement.setString(3,user.getEmail());
-            preparedStatement.setString(4,user.getPassword());
-            preparedStatement.setString(5,user.getPhone());
-            preparedStatement.setString(6,user.getAdd_line_1());
-            preparedStatement.setString(7,user.getAdd_line_2());
-            preparedStatement.setString(8,user.getAdd_line_3());
-            preparedStatement.setString(9,user.getRole());
+            preparedStatement.setString(1,employee.getDob());
+            preparedStatement.setString(2,employee.getNic());
+            preparedStatement.setInt(3,employee.getId());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
 
             if (resultSet.next()) {
-                userId = resultSet.getInt(1);
+                employeeId = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return employeeId;
+    }
+
+    public List<EmployeeModel> getAll() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<EmployeeModel> employees = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT employees.id, users.first_name, users.role, users.phone, users.add_line_3 FROM employees inner join users where users.id = employees.user_id_ ;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String first_name = resultSet.getString(2);
+                String role = resultSet.getString(3);
+                String phone = resultSet.getString(4);
+                String city = resultSet.getString(5);
+
+                EmployeeModel employee = new EmployeeModel(id,first_name,phone,city,role);
+                employees.add(employee);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return employees;
+    }
+
+    public EmployeeModel getEmployee(int id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        EmployeeModel employee = new EmployeeModel();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT users.first_name,users.last_name, users.email, users.phone,users.add_line_1,users.add_line_2, users.add_line_3,employees.dob,employees.nic,users.role,employees.id FROM employees inner join users where users.id = employees.user_id_ and  employees.id= ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                employee.setFirst_name(resultSet.getString(1));
+                employee.setLast_name(resultSet.getString(2));
+                employee.setEmail(resultSet.getString(3));
+                employee.setPhone(resultSet.getString(4));
+                employee.setAdd_line_1(resultSet.getString(5));
+                employee.setAdd_line_2(resultSet.getString(6));
+                employee.setAdd_line_3(resultSet.getString(7));
+                employee.setDob(resultSet.getString(8));
+                employee.setNic(resultSet.getString(9));
+                employee.setRole(resultSet.getString(10));
+                employee.seteId(resultSet.getInt(11));
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return employee;
+    }
+
+    public boolean updateEmployee(EmployeeModel employee){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE employees SET dob=?,nic=? WHERE user_id_=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,employee.getDob());
+            preparedStatement.setString(2,employee.getNic());
+            preparedStatement.setInt(3,employee.geteId());
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
+
+    public int getUserId(int id){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        int userId = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT user_id_ FROM employees where id = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                userId =  resultSet.getInt(1);
             }
 
             resultSet.close();
@@ -46,154 +184,15 @@ public class UserDAO {
         return userId;
     }
 
-    public boolean emailExists(String Email){
+    public boolean deleteUser(int id){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
-
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT email FROM users WHERE email = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1,Email);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                status = true;
-            }
-
-            resultSet.close();
-            preparedStatement.close();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (connection != null) try {
-                connection.close();
-            } catch (Exception ignore) {
-            }
-        }
-        return status;
-    }
-
-    public static UserModel getUserByEmail(String Email){
-        ConnectionPool connectionPool = ConnectionPool.getInstance();
-        Connection connection = null;
-        UserModel user = new UserModel();
-
-        try {
-            connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM users WHERE email = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1,Email);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                user.setId(resultSet.getInt(1));
-                user.setFirst_name(resultSet.getString(2));
-                user.setLast_name(resultSet.getString(3));
-                user.setEmail(resultSet.getString(4));
-                user.setPassword(resultSet.getString(5));
-                user.setPhone(resultSet.getString(6));
-                user.setAdd_line_1(resultSet.getString(7));
-                user.setAdd_line_2(resultSet.getString(8));
-                user.setAdd_line_3(resultSet.getString(9));
-                user.setRole(resultSet.getString(10));
-                user.setValidity(resultSet.getInt(11));
-            }
-
-            resultSet.close();
-            preparedStatement.close();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (connection != null) try {
-                connection.close();
-            } catch (Exception ignore) {
-            }
-        }
-        return user;
-    }
-
-    public static UserModel getUserById(int id){
-        ConnectionPool connectionPool = ConnectionPool.getInstance();
-        Connection connection = null;
-        UserModel user = new UserModel();
-
-        try {
-            connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM users WHERE id = ?";
+            String sql = "DELETE FROM users WHERE id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                user.setId(resultSet.getInt(1));
-                user.setFirst_name(resultSet.getString(2));
-                user.setLast_name(resultSet.getString(3));
-                user.setEmail(resultSet.getString(4));
-                user.setPassword(resultSet.getString(5));
-                user.setPhone(resultSet.getString(6));
-                user.setAdd_line_1(resultSet.getString(7));
-                user.setAdd_line_2(resultSet.getString(8));
-                user.setAdd_line_3(resultSet.getString(9));
-                user.setRole(resultSet.getString(10));
-            }
-
-            resultSet.close();
-            preparedStatement.close();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (connection != null) try {
-                connection.close();
-            } catch (Exception ignore) {
-            }
-        }
-        return user;
-    }
-
-    public static void updateValidity(int id){
-        ConnectionPool connectionPool = ConnectionPool.getInstance();
-        Connection connection = null;
-        try {
-            connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE users SET validity = '1' WHERE id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,id);
-            preparedStatement.executeUpdate();
-
-            preparedStatement.close();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (connection != null) try {
-                connection.close();
-            } catch (Exception ignore) {
-            }
-        }
-    }
-
-    public boolean updateUser(UserModel user){
-        ConnectionPool connectionPool = ConnectionPool.getInstance();
-        Connection connection = null;
-        boolean status = false;
-
-        try {
-            connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE users SET first_name=?,last_name=?,phone=?,add_line_1=?,add_line_2=?,add_line_3=?,role=? WHERE id=?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1,user.getFirst_name());
-            preparedStatement.setString(2,user.getLast_name());
-            preparedStatement.setString(3,user.getPhone());
-            preparedStatement.setString(4,user.getAdd_line_1());
-            preparedStatement.setString(5,user.getAdd_line_2());
-            preparedStatement.setString(6,user.getAdd_line_3());
-            preparedStatement.setString(7,user.getRole());
-            preparedStatement.setInt(8,user.getId());
 
             int x = preparedStatement.executeUpdate();
             if(x !=0){

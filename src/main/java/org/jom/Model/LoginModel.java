@@ -6,6 +6,10 @@ public class LoginModel {
     private String username;
     private String password;
 
+    public LoginModel(String username) {
+        this.username = username;
+    }
+
     public LoginModel(String username, String password) {
         this.username = username;
         this.password = password;
@@ -21,7 +25,7 @@ public class LoginModel {
 
     public UserModel getUser(){
         UserDAO userDAO = new UserDAO();
-        UserModel user = userDAO.getUser(this.username);
+        UserModel user = userDAO.getUserByEmail(this.username);
         return  user;
     }
 }

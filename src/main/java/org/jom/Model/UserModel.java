@@ -1,5 +1,6 @@
 package org.jom.Model;
 
+import org.jom.Dao.Supplier.EstateDAO;
 import org.jom.Dao.UserDAO;
 
 public class UserModel {
@@ -12,11 +13,22 @@ public class UserModel {
     private String add_line_1;
     private String add_line_2;
     private String add_line_3;
+    private String role;
+    private int validity;
 
     public UserModel() {
     }
 
-    public UserModel(String first_name, String last_name, String email, String password, String phone, String add_line_1, String add_line_2, String add_line_3) {
+    public UserModel(int id, String first_name, String phone, String add_line_3, String role) {
+        this.id = id;
+        this.first_name = first_name;
+        this.phone = phone;
+        this.add_line_3 = add_line_3;
+        this.role = role;
+    }
+
+    public UserModel(String first_name, String last_name, String email, String password, String phone, String add_line_1, String add_line_2, String add_line_3, String role) {
+        this.id = 0;
         this.first_name = first_name;
         this.last_name = last_name;
         this.email = email;
@@ -25,6 +37,8 @@ public class UserModel {
         this.add_line_1 = add_line_1;
         this.add_line_2 = add_line_2;
         this.add_line_3 = add_line_3;
+        this.role = role;
+        this.validity = 0;
     }
 
     public void setId(int id) {
@@ -57,6 +71,14 @@ public class UserModel {
 
     public void setAdd_line_3(String add_line_3) {
         this.add_line_3 = add_line_3;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public void setValidity(int validity) {
+        this.validity = validity;
     }
 
     public int getId() {
@@ -95,19 +117,46 @@ public class UserModel {
         return add_line_3;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public int getValidity() {
+        return validity;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public boolean Register(){
+    public void Register(){
         UserDAO userDAO = new UserDAO();
-        boolean status = userDAO.register(this);
-        return  status;
+        this.id = userDAO.register(this);
+        EmployeeRegister();
     }
+
+    public boolean updateUser(){
+        UserDAO userDAO = new UserDAO();
+        updateEmployee();
+        return userDAO.updateUser(this);
+    }
+
+    public void EmployeeRegister() {
+    }
+
+    public boolean updateEmployee(){
+        return true;}
 
     public boolean EmailExists(){
         UserDAO userDAO = new UserDAO();
         boolean status = userDAO.emailExists(this.email);
         return  status;
     }
+
+    public void updateValidity(int validity){
+        UserDAO userDAO = new UserDAO();
+        userDAO.updateValidity(this.id);
+        this.setValidity(1);
+    }
+
 }

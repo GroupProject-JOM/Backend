@@ -27,7 +27,7 @@ public class SendEmailOTP {
         props.put("mail.smtp.port", "465");
         Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("bnsbuddhika@gmail.com", "fsoznqdgpxgbbdde");
+                return new PasswordAuthentication("bnsbuddhika@gmail.com", "mjlcrjinibmfiwew");
             }
         });
         // compose message
@@ -39,7 +39,7 @@ public class SendEmailOTP {
             message.setText("your OTP is: " + otpvalue);
             // send message
             Transport.send(message);
-            System.out.println("message sent successfully");
+            System.out.println("Email otp sent successfully");
             return otpvalue;
         }
 

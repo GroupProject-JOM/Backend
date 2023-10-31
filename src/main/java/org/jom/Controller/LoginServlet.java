@@ -1,7 +1,9 @@
 package org.jom.Controller;
 
 import com.google.gson.Gson;
+import org.jom.Dao.Supplier.SupplierDAO;
 import org.jom.Model.LoginModel;
+import org.jom.Model.SupplierModel;
 import org.jom.Model.UserModel;
 
 import javax.servlet.annotation.WebServlet;
@@ -30,27 +32,34 @@ public class LoginServlet extends HttpServlet {
             System.out.println(login.getPassword());
             System.out.println();
             System.out.println(user.getId());
-//            System.out.println(user.getFirst_name());
-//            System.out.println(user.getLast_name());
             System.out.println(user.getEmail());
             System.out.println(user.getPassword());
-//            System.out.println(user.getPhone());
-//            System.out.println(user.getAdd_line_1());
-//            System.out.println(user.getAdd_line_2());
-//            System.out.println(user.getAdd_line_3());
 
             if(user.getId() != 0){
-                response.setStatus(HttpServletResponse.SC_OK);
-                if(user.getPassword().equals(login.getPassword())) {
-                    out.write("{\"message\": \"Login successfully\"}");
-                    System.out.println("Login successful");
+                if(user.getValidity() != 0) {
+                    if (user.getPassword().equals(login.getPassword())) {
+                        if(user.getRole().equals("supplier")){
+                            SupplierModel supplier = new SupplierModel(user.getId());
+                            supplier.getSupplier();
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\",\"name\":\"" + user.getFirst_name() + "\",\"sId\":\""+ supplier.getId() +"\"}");
+                        System.out.println("Login successful");
+                        }
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                        out.write("{\"message\": \"password\"}");
+                        System.out.println("Wrong password");
+                    }
                 }else{
-                    out.write("{\"message\": \"Wrong Password\"}");
-                    System.out.println("Wrong password");
+                    // TODO hadle
+                    System.out.println("User not validated");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"message\": \"validate\"}");
+                    System.out.println("Login incorrect");
                 }
             }else{
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"message\": \"Invalid Email\"}");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"username\"}");
                 System.out.println("Login incorrect");
             }
 
