@@ -229,4 +229,34 @@ public class EmployeeServlet extends HttpServlet {
             out.close();
         }
     }
+
+    // delete Employee
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        int employeeId = Integer.parseInt(request.getParameter("id"));
+
+        EmployeeModel employee = new EmployeeModel(employeeId);
+        employee.getUserId();
+
+        try {
+            EmployeeDAO employeeDAO = new EmployeeDAO();
+            if(employeeDAO.deleteUser(employee.getId())) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"message\": \"Delete employee\"}");
+                System.out.println("Delete employee");
+            }else {
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                out.write("{\"message\": \"Unable to Delete employee\"}");
+                System.out.println("employee not deleted");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
 }

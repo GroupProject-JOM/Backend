@@ -11,6 +11,10 @@ public class EmployeeModel extends UserModel{
     public EmployeeModel() {
     }
 
+    public EmployeeModel(int eId) {
+        this.eId = eId;
+    }
+
     public EmployeeModel(int id, String first_name, String phone, String add_line_3, String role) {
         super(id, first_name, phone, add_line_3, role);
     }
