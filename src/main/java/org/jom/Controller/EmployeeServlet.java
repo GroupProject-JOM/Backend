@@ -153,4 +153,80 @@ public class EmployeeServlet extends HttpServlet {
             out.close();
         }
     }
+
+    //update employee
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        try {
+            Gson gson = new Gson();
+            // json data to user object
+            BufferedReader bufferedReader = request.getReader();
+            EmployeeModel employee = gson.fromJson(bufferedReader, EmployeeModel.class);
+
+            // TODO backend validations and user exists
+            // Check input field is empty
+            if(employee.getFirst_name().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"fname\"}");
+                return ;
+            }if(employee.getLast_name().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"lname\"}");
+                return;
+            }
+            if(employee.getPhone().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"phone\"}");
+                return;
+            }
+            if(employee.getAdd_line_1().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"address1\"}");
+                return;
+            }
+            if(employee.getAdd_line_2().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"address2\"}");
+                return;
+            }
+            if(employee.getAdd_line_3().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"address3\"}");
+                return;
+            }
+            if(employee.getRole().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"role\"}");
+                return;
+            }
+            if(employee.getDob().equals(null)){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"dob\"}");
+                return;
+            }
+            if(employee.getNic().isEmpty()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"nic\"}");
+                return;
+            }
+
+            employee.getUserId();
+
+            if(employee.updateUser()){
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"message\": \"Employee Updated successfully\"}");
+                System.out.println("Employee Update successfully");
+            }else{
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"Employee is not updated\"}");
+                System.out.println("Employee is not Updated");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
 }

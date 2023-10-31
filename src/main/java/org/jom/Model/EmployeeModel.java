@@ -58,4 +58,15 @@ public class EmployeeModel extends UserModel{
         EmployeeDAO employeeDAO = new EmployeeDAO();
         this.eId = employeeDAO.register(this);
     }
+
+    @Override
+    public boolean updateEmployee(){
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        return employeeDAO.updateEmployee(this);
+    }
+
+    public void getUserId(){
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        this.setId(employeeDAO.getUserId(this.eId));
+    }
 }

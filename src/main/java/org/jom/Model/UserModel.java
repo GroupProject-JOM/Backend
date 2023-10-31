@@ -1,5 +1,6 @@
 package org.jom.Model;
 
+import org.jom.Dao.Supplier.EstateDAO;
 import org.jom.Dao.UserDAO;
 
 public class UserModel {
@@ -134,8 +135,17 @@ public class UserModel {
         EmployeeRegister();
     }
 
+    public boolean updateUser(){
+        UserDAO userDAO = new UserDAO();
+        updateEmployee();
+        return userDAO.updateUser(this);
+    }
+
     public void EmployeeRegister() {
     }
+
+    public boolean updateEmployee(){
+        return true;}
 
     public boolean EmailExists(){
         UserDAO userDAO = new UserDAO();

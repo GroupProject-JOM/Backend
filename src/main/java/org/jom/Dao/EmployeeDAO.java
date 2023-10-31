@@ -122,4 +122,65 @@ public class EmployeeDAO {
         }
         return employee;
     }
+
+    public boolean updateEmployee(EmployeeModel employee){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE employees SET dob=?,nic=? WHERE user_id_=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,employee.getDob());
+            preparedStatement.setString(2,employee.getNic());
+            preparedStatement.setInt(3,employee.geteId());
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
+
+    public int getUserId(int id){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        int userId = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT user_id_ FROM employees where id = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                userId =  resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return userId;
+    }
 }
