@@ -1,8 +1,10 @@
 package org.jom.Controller.Supplier.Collection;
 
 import com.google.gson.Gson;
+import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
 import org.jom.Model.Collection.CollectionModel;
+import org.jom.Model.Collection.CollectionSingleViewModel;
 import org.jom.Model.Collection.SupplyModel;
 
 import javax.servlet.annotation.WebServlet;
@@ -60,23 +62,24 @@ public class CollectionServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         int supplier_id = Integer.parseInt(request.getParameter("sId"));
+        int id = Integer.parseInt(request.getParameter("id"));
 
         try {
-            SupplyDAO supplyDAO = new SupplyDAO();
-            List<SupplyModel> supplies = supplyDAO.getAll(supplier_id);
+            CollectionDAO collectionDAO = new CollectionDAO();
+            CollectionSingleViewModel collection = collectionDAO.getCollection(id);
 
             Gson gson = new Gson();
             // Object array to json
-            String objectArray = gson.toJson(supplies);
+            String objectArray = gson.toJson(collection);
 
-            if (supplies.size() != 0) {
+            if (collection.getCollection_id() != 0) {
                 response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"size\": " + supplies.size() + ",\"list\":" + objectArray + "}");
-                System.out.println("Supplier dashboard tables contents");
-            } else if (supplies.size() == 0) {
+                out.write("{\"collection\": " + objectArray + " }");
+                System.out.println("Collection sent");
+            } else if (collection.getCollection_id() == 0) {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                out.write("{\"size\": \"0\"}");
-                System.out.println("No Supplies");
+                out.write("{\"collection\": \"No collection\"}");
+                System.out.println("No collection");
             } else {
                 // TODO handle
             }
