@@ -91,7 +91,7 @@ public class EmployeeDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT users.first_name,users.last_name, users.email, users.phone,users.add_line_1,users.add_line_2, users.add_line_3,employees.dob,employees.nic,users.role,employees.id FROM employees inner join users where users.id = employees.user_id_ and  employees.id= ?;";
+            String sql = "SELECT users.first_name,users.last_name, users.email, users.phone,users.add_line_1,users.add_line_2, users.add_line_3,employees.dob,employees.nic,employees.gender,users.role,employees.id FROM employees inner join users where users.id = employees.user_id_ and  employees.id= ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -106,8 +106,9 @@ public class EmployeeDAO {
                 employee.setAdd_line_3(resultSet.getString(7));
                 employee.setDob(resultSet.getString(8));
                 employee.setNic(resultSet.getString(9));
-                employee.setRole(resultSet.getString(10));
-                employee.seteId(resultSet.getInt(11));
+                employee.setGender(resultSet.getString(10));
+                employee.setRole(resultSet.getString(11));
+                employee.seteId(resultSet.getInt(12));
             }
 
             resultSet.close();
@@ -271,5 +272,34 @@ public class EmployeeDAO {
             }
         }
         return eId;
+    }
+
+    public int rowCount(){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int count = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT COUNT(*) AS Row_Count FROM employees; ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);;
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return count;
     }
 }
