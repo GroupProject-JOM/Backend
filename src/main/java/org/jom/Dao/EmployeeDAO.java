@@ -18,11 +18,12 @@ public class EmployeeDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "INSERT INTO employees (dob,nic,user_id_) VALUES (?,?,?)";
+            String sql = "INSERT INTO employees (dob,nic,gender,user_id_) VALUES (?,?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1,employee.getDob());
             preparedStatement.setString(2,employee.getNic());
-            preparedStatement.setInt(3,employee.getId());
+            preparedStatement.setString(3,employee.getGender());
+            preparedStatement.setInt(4,employee.getId());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
@@ -130,11 +131,12 @@ public class EmployeeDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE employees SET dob=?,nic=? WHERE user_id_=?";
+            String sql = "UPDATE employees SET dob=?,nic=?,gender=? WHERE user_id_=?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1,employee.getDob());
             preparedStatement.setString(2,employee.getNic());
-            preparedStatement.setInt(3,employee.geteId());
+            preparedStatement.setString(3,employee.getGender());
+            preparedStatement.setInt(4,employee.geteId());
 
             int x = preparedStatement.executeUpdate();
             if(x !=0){
@@ -209,5 +211,65 @@ public class EmployeeDAO {
             }
         }
         return status;
+    }
+
+    public boolean nicExists(String nic){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT nic FROM employees WHERE nic = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,nic);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                status = true;
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
+
+    public int getEId(String nic){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int eId = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT id FROM employees WHERE nic = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,nic);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                eId = resultSet.getInt(1);;
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return eId;
     }
 }
