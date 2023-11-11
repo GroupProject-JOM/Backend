@@ -27,7 +27,7 @@ public class SendEmailOTP {
         props.put("mail.smtp.port", "465");
         Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("bnsbuddhika@gmail.com", "mjlcrjinibmfiwew");
+                return new PasswordAuthentication("saumyasewwandi05@gmail.com", "auzciwkhdnhnzofw");
             }
         });
         // compose message

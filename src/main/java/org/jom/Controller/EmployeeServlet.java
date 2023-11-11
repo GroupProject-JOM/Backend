@@ -71,7 +71,22 @@ public class EmployeeServlet extends HttpServlet {
                 out.write("{\"message\": \"role\"}");
                 return;
             }
-            if(employee.getDob().equals(null)){
+
+            int count =0;
+            String roles[] = {"Collector","Distributor","Stock-Manager","Production-Manager","Sales-Manager"};
+            for (String role : roles)
+            {
+                if(!employee.getRole().equals(role)){
+                    count++;
+                }else break;
+                if(count>=5) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.write("{\"message\": \"roleV\"}");
+                    return;
+                }
+            }
+
+            if(employee.getDob().isEmpty()){
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"dob\"}");
                 return;
@@ -97,6 +112,13 @@ public class EmployeeServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 out.write("{\"message\": \"email3\"}");
                 System.out.println("Email already exists");
+                return;
+            }
+
+            if(employee.NICExists()){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"NIC\"}");
+                System.out.println("NIC already exists");
                 return;
             }
 
@@ -200,7 +222,22 @@ public class EmployeeServlet extends HttpServlet {
                 out.write("{\"message\": \"role\"}");
                 return;
             }
-            if(employee.getDob().equals(null)){
+
+            int count =0;
+            String roles[] = {"Collector","Distributor","Stock-Manager","Production-Manager","Sales-Manager"};
+            for (String role : roles)
+            {
+                if(!employee.getRole().equals(role)){
+                    count++;
+                }else break;
+                if(count>=5) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.write("{\"message\": \"roleV\"}");
+                    return;
+                }
+            }
+
+            if(employee.getDob().isEmpty()){
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"dob\"}");
                 return;
@@ -209,6 +246,15 @@ public class EmployeeServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"nic\"}");
                 return;
+            }
+
+            if(employee.NICExists()){
+                if(employee.getEId() != employee.geteId()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.write("{\"message\": \"NIC\"}");
+                    System.out.println("NIC already exists");
+                    return;
+                }
             }
 
             employee.getUserId();
