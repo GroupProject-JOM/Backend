@@ -1,11 +1,8 @@
 package org.jom.Controller;
 
-import com.google.gson.Gson;
 import org.jom.Dao.OTPDAO;
-import org.jom.Dao.Supplier.AccountDAO;
 import org.jom.Dao.UserDAO;
 import org.jom.Model.*;
-import org.jom.OTP.SendEmailOTP;
 import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;

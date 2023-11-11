@@ -2,6 +2,7 @@ package org.jom.Controller;
 
 import com.google.gson.Gson;
 import org.jom.Dao.Supplier.SupplierDAO;
+import org.jom.Model.EmployeeModel;
 import org.jom.Model.LoginModel;
 import org.jom.Model.SupplierModel;
 import org.jom.Model.UserModel;
@@ -28,13 +29,6 @@ public class LoginServlet extends HttpServlet {
             LoginModel login = gson.fromJson(bufferedReader, LoginModel.class);
             UserModel user = login.getUser();
 
-            System.out.println(login.getUsername());
-            System.out.println(login.getPassword());
-            System.out.println();
-            System.out.println(user.getId());
-            System.out.println(user.getEmail());
-            System.out.println(user.getPassword());
-
             if(user.getId() != 0){
                 if(user.getValidity() != 0) {
                     if (user.getPassword().equals(login.getPassword())) {
@@ -44,6 +38,12 @@ public class LoginServlet extends HttpServlet {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\",\"name\":\"" + user.getFirst_name() + "\",\"sId\":\""+ supplier.getId() +"\"}");
                         System.out.println("Login successful");
+                        }else{
+                            EmployeeModel employee = new EmployeeModel(user.getId(),0);
+                            employee.getEIdById();
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\",\"name\":\"" + user.getFirst_name() + "\",\"sId\":\""+ employee.geteId() +"\"}");
+                            System.out.println("Login successful");
                         }
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);

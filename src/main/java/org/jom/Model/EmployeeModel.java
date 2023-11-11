@@ -1,6 +1,7 @@
 package org.jom.Model;
 
 import org.jom.Dao.EmployeeDAO;
+import org.jom.Dao.Supplier.SupplierDAO;
 import org.jom.Dao.UserDAO;
 
 public class EmployeeModel extends UserModel{
@@ -14,6 +15,11 @@ public class EmployeeModel extends UserModel{
     }
 
     public EmployeeModel(int eId) {
+        this.eId = eId;
+    }
+
+    public EmployeeModel(int id, int eId) {
+        super(id);
         this.eId = eId;
     }
 
@@ -94,5 +100,10 @@ public class EmployeeModel extends UserModel{
     public int getEId(){
         EmployeeDAO employeeDAO = new EmployeeDAO();
         return employeeDAO.getEId(this.nic);
+    }
+
+    public void getEIdById(){
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        this.eId = employeeDAO.getEIdById(this.getId());
     }
 }

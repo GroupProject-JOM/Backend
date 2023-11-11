@@ -1,10 +1,9 @@
 package org.jom.Controller;
 
-import org.jom.Dao.OTPDAO;
 import org.jom.Dao.UserDAO;
+import org.jom.Email.SendEmail;
 import org.jom.Model.OTPModel;
 import org.jom.Model.UserModel;
-import org.jom.OTP.SendEmailOTP;
 import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
@@ -40,8 +39,8 @@ public class SendEmailOTPServlet extends HttpServlet {
         //check if emails are correct
         if(user.getEmail().equals(email)) {
             try {
-                SendEmailOTP sendEmailOTP = new SendEmailOTP();
-                int otp = SendEmailOTP.SendOTP(email);
+                SendEmail sendEmail = new SendEmail();
+                int otp = SendEmail.SendOTP(email);
                 System.out.println(otp);
 
                 OTPModel record = new OTPModel(id,email,otp);
