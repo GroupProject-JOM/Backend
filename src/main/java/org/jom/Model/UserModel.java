@@ -19,6 +19,10 @@ public class UserModel {
     public UserModel() {
     }
 
+    public UserModel(int id) {
+        this.id = id;
+    }
+
     public UserModel(int id, String first_name, String phone, String add_line_3, String role) {
         this.id = id;
         this.first_name = first_name;

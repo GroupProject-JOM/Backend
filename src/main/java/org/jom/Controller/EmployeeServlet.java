@@ -3,10 +3,8 @@ package org.jom.Controller;
 import com.google.gson.Gson;
 import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.OutletDAO;
-import org.jom.Model.EmployeeModel;
-import org.jom.Model.OutletModel;
-import org.jom.Model.SupplierModel;
-import org.jom.Model.UserModel;
+import org.jom.Email.SendEmail;
+import org.jom.Model.*;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -98,7 +96,7 @@ public class EmployeeServlet extends HttpServlet {
             }
 
             // Email validation
-            String regex = "[a-z0-9]+@[a-z]+\\.[a-z]{2,3}";
+            String regex = "[a-z0-9\\.]+@[a-z]+\\.[a-z]{2,3}";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(employee.getEmail());
             if(!matcher.matches()){
@@ -121,6 +119,15 @@ public class EmployeeServlet extends HttpServlet {
                 System.out.println("NIC already exists");
                 return;
             }
+
+            //Generate and send new password to email
+            SendEmail sendEmail = new SendEmail();
+            String password = SendEmail.SendPassword(employee.getEmail());
+            System.out.println(password);
+
+            employee.setPassword(password); //Save password in db
+
+            employee.setValidity(1); // Mark as validate user
 
             // All validations are passed then register
             employee.Register();
