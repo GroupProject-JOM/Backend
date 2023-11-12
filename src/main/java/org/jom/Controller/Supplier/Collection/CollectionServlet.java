@@ -1,6 +1,7 @@
 package org.jom.Controller.Supplier.Collection;
 
 import com.google.gson.Gson;
+import org.jom.Dao.Supplier.AccountDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
 import org.jom.Model.Collection.CollectionModel;
@@ -57,6 +58,7 @@ public class CollectionServlet extends HttpServlet {
         }
     }
 
+    // Get collection
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -82,6 +84,35 @@ public class CollectionServlet extends HttpServlet {
                 System.out.println("No collection");
             } else {
                 // TODO handle
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
+
+    // delete collection
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        int supplier_id = Integer.parseInt(request.getParameter("sId"));
+        int collection_id = Integer.parseInt(request.getParameter("id"));
+
+        try {
+            CollectionDAO collectionDAO = new CollectionDAO();
+
+            if(collectionDAO.deleteCollection(supplier_id,collection_id)) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.write("{\"message\": \"Delete Collection\"}");
+                System.out.println("Delete Collection");
+            }else {
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                out.write("{\"message\": \"Unable to Delete Collection\"}");
+                System.out.println("Collection not deleted");
             }
 
         } catch (Exception e) {

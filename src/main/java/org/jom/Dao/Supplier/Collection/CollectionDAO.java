@@ -82,8 +82,8 @@ public class CollectionDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "select c.id,c.p_method,c.s_method,p.pickup_date ,p.pickup_time , c.init_amount ,c.status,c.final_amount,c.value from pickups p inner join collections c on p.collection_id=c.id where c.id = ? union\n" +
-                    "select c.id,c.p_method,c.s_method,d.delivery_date,d.delivery_time,c.init_amount ,c.status,c.final_amount,c.value from deliveries d inner join collections c on d.collec_id=c.id where c.id = ?;";
+            String sql = "select c.id,c.p_method,c.s_method,p.pickup_date ,p.pickup_time , c.init_amount ,c.status,c.final_amount,c.value from pickups p inner join collections c on p.collection_id=c.id where c.id = ? AND c.delete=0 union\n" +
+                    "select c.id,c.p_method,c.s_method,d.delivery_date,d.delivery_time,c.init_amount ,c.status,c.final_amount,c.value from deliveries d inner join collections c on d.collec_id=c.id where c.id = ? AND c.delete=0;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             preparedStatement.setInt(2,id);
@@ -122,7 +122,7 @@ public class CollectionDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT COUNT(*) AS Row_Count FROM collections WHERE status=2;";
+            String sql = "SELECT COUNT(*) AS Row_Count FROM collections WHERE status=2 AND jom_db.collections.delete=0;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -142,5 +142,34 @@ public class CollectionDAO {
             }
         }
         return count;
+    }
+
+    public boolean deleteCollection(int sId,int id){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE collections SET jom_db.collections.delete=1 WHERE sup_id = ? AND id = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,sId);
+            preparedStatement.setInt(2,id);
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
     }
 }
