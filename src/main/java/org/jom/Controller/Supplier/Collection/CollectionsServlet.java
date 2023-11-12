@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @WebServlet("/collections")
@@ -23,9 +26,17 @@ public class CollectionsServlet extends HttpServlet {
 
         int supplier_id = Integer.parseInt(request.getParameter("sId"));
 
+        // Create month pattern
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = dateFormat.format(currentDate);
+        String yearMonth = formattedDate.substring(0, 7);
+        String monthPattern = yearMonth + "-%";
+
         try {
             SupplyDAO supplyDAO = new SupplyDAO();
             List<SupplyModel> supplies = supplyDAO.getAll(supplier_id);
+            int income = supplyDAO.getIncome(supplier_id,monthPattern);
 
             Gson gson = new Gson();
             // Object array to json
@@ -33,7 +44,7 @@ public class CollectionsServlet extends HttpServlet {
 
             if (supplies.size() != 0) {
                 response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"size\": " + supplies.size() + ",\"list\":" + objectArray + "}");
+                out.write("{\"size\": " + supplies.size() + ",\"list\":" + objectArray + ",\"income\":"+income+"}");
                 System.out.println("Supplier dashboard tables contents");
             } else if (supplies.size() == 0) {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
