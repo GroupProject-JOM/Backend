@@ -54,7 +54,7 @@ public class OutletDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM outlets";
+            String sql = "SELECT * FROM outlets WHERE jom_db.outlets.delete=0";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -93,7 +93,7 @@ public class OutletDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM outlets WHERE id = ?";
+            String sql = "SELECT * FROM outlets WHERE id = ? AND jom_db.outlets.delete=0";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -163,7 +163,7 @@ public class OutletDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "DELETE FROM outlets WHERE id = ?";
+            String sql = "UPDATE outlets SET jom_db.outlets.delete=1 WHERE id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
 

@@ -23,6 +23,11 @@ public class UserModel {
         this.id = id;
     }
 
+    public UserModel(int id, String email) {
+        this.id = id;
+        this.email = email;
+    }
+
     public UserModel(int id, String first_name, String phone, String add_line_3, String role) {
         this.id = id;
         this.first_name = first_name;
@@ -161,6 +166,10 @@ public class UserModel {
         UserDAO userDAO = new UserDAO();
         userDAO.updateValidity(this.id);
         this.setValidity(1);
+    }
+    public boolean updateEmail(){
+        UserDAO userDAO = new UserDAO();
+        return userDAO.updateEmail(this.email,this.id);
     }
 
 }

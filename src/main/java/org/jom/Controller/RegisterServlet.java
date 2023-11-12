@@ -70,7 +70,7 @@ public class RegisterServlet extends HttpServlet {
             }
 
             // Email validation
-            String regex = "[a-z0-9\\.]+@[a-z]+\\.[a-z]{2,3}";
+            String regex = "[a-z0-9\\.\\-]+@[a-z]+\\.[a-z]{2,3}";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(user.getEmail());
             if(!matcher.matches()){

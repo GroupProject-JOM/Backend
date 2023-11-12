@@ -4,26 +4,14 @@ public class CollectionSingleViewModel {
     private int collection_id;
     private String sMethod;
     private String pMethod;
-    private int init_amount;
-    private int final_amount;
-    private String name;
-    private String phone;
     private String date;
     private String time;
+    private int init_amount;
+    private int final_amount;
     private int status;
+    private int value;
 
     public CollectionSingleViewModel() {
-    }
-
-    public CollectionSingleViewModel(int collection_id, String sMethod, String pMethod, int init_amount, int final_amount, String name, String phone, int status) {
-        this.collection_id = collection_id;
-        this.sMethod = sMethod;
-        this.pMethod = pMethod;
-        this.init_amount = init_amount;
-        this.final_amount = final_amount;
-        this.name = name;
-        this.phone = phone;
-        this.status = status;
     }
 
     public int getCollection_id() {
@@ -66,27 +54,35 @@ public class CollectionSingleViewModel {
         this.final_amount = final_amount;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
     public int getStatus() {
         return status;
     }
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
     }
 }

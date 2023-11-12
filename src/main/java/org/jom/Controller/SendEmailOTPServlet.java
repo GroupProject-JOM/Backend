@@ -50,7 +50,8 @@ public class SendEmailOTPServlet extends HttpServlet {
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.write("{\"message\": \"OTP Sent\",\"oId\":\""+ record.getId() +"\"}");
                 }else {
-                    // TODO handle otp record unsuccess
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    out.write("{\"message\": \"OTP not Sent\"}");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -59,7 +60,8 @@ public class SendEmailOTPServlet extends HttpServlet {
                 out.close();
             }
         } else{
-            // TODO handle error wrong email
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"Invalid User\"}");
         }
 
     }

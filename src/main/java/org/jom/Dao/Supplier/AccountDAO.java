@@ -52,7 +52,7 @@ public class AccountDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM accounts WHERE supplier_id_ = ?";
+            String sql = "SELECT * FROM accounts WHERE supplier_id_ = ? AND jom_db.accounts.delete=0";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -64,7 +64,7 @@ public class AccountDAO {
                 String bank = resultSet.getString(4);
                 int supplier_id = resultSet.getInt(5);
 
-                AccountModel account = new AccountModel(account_id,supplier_id,holder_name,account_number,bank);
+                AccountModel account = new AccountModel(account_id,supplier_id,account_number,bank,holder_name);
                 accounts.add(account);
             }
 
@@ -90,7 +90,7 @@ public class AccountDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM accounts WHERE supplier_id_ = ? AND id = ?";
+            String sql = "SELECT * FROM accounts WHERE supplier_id_ = ? AND id = ? AND jom_db.accounts.delete=0";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,sId);
             preparedStatement.setInt(2,id);
@@ -157,7 +157,7 @@ public class AccountDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "DELETE FROM accounts WHERE supplier_id_ = ? AND id = ? ";
+            String sql = "UPDATE accounts SET jom_db.accounts.delete=1 WHERE supplier_id_ = ? AND id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,sId);
             preparedStatement.setInt(2,id);

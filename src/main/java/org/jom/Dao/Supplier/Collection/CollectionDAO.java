@@ -82,20 +82,23 @@ public class CollectionDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM jom_db.collections inner join jom_db.suppliers inner join jom_db.users where jom_db.collections.id = ? and jom_db.collections.sup_id = jom_db.suppliers.id and jom_db.suppliers.user_id = jom_db.users.id;";
+            String sql = "select c.id,c.p_method,c.s_method,p.pickup_date ,p.pickup_time , c.init_amount ,c.status,c.final_amount,c.value from pickups p inner join collections c on p.collection_id=c.id where c.id = ? AND c.delete=0 union\n" +
+                    "select c.id,c.p_method,c.s_method,d.delivery_date,d.delivery_time,c.init_amount ,c.status,c.final_amount,c.value from deliveries d inner join collections c on d.collec_id=c.id where c.id = ? AND c.delete=0;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
+            preparedStatement.setInt(2,id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
                 collection.setCollection_id(resultSet.getInt(1));
-                collection.setsMethod(resultSet.getString(6));
-                collection.setpMethod(resultSet.getString(5));
-                collection.setInit_amount(resultSet.getInt(2));
-                collection.setFinal_amount(resultSet.getInt(3));
-                collection.setName(resultSet.getString(13));
-                collection.setPhone(resultSet.getString(17));
+                collection.setpMethod(resultSet.getString(2));
+                collection.setsMethod(resultSet.getString(3));
+                collection.setDate(resultSet.getString(4));
+                collection.setTime(resultSet.getString(5));
+                collection.setInit_amount(resultSet.getInt(6));
                 collection.setStatus(resultSet.getInt(7));
+                collection.setFinal_amount(resultSet.getInt(8));
+                collection.setValue(resultSet.getInt(9));
             }
 
             resultSet.close();
@@ -119,7 +122,7 @@ public class CollectionDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT COUNT(*) AS Row_Count FROM collections WHERE status=2;";
+            String sql = "SELECT COUNT(*) AS Row_Count FROM collections WHERE status=2 AND jom_db.collections.delete=0;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -139,5 +142,34 @@ public class CollectionDAO {
             }
         }
         return count;
+    }
+
+    public boolean deleteCollection(int sId,int id){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE collections SET jom_db.collections.delete=1 WHERE sup_id = ? AND id = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,sId);
+            preparedStatement.setInt(2,id);
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
     }
 }
