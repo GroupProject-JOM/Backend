@@ -13,16 +13,6 @@ public class OutletModel {
     private String city;
     private int emp_id;
 
-    public OutletModel(String name, String email, String phone, String address1, String street, String city, int emp_id) {
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-        this.address1 = address1;
-        this.street = street;
-        this.city = city;
-        this.emp_id = emp_id;
-    }
-
     public OutletModel() {
     }
 
@@ -34,6 +24,27 @@ public class OutletModel {
         this.address1 = address1;
         this.street = street;
         this.city = city;
+    }
+
+    public OutletModel(String name, String email, String phone, String address1, String street, String city, int emp_id) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.address1 = address1;
+        this.street = street;
+        this.city = city;
+        this.emp_id = emp_id;
+    }
+
+    public OutletModel(int id, String name, String email, String phone, String address1, String street, String city, int emp_id) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.address1 = address1;
+        this.street = street;
+        this.city = city;
+        this.emp_id = emp_id;
     }
 
     public int getId() {

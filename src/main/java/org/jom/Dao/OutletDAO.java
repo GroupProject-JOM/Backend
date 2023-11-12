@@ -192,7 +192,7 @@ public class OutletDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT COUNT(*) AS Row_Count FROM outlets; ";
+            String sql = "SELECT COUNT(*) AS Row_Count FROM outlets WHERE  jom_db.outlets.delete=0; ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
 
