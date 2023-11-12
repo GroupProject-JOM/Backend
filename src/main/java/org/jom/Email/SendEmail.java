@@ -52,7 +52,7 @@ public class SendEmail {
         }
     }
 
-    public static String SendPassword (String email){
+    public static String SendPassword (String email,String name){
         String password = getAlphaNumericString();
 
         String to = email;// change accordingly
@@ -74,7 +74,7 @@ public class SendEmail {
             message.setFrom(new InternetAddress(email));// change accordingly
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             message.setSubject("Employee Password");
-            message.setText("Your password is: " + password +"\n\n*This is system generated password. After login you can change your password anytime.");
+            message.setText("Hello "+name+",\n\nYour password is: " + password +"\n\n*This is system generated password. After login you can change your password anytime.");
 
             // send message
             Transport.send(message);

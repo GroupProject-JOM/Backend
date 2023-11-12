@@ -96,7 +96,7 @@ public class EmployeeServlet extends HttpServlet {
             }
 
             // Email validation
-            String regex = "[a-z0-9\\.]+@[a-z]+\\.[a-z]{2,3}";
+            String regex = "[a-z0-9\\.\\-]+@[a-z]+\\.[a-z]{2,3}";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(employee.getEmail());
             if(!matcher.matches()){
@@ -122,7 +122,7 @@ public class EmployeeServlet extends HttpServlet {
 
             //Generate and send new password to email
             SendEmail sendEmail = new SendEmail();
-            String password = SendEmail.SendPassword(employee.getEmail());
+            String password = SendEmail.SendPassword(employee.getEmail(),employee.getFirst_name());
             System.out.println(password);
 
             employee.setPassword(password); //Save password in db
@@ -231,7 +231,7 @@ public class EmployeeServlet extends HttpServlet {
             }
 
             int count =0;
-            String roles[] = {"Collector","Distributor","Stock-Manager","Production-Manager","Sales-Manager"};
+            String roles[] = {"collector","distributor","stock-manager","production-manager","sales-manager"};
             for (String role : roles)
             {
                 if(!employee.getRole().equals(role)){

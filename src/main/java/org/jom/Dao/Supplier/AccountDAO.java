@@ -64,7 +64,7 @@ public class AccountDAO {
                 String bank = resultSet.getString(4);
                 int supplier_id = resultSet.getInt(5);
 
-                AccountModel account = new AccountModel(account_id,supplier_id,holder_name,account_number,bank);
+                AccountModel account = new AccountModel(account_id,supplier_id,account_number,bank,holder_name);
                 accounts.add(account);
             }
 

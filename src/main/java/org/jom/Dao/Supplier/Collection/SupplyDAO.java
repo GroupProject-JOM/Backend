@@ -26,7 +26,7 @@ public class SupplyDAO {
                     "SELECT c.id,d.delivery_date,d.delivery_time,c.init_amount ,c.status,c.final_amount,c.value\n" +
                     "FROM collections c\n" +
                     "INNER JOIN deliveries d ON c.id = d.collec_id\n" +
-                    "WHERE c.sup_id = ?;";
+                    "WHERE c.sup_id = ? ORDER BY pickup_date;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             preparedStatement.setInt(2,id);
