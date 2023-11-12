@@ -161,18 +161,34 @@ public class OutletServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         int outlet_id = Integer.parseInt(request.getParameter("id"));
+        int employee_id = Integer.parseInt(request.getParameter("emp"));
 
         try {
             OutletDAO outletDAO = new OutletDAO();
 
-            if (outletDAO.deleteOutlet(outlet_id)) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"message\": \"Delete Outlet\"}");
-                System.out.println("Delete Outlet");
+            EmployeeDAO employeeDAO = new EmployeeDAO();
+            EmployeeModel employee = employeeDAO.getEmployee(employee_id);
+
+            if (employee.geteId() != 0) {
+                if (employee.getRole().equals("distributor") || employee.getRole().equals("admin") || employee.getRole().equals("sales-manager")) {
+                    if (outletDAO.deleteOutlet(outlet_id)) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"message\": \"Delete Outlet\"}");
+                        System.out.println("Delete Outlet");
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"Unable to Delete Outlet\"}");
+                        System.out.println("Outlet not deleted");
+                    }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"message\": \"Invalid User\"}");
+                    System.out.println("Invalid User");
+                }
             } else {
-                response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                out.write("{\"message\": \"Unable to Delete Outlet\"}");
-                System.out.println("Outlet not deleted");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"Invalid User\"}");
+                System.out.println("Invalid User");
             }
 
         } catch (Exception e) {
