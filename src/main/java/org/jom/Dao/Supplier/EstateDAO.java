@@ -16,7 +16,7 @@ public class EstateDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM estates WHERE supplier_id = ? AND id = ?";
+            String sql = "SELECT * FROM estates WHERE supplier_id = ? AND id = ? AND jom_db.estates.delete=0";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,sId);
             preparedStatement.setInt(2,id);
@@ -87,7 +87,7 @@ public class EstateDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM estates WHERE supplier_id = ?";
+            String sql = "SELECT * FROM estates WHERE supplier_id = ? AND jom_db.estates.delete=0";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -156,7 +156,7 @@ public class EstateDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "DELETE FROM estates WHERE supplier_id = ? AND id = ? ";
+            String sql = "UPDATE estates SET jom_db.estates.delete=1 WHERE supplier_id = ? AND id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,sId);
             preparedStatement.setInt(2,id);
