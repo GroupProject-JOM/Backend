@@ -54,7 +54,8 @@ public class ValidateEmailOTPServlet extends HttpServlet {
                 out.write("{\"message\": \"OTP Invalid\"}");
             }
         } else{
-            // TODO handle error user already validated
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            out.write("{\"message\": \"Already validated\"}");
         }
 
     }

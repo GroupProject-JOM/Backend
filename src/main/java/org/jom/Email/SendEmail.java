@@ -81,7 +81,6 @@ public class SendEmail {
             System.out.println("Password sent successfully");
             return password;
         }
-
         catch (MessagingException e) {
             throw new RuntimeException(e);
         }
