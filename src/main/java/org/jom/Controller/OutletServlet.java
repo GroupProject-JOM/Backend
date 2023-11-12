@@ -1,9 +1,11 @@
 package org.jom.Controller;
 
 import com.google.gson.Gson;
+import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.OutletDAO;
 import org.jom.Dao.Supplier.AccountDAO;
 import org.jom.Model.AccountModel;
+import org.jom.Model.EmployeeModel;
 import org.jom.Model.EstateModel;
 import org.jom.Model.OutletModel;
 
@@ -27,20 +29,31 @@ public class OutletServlet extends HttpServlet {
             BufferedReader bufferedReader = request.getReader();
             OutletModel outlet = gson.fromJson(bufferedReader, OutletModel.class);
 
-            // TODO backend validations and user exists
+            EmployeeDAO employeeDAO = new EmployeeDAO();
+            EmployeeModel employee = employeeDAO.getEmployee(outlet.getEmp_id());
 
+            if (employee.geteId() != 0) {
+                if (employee.getRole().equals("distributor") || employee.getRole().equals("admin") || employee.getRole().equals("sales-manager")) {
 
-            outlet.addOutlet();
-
-            if(outlet.getId() != 0){
-
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"message\": \"Outlet added successfully\"}");
-                System.out.println("Outlet added successfully");
-            }else{
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"message\": \"Outlet is not added\"}");
-                System.out.println("Outlet is not added");
+                    outlet.addOutlet();
+                    if (outlet.getId() != 0) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"message\": \"Outlet added successfully\"}");
+                        System.out.println("Outlet added successfully");
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"Outlet is not added\"}");
+                        System.out.println("Outlet is not added");
+                    }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"message\": \"Invalid User\"}");
+                    System.out.println("Invalid User");
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"Invalid User\"}");
+                System.out.println("Invalid User");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,11 +78,11 @@ public class OutletServlet extends HttpServlet {
             // Object array to json
             String object = gson.toJson(outlet);
 
-            if(outlet.getId() !=0){
+            if (outlet.getId() != 0) {
                 response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"outlet\": "+ object +"}");
+                out.write("{\"outlet\": " + object + "}");
                 System.out.println("Send Outlet");
-            }else{
+            } else {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 out.write("{\"outlet\": \"No outlet\"}");
                 System.out.println("No Outlet");
@@ -97,12 +110,12 @@ public class OutletServlet extends HttpServlet {
             // TODO backend validations and user exists
 
 
-            if(outlet.updateOutlet()){
+            if (outlet.updateOutlet()) {
 
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"message\": \"Outlet Updated successfully\"}");
                 System.out.println("Outlet Update successfully");
-            }else{
+            } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"Outlet is not updated\"}");
                 System.out.println("Outlet is not Updated");
@@ -125,11 +138,11 @@ public class OutletServlet extends HttpServlet {
         try {
             OutletDAO outletDAO = new OutletDAO();
 
-            if(outletDAO.deleteOutlet(outlet_id)) {
+            if (outletDAO.deleteOutlet(outlet_id)) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"message\": \"Delete Outlet\"}");
                 System.out.println("Delete Outlet");
-            }else {
+            } else {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 out.write("{\"message\": \"Unable to Delete Outlet\"}");
                 System.out.println("Outlet not deleted");

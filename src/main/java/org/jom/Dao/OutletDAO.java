@@ -17,7 +17,7 @@ public class OutletDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "INSERT INTO outlets (name,email,phone,address1,street,city) VALUES (?,?,?,?,?,?)";
+            String sql = "INSERT INTO outlets (name,email,phone,address1,street,city,registerd_by) VALUES (?,?,?,?,?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1,outlet.getName());
             preparedStatement.setString(2,outlet.getEmail());
@@ -25,6 +25,7 @@ public class OutletDAO {
             preparedStatement.setString(4,outlet.getAddress1());
             preparedStatement.setString(5,outlet.getStreet());
             preparedStatement.setString(6,outlet.getCity());
+            preparedStatement.setInt(7,outlet.getEmp_id());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
