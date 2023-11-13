@@ -78,7 +78,7 @@ public class SupplierDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT COUNT(*) AS Row_Count FROM suppliers; ";
+            String sql = "SELECT COUNT(*) AS Row_Count FROM users WHERE validity=1 AND role=\"supplier\" ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
 
