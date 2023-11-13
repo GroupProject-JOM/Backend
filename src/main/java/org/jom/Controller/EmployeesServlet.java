@@ -25,24 +25,39 @@ public class EmployeesServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
+        int admin_id = Integer.parseInt(request.getParameter("emp"));
+
         try {
             EmployeeDAO employeeDAO = new EmployeeDAO();
-            List<EmployeeModel> employees = employeeDAO.getAll();
+            EmployeeModel admin = employeeDAO.getEmployee(admin_id);
 
-            Gson gson = new Gson();
-            // Object array to json
-            String objectArray = gson.toJson(employees);
+            if (admin.geteId() != 0) {
+                if (admin.getRole().equals("admin")) {
 
-            if(employees.size() != 0){
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"size\": "+ employees.size() +",\"list\":"+ objectArray+"}");
-                System.out.println("View all Employees");
-            }else if(employees.size() == 0){
-                response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                out.write("{\"size\": \"0\"}");
-                System.out.println("No employee");
-            }else{
-                // TODO handle
+                    List<EmployeeModel> employees = employeeDAO.getAll();
+
+                    Gson gson = new Gson();
+                    // Object array to json
+                    String objectArray = gson.toJson(employees);
+
+                    if (employees.size() != 0) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"size\": " + employees.size() + ",\"list\":" + objectArray + "}");
+                        System.out.println("View all Employees");
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                        out.write("{\"size\": \"0\"}");
+                        System.out.println("No employee");
+                    }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"message\": \"Invalid User\"}");
+                    System.out.println("Invalid User");
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"Invalid User\"}");
+                System.out.println("Invalid User");
             }
 
         } catch (Exception e) {
