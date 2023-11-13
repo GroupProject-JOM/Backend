@@ -21,16 +21,32 @@ public class AdminServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
+        int admin_id = Integer.parseInt(request.getParameter("emp"));
+
         try {
             EmployeeDAO employeeDAO = new EmployeeDAO();
-            SupplierDAO supplierDAO = new SupplierDAO();
-            OutletDAO outletDAO = new OutletDAO();
-            CollectionDAO collectionDAO = new CollectionDAO();
+            EmployeeModel admin = employeeDAO.getEmployee(admin_id);
 
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"employees\": "+ employeeDAO.rowCount() +",\"suppliers\":"+ supplierDAO.rowCount()+",\"outlets\":"+ outletDAO.rowCount()+",\"collections\":"+collectionDAO.rowCount()+"}");
-                System.out.println("Send dashboard content");
+            if (admin.geteId() != 0) {
+                if (admin.getRole().equals("admin")) {
 
+                    SupplierDAO supplierDAO = new SupplierDAO();
+                    OutletDAO outletDAO = new OutletDAO();
+                    CollectionDAO collectionDAO = new CollectionDAO();
+
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out.write("{\"employees\": " + employeeDAO.rowCount() + ",\"suppliers\":" + supplierDAO.rowCount() + ",\"outlets\":" + outletDAO.rowCount() + ",\"collections\":" + collectionDAO.rowCount() + "}");
+                    System.out.println("Send dashboard content");
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"message\": \"Invalid User\"}");
+                    System.out.println("Invalid User");
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"Invalid User\"}");
+                System.out.println("Invalid User");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
