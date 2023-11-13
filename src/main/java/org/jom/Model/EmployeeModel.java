@@ -10,6 +10,7 @@ public class EmployeeModel extends UserModel{
     private String nic;
     private String photo;
     private String gender;
+    private int emp;
 
     public EmployeeModel() {
     }
@@ -27,11 +28,12 @@ public class EmployeeModel extends UserModel{
         super(id, first_name, phone, add_line_3, role);
     }
 
-    public EmployeeModel(String first_name, String last_name, String email, String password, String phone, String add_line_1, String add_line_2, String add_line_3, String role, String dob, String nic,String gender) {
+    public EmployeeModel(String first_name, String last_name, String email, String password, String phone, String add_line_1, String add_line_2, String add_line_3, String role, String dob, String nic,String gender,int emp) {
         super(first_name, last_name, email, password, phone, add_line_1, add_line_2, add_line_3, role);
         this.dob = dob;
         this.nic = nic;
         this.gender = gender;
+        this.emp = emp;
     }
 
     public int geteId() {
@@ -72,6 +74,14 @@ public class EmployeeModel extends UserModel{
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public int getEmp() {
+        return emp;
+    }
+
+    public void setEmp(int emp) {
+        this.emp = emp;
     }
 
     @Override
