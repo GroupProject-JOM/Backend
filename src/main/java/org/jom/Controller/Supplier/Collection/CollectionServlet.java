@@ -68,7 +68,7 @@ public class CollectionServlet extends HttpServlet {
 
         try {
             CollectionDAO collectionDAO = new CollectionDAO();
-            CollectionSingleViewModel collection = collectionDAO.getCollection(id);
+            CollectionSingleViewModel collection = collectionDAO.getCollection(id,supplier_id);
 
             Gson gson = new Gson();
             // Object array to json
@@ -78,12 +78,10 @@ public class CollectionServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"collection\": " + objectArray + " }");
                 System.out.println("Collection sent");
-            } else if (collection.getCollection_id() == 0) {
+            } else {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 out.write("{\"collection\": \"No collection\"}");
                 System.out.println("No collection");
-            } else {
-                // TODO handle
             }
 
         } catch (Exception e) {
