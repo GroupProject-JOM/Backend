@@ -335,20 +335,35 @@ public class EmployeeServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         int employeeId = Integer.parseInt(request.getParameter("id"));
-
-        EmployeeModel employee = new EmployeeModel(employeeId);
-        employee.getUserId();
+        int admin_id = Integer.parseInt(request.getParameter("emp"));
 
         try {
             EmployeeDAO employeeDAO = new EmployeeDAO();
-            if (employeeDAO.deleteUser(employee.getId())) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"message\": \"Delete employee\"}");
-                System.out.println("Delete employee");
+            EmployeeModel admin = employeeDAO.getEmployee(admin_id);
+
+            if (admin.geteId() != 0) {
+                if (admin.getRole().equals("admin")) {
+
+                    EmployeeModel employee = new EmployeeModel(employeeId);
+                    employee.getUserId();
+                    if (employeeDAO.deleteUser(employee.getId())) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"message\": \"Delete employee\"}");
+                        System.out.println("Delete employee");
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                        out.write("{\"message\": \"Unable to Delete employee\"}");
+                        System.out.println("employee not deleted");
+                    }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"message\": \"Invalid User\"}");
+                    System.out.println("Invalid User");
+                }
             } else {
-                response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                out.write("{\"message\": \"Unable to Delete employee\"}");
-                System.out.println("employee not deleted");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"Invalid User\"}");
+                System.out.println("Invalid User");
             }
 
         } catch (Exception e) {
