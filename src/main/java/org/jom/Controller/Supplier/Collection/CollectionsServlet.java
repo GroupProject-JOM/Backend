@@ -36,7 +36,7 @@ public class CollectionsServlet extends HttpServlet {
         try {
             SupplyDAO supplyDAO = new SupplyDAO();
             List<SupplyModel> supplies = supplyDAO.getAll(supplier_id);
-            int income = supplyDAO.getIncome(supplier_id,monthPattern);
+            int income = supplyDAO.getIncome(supplier_id, monthPattern);
 
             Gson gson = new Gson();
             // Object array to json
@@ -44,14 +44,12 @@ public class CollectionsServlet extends HttpServlet {
 
             if (supplies.size() != 0) {
                 response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"size\": " + supplies.size() + ",\"list\":" + objectArray + ",\"income\":"+income+"}");
+                out.write("{\"size\": " + supplies.size() + ",\"list\":" + objectArray + ",\"income\":" + income + "}");
                 System.out.println("Supplier dashboard tables contents");
-            } else if (supplies.size() == 0) {
+            } else{
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                out.write("{\"size\": \"0\"}");
+                out.write("{\"size\": \"0\",\"income\":" + income + "}");
                 System.out.println("No Supplies");
-            } else {
-                // TODO handle
             }
 
         } catch (Exception e) {

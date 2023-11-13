@@ -74,7 +74,7 @@ public class CollectionDAO {
         return isSuccess;
     }
 
-    public CollectionSingleViewModel getCollection(int id) {
+    public CollectionSingleViewModel getCollection(int collection_id,int supplier_id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
 
@@ -82,11 +82,13 @@ public class CollectionDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "select c.id,c.p_method,c.s_method,p.pickup_date ,p.pickup_time , c.init_amount ,c.status,c.final_amount,c.value from pickups p inner join collections c on p.collection_id=c.id where c.id = ? AND c.delete=0 union\n" +
-                    "select c.id,c.p_method,c.s_method,d.delivery_date,d.delivery_time,c.init_amount ,c.status,c.final_amount,c.value from deliveries d inner join collections c on d.collec_id=c.id where c.id = ? AND c.delete=0;";
+            String sql = "SELECT c.id,c.p_method,c.s_method,p.pickup_date ,p.pickup_time , c.init_amount ,c.status,c.final_amount,c.value FROM pickups p INNER JOIN collections c on p.collection_id=c.id WHERE c.id = ? AND c.delete=0 AND c.sup_id=? UNION \n" +
+                    "SELECT c.id,c.p_method,c.s_method,d.delivery_date,d.delivery_time,c.init_amount ,c.status,c.final_amount,c.value FROM deliveries d INNER JOIN collections c on d.collec_id=c.id WHERE c.id = ? AND c.delete=0 AND c.sup_id=?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,id);
-            preparedStatement.setInt(2,id);
+            preparedStatement.setInt(1,collection_id);
+            preparedStatement.setInt(2,supplier_id);
+            preparedStatement.setInt(3,collection_id);
+            preparedStatement.setInt(4,supplier_id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
