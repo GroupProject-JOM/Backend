@@ -28,6 +28,16 @@ public class UserModel {
         this.email = email;
     }
 
+    public UserModel(String first_name, String last_name, String phone, String add_line_1, String add_line_2, String add_line_3, String role) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.phone = phone;
+        this.add_line_1 = add_line_1;
+        this.add_line_2 = add_line_2;
+        this.add_line_3 = add_line_3;
+        this.role = role;
+    }
+
     public UserModel(int id, String first_name, String phone, String add_line_3, String role) {
         this.id = id;
         this.first_name = first_name;

@@ -137,7 +137,7 @@ public class EmployeeDAO {
             preparedStatement.setString(1,employee.getDob());
             preparedStatement.setString(2,employee.getNic());
             preparedStatement.setString(3,employee.getGender());
-            preparedStatement.setInt(4,employee.geteId());
+            preparedStatement.setInt(4,employee.getId());
 
             int x = preparedStatement.executeUpdate();
             if(x !=0){
