@@ -13,8 +13,16 @@ public class SupplyModel {
     private int value;
     private String name;
     private String method;
+    private String last_name;
+    private String phone;
+    private String payment_method;
+    private String location;
+    private String area;
 
-    public SupplyModel(int id, String date, String time, int amount, int status,int final_amount,int value) {
+    public SupplyModel() {
+    }
+
+    public SupplyModel(int id, String date, String time, int amount, int status, int final_amount, int value) {
         this.id = id;
         this.date = date;
         this.time = time;
@@ -30,5 +38,53 @@ public class SupplyModel {
         this.amount = amount;
         this.name = name;
         this.method = method;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public void setLast_name(String last_name) {
+        this.last_name = last_name;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setPayment_method(String payment_method) {
+        this.payment_method = payment_method;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
     }
 }
