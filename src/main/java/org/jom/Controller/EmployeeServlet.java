@@ -78,7 +78,7 @@ public class EmployeeServlet extends HttpServlet {
                     }
 
                     int count = 0;
-                    String roles[] = {"Collector", "Distributor", "Stock-Manager", "Production-Manager", "Sales-Manager"};
+                    String roles[] = {"collector", "distributor", "stock-manager", "production-manager", "sales-manager"};
                     for (String role : roles) {
                         if (!employee.getRole().equals(role)) {
                             count++;

@@ -28,7 +28,16 @@ public class EmployeeModel extends UserModel{
         super(id, first_name, phone, add_line_3, role);
     }
 
-    public EmployeeModel(String first_name, String last_name, String email, String password, String phone, String add_line_1, String add_line_2, String add_line_3, String role, String dob, String nic,String gender,int emp) {
+    public EmployeeModel(String first_name, String last_name, String phone, String add_line_1, String add_line_2, String add_line_3, String role, int eId, String dob, String nic, String gender, int emp) {
+        super(first_name, last_name, phone, add_line_1, add_line_2, add_line_3, role);
+        this.eId = eId;
+        this.dob = dob;
+        this.nic = nic;
+        this.gender = gender;
+        this.emp = emp;
+    }
+
+    public EmployeeModel(String first_name, String last_name, String email, String password, String phone, String add_line_1, String add_line_2, String add_line_3, String role, String dob, String nic, String gender, int emp) {
         super(first_name, last_name, email, password, phone, add_line_1, add_line_2, add_line_3, role);
         this.dob = dob;
         this.nic = nic;
