@@ -171,25 +171,40 @@ public class EmployeeServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         int employee_id = Integer.parseInt(request.getParameter("id"));
+        int admin_id = Integer.parseInt(request.getParameter("emp"));
 
         try {
             EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel employee = employeeDAO.getEmployee(employee_id);
+            EmployeeModel admin = employeeDAO.getEmployee(admin_id);
 
-            Gson gson = new Gson();
-            // Object array to json
-            String object = gson.toJson(employee);
+            if (admin.geteId() != 0) {
+                if (admin.getRole().equals("admin")) {
 
-            if (employee.geteId() != 0) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"employee\": " + object + "}");
-                System.out.println("Send employee");
+                    EmployeeModel employee = employeeDAO.getEmployee(employee_id);
+
+                    Gson gson = new Gson();
+                    // Object array to json
+                    String object = gson.toJson(employee);
+
+                    if (employee.geteId() != 0) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"employee\": " + object + "}");
+                        System.out.println("Send employee");
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                        out.write("{\"employee\": \"No employee\"}");
+                        System.out.println("No employee");
+                    }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"message\": \"Invalid User\"}");
+                    System.out.println("Invalid User");
+                }
             } else {
-                response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                out.write("{\"employee\": \"No employee\"}");
-                System.out.println("No employee");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"Invalid User\"}");
+                System.out.println("Invalid User");
             }
-            // TODO handle
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -209,87 +224,102 @@ public class EmployeeServlet extends HttpServlet {
             BufferedReader bufferedReader = request.getReader();
             EmployeeModel employee = gson.fromJson(bufferedReader, EmployeeModel.class);
 
-            // TODO backend validations and user exists
-            // Check input field is empty
-            if (employee.getFirst_name().isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"message\": \"fname\"}");
-                return;
-            }
-            if (employee.getLast_name().isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"message\": \"lname\"}");
-                return;
-            }
-            if (employee.getPhone().isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"message\": \"phone\"}");
-                return;
-            }
-            if (employee.getAdd_line_1().isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"message\": \"address1\"}");
-                return;
-            }
-            if (employee.getAdd_line_2().isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"message\": \"address2\"}");
-                return;
-            }
-            if (employee.getAdd_line_3().isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"message\": \"address3\"}");
-                return;
-            }
-            if (employee.getRole().isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"message\": \"role\"}");
-                return;
-            }
+            EmployeeDAO employeeDAO = new EmployeeDAO();
+            EmployeeModel admin = employeeDAO.getEmployee(employee.getEmp());
 
-            int count = 0;
-            String roles[] = {"collector", "distributor", "stock-manager", "production-manager", "sales-manager"};
-            for (String role : roles) {
-                if (!employee.getRole().equals(role)) {
-                    count++;
-                } else break;
-                if (count >= 5) {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    out.write("{\"message\": \"roleV\"}");
-                    return;
+            if (admin.geteId() != 0) {
+                if (admin.getRole().equals("admin")) {
+
+                    // Check input field is empty
+                    if (employee.getFirst_name().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"fname\"}");
+                        return;
+                    }
+                    if (employee.getLast_name().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"lname\"}");
+                        return;
+                    }
+                    if (employee.getPhone().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"phone\"}");
+                        return;
+                    }
+                    if (employee.getAdd_line_1().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"address1\"}");
+                        return;
+                    }
+                    if (employee.getAdd_line_2().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"address2\"}");
+                        return;
+                    }
+                    if (employee.getAdd_line_3().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"address3\"}");
+                        return;
+                    }
+                    if (employee.getRole().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"role\"}");
+                        return;
+                    }
+
+                    int count = 0;
+                    String roles[] = {"collector", "distributor", "stock-manager", "production-manager", "sales-manager"};
+                    for (String role : roles) {
+                        if (!employee.getRole().equals(role)) {
+                            count++;
+                        } else break;
+                        if (count >= 5) {
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            out.write("{\"message\": \"roleV\"}");
+                            return;
+                        }
+                    }
+
+                    if (employee.getDob().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"dob\"}");
+                        return;
+                    }
+                    if (employee.getNic().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"nic\"}");
+                        return;
+                    }
+
+                    if (employee.NICExists()) {
+                        if (employee.getEId() != employee.geteId()) {
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            out.write("{\"message\": \"NIC\"}");
+                            System.out.println("NIC already exists");
+                            return;
+                        }
+                    }
+
+                    employee.getUserId();
+
+                    if (employee.updateUser()) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"message\": \"Employee Updated successfully\"}");
+                        System.out.println("Employee Update successfully");
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+                        out.write("{\"message\": \"Employee is not updated\"}");
+                        System.out.println("Employee is not Updated");
+                    }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"message\": \"Invalid User\"}");
+                    System.out.println("Invalid User");
                 }
-            }
-
-            if (employee.getDob().isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"message\": \"dob\"}");
-                return;
-            }
-            if (employee.getNic().isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"message\": \"nic\"}");
-                return;
-            }
-
-            if (employee.NICExists()) {
-                if (employee.getEId() != employee.geteId()) {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    out.write("{\"message\": \"NIC\"}");
-                    System.out.println("NIC already exists");
-                    return;
-                }
-            }
-
-            employee.getUserId();
-
-            if (employee.updateUser()) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"message\": \"Employee Updated successfully\"}");
-                System.out.println("Employee Update successfully");
             } else {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"message\": \"Employee is not updated\"}");
-                System.out.println("Employee is not Updated");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"Invalid User\"}");
+                System.out.println("Invalid User");
             }
         } catch (Exception e) {
             e.printStackTrace();
