@@ -45,17 +45,16 @@ public class CollectionDAO {
         return collectionId;
     }
 
-    public boolean updateStatus(int status,int id){
+    public boolean updateStatus(int id){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean isSuccess = false;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE collections SET status=? WHERE id = ? ";
+            String sql = "UPDATE collections SET status=1 WHERE id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,status);
-            preparedStatement.setInt(2,id);
+            preparedStatement.setInt(1,id);
 
             int x = preparedStatement.executeUpdate();
             if(x !=0){

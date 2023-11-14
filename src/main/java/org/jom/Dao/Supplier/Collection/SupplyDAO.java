@@ -120,14 +120,14 @@ public class SupplyDAO {
                     "    SELECT c.id, c.value, c.delete\n" +
                     "    FROM pickups p\n" +
                     "    INNER JOIN collections c ON p.collection_id = c.id\n" +
-                    "    WHERE c.sup_id = ? AND c.status=5 AND p.pickup_date LIKE " + "\'" + pattern + "\'" + "\n" +
+                    "    WHERE c.sup_id = ? AND c.status=6 AND p.pickup_date LIKE " + "\'" + pattern + "\'" + "\n" +
                     "    \n" +
                     "    UNION\n" +
                     "    \n" +
                     "    SELECT c.id, c.value, c.delete\n" +
                     "    FROM deliveries d\n" +
                     "    INNER JOIN collections c ON d.collec_id = c.id\n" +
-                    "    WHERE c.sup_id = ? AND c.status=5 AND d.delivery_date LIKE " + "\'" + pattern + "\'" + "\n" +
+                    "    WHERE c.sup_id = ? AND c.status=6 AND d.delivery_date LIKE " + "\'" + pattern + "\'" + "\n" +
                     ") AS subquery;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, supplier_id);
@@ -203,4 +203,31 @@ public class SupplyDAO {
         return supply;
     }
 
+    public boolean acceptSupply(int collection_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE collections SET status=2 WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collection_id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
 }

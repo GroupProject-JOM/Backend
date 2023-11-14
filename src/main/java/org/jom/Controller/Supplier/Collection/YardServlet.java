@@ -43,7 +43,7 @@ public class YardServlet extends HttpServlet {
 
             if(yard.getId() != 0){
                 CollectionDAO collectionDAO = new CollectionDAO();
-                if(collectionDAO.updateStatus(1,yard.getCollection_id())) {
+                if(collectionDAO.updateStatus(yard.getCollection_id())) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.write("{\"message\": \"Yard request added successfully\"}");
                     System.out.println("Yard request added successfully");
