@@ -43,7 +43,7 @@ public class PickupServlet extends HttpServlet {
 
             if(pickup.getId() != 0){
                 CollectionDAO collectionDAO = new CollectionDAO();
-                if(collectionDAO.updateStatus(pickup.getCollection_id())) {
+                if(collectionDAO.updateStatus(1,pickup.getCollection_id())) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.write("{\"message\": \"Pickup request added successfully\"}");
                     System.out.println("Pickup request added successfully");
