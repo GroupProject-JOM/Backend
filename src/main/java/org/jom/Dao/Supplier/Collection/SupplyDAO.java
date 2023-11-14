@@ -23,12 +23,12 @@ public class SupplyDAO {
             String sql = "SELECT c.id,u.first_name,p.pickup_date, c.init_amount ,c.s_method,c.status\n" +
                     "FROM collections c\n" +
                     "INNER JOIN pickups p ON c.id = p.collection_id INNER JOIN suppliers s ON c.sup_id = s.id INNER JOIN users u ON u.id=s.user_id \n" +
-                    "WHERE c.delete=0 AND c.status=1 OR c.status=2\n" +
+                    "WHERE c.delete=0 AND (c.status=1 OR c.status=2)\n" +
                     "UNION\n" +
                     "SELECT c.id,u.first_name,d.delivery_date,c.init_amount ,c.s_method,c.status\n" +
                     "FROM collections c\n" +
                     "INNER JOIN deliveries d ON c.id = d.collec_id INNER JOIN suppliers s ON c.sup_id = s.id INNER JOIN users u ON u.id=s.user_id \n" +
-                    "WHERE c.delete=0 AND c.status=1 OR c.status=2 ORDER BY id;";
+                    "WHERE c.delete=0 AND c.status=1 ORDER BY id;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
 
