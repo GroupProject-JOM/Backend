@@ -19,15 +19,15 @@ public class SupplyDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT c.id,u.first_name,p.pickup_date, c.init_amount ,c.s_method\n" +
+            String sql = "SELECT c.id,u.first_name,p.pickup_date, c.init_amount ,c.s_method,c.status\n" +
                     "FROM collections c\n" +
                     "INNER JOIN pickups p ON c.id = p.collection_id INNER JOIN suppliers s ON c.sup_id = s.id INNER JOIN users u ON u.id=s.user_id \n" +
-                    "WHERE c.delete=0 AND c.status=1\n" +
+                    "WHERE c.delete=0 AND c.status=1 OR c.status=2\n" +
                     "UNION\n" +
-                    "SELECT c.id,u.first_name,d.delivery_date,c.init_amount ,c.s_method\n" +
+                    "SELECT c.id,u.first_name,d.delivery_date,c.init_amount ,c.s_method,c.status\n" +
                     "FROM collections c\n" +
                     "INNER JOIN deliveries d ON c.id = d.collec_id INNER JOIN suppliers s ON c.sup_id = s.id INNER JOIN users u ON u.id=s.user_id \n" +
-                    "WHERE c.delete=0 AND c.status=1;";
+                    "WHERE c.delete=0 AND c.status=1 OR c.status=2;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -37,8 +37,9 @@ public class SupplyDAO {
                 String date = resultSet.getString(3);
                 int amount = resultSet.getInt(4);
                 String method = resultSet.getString(5);
+                int status = resultSet.getInt(6);
 
-                SupplyModel supply = new SupplyModel(collection_id, date, amount, name, method);
+                SupplyModel supply = new SupplyModel(collection_id, date, amount, name, method,status);
                 supplies.add(supply);
             }
 
@@ -161,15 +162,15 @@ public class SupplyDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT c.id,u.first_name,u.last_name,u.phone,c.s_method,p.pickup_date,p.pickup_time ,c.init_amount,c.p_method,e.location,e.area\n" +
+            String sql = "SELECT c.id,u.first_name,u.last_name,u.phone,c.s_method,p.pickup_date,p.pickup_time ,c.init_amount,c.p_method,e.location,e.area,c.status\n" +
                     "FROM collections c\n" +
                     "INNER JOIN pickups p ON c.id = p.collection_id INNER JOIN suppliers s ON c.sup_id = s.id INNER JOIN users u ON u.id=s.user_id INNER JOIN estates e ON e.id=p.estate_id\n" +
-                    "WHERE c.delete=0 AND c.status=1 AND c.id=?\n" +
+                    "WHERE c.delete=0 AND c.status=1 OR c.status=2 AND c.id=?\n" +
                     "UNION\n" +
-                    "SELECT c.id,u.first_name,u.last_name,u.phone,c.s_method,d.delivery_date,d.delivery_time,c.init_amount,c.p_method,e.location,e.area\n" +
+                    "SELECT c.id,u.first_name,u.last_name,u.phone,c.s_method,d.delivery_date,d.delivery_time,c.init_amount,c.p_method,e.location,e.area,c.status\n" +
                     "FROM collections c\n" +
                     "INNER JOIN deliveries d ON c.id = d.collec_id INNER JOIN suppliers s ON c.sup_id = s.id INNER JOIN users u ON u.id=s.user_id INNER JOIN estates e ON e.supplier_id=s.id\n" +
-                    "WHERE c.delete=0 AND c.status=1 AND c.id=? LIMIT 1;";
+                    "WHERE c.delete=0 AND c.status=1 OR c.status=2 AND c.id=? LIMIT 1;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, collection_id);
             preparedStatement.setInt(2, collection_id);
@@ -187,6 +188,7 @@ public class SupplyDAO {
                 supply.setPayment_method(resultSet.getString(9));
                 supply.setLocation(resultSet.getString(10));
                 supply.setArea(resultSet.getString(11));
+                supply.setStatus(resultSet.getInt(12));
             }
 
             resultSet.close();
