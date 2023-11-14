@@ -203,6 +203,7 @@ public class SupplyDAO {
         return supply;
     }
 
+    //Accept supply request
     public boolean acceptSupply(int collection_id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
@@ -211,6 +212,35 @@ public class SupplyDAO {
         try {
             connection = connectionPool.dataSource.getConnection();
             String sql = "UPDATE collections SET status=2 WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collection_id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
+
+    //Reject supply request
+    public boolean rejectSupply(int collection_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE collections SET status=4 WHERE id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, collection_id);
 
