@@ -32,12 +32,13 @@ public class SupplyModel {
         this.value = value;
     }
 
-    public SupplyModel(int id, String date, int amount, String name, String method) {
+    public SupplyModel(int id, String date, int amount, String name, String method, int status) {
         this.id = id;
         this.date = date;
         this.amount = amount;
         this.name = name;
         this.method = method;
+        this.status = status;
     }
 
     public int getId() {
@@ -86,5 +87,9 @@ public class SupplyModel {
 
     public void setArea(String area) {
         this.area = area;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }
