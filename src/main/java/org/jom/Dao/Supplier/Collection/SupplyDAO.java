@@ -316,4 +316,186 @@ public class SupplyDAO {
         return collectors;
     }
 
+    //collection for relevant date
+    public List<SupplyModel> getCollectionByDay(int collector, String pickup_date) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    p.pickup_date,\n" +
+                    "    p.pickup_time,\n" +
+                    "    p.collection_id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    u.phone,\n" +
+                    "    e.location,\n" +
+                    "    e.area,\n" +
+                    "    c.init_amount\n" +
+                    "FROM\n" +
+                    "    jom_db.pickups p\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id = p.s_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON s.user_id = u.id\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON p.collection_id = c.id AND c.delete = 0\n" +
+                    "        AND c.status = 3\n" +
+                    "        INNER JOIN\n" +
+                    "    estates e ON e.id = p.estate_id\n" +
+                    "WHERE\n" +
+                    "    p.pickup_date = ?\n" +
+                    "        AND p.collector = ?;        ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, pickup_date);
+            preparedStatement.setInt(2, collector);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String date = resultSet.getString(1);
+                String time = resultSet.getString(2);
+                int collection_id = resultSet.getInt(3);
+                String fist_name = resultSet.getString(4);
+                String last_name = resultSet.getString(5);
+                String phone = resultSet.getString(6);
+                String location = resultSet.getString(7);
+                String area = resultSet.getString(8);
+                int initial_amount = resultSet.getInt(9);
+
+                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, phone,location,area);
+                supplies.add(supply);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
+    }
+
+    // upcoming collection for next two days
+    public List<SupplyModel> getUpcomingCollections(int collector, String pickup_date,String day_after_tomorrow) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    p.pickup_date,\n" +
+                    "    p.pickup_time,\n" +
+                    "    p.collection_id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    u.phone,\n" +
+                    "    e.location,\n" +
+                    "    e.area,\n" +
+                    "    c.init_amount\n" +
+                    "FROM\n" +
+                    "    jom_db.pickups p\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id = p.s_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON s.user_id = u.id\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON p.collection_id = c.id AND c.delete = 0\n" +
+                    "        AND c.status = 3\n" +
+                    "        INNER JOIN\n" +
+                    "    estates e ON e.id = p.estate_id\n" +
+                    "WHERE\n" +
+                    "    p.pickup_date > ? AND p.pickup_date <= ?\n" +
+                    "        AND p.collector = ?;        ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, pickup_date);
+            preparedStatement.setString(2, day_after_tomorrow);
+            preparedStatement.setInt(3, collector);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String date = resultSet.getString(1);
+                String time = resultSet.getString(2);
+                int collection_id = resultSet.getInt(3);
+                String fist_name = resultSet.getString(4);
+                String last_name = resultSet.getString(5);
+                String phone = resultSet.getString(6);
+                String location = resultSet.getString(7);
+                String area = resultSet.getString(8);
+                int initial_amount = resultSet.getInt(9);
+
+                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, phone,location,area);
+                supplies.add(supply);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
+    }
+
+    //Get All collection count for relevant date
+    public int getCollectionCount(int collector, String pickup_date) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        int count = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    COUNT(*) AS Row_Count\n" +
+                    "FROM\n" +
+                    "    jom_db.pickups p\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id = p.s_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON s.user_id = u.id\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON p.collection_id = c.id AND c.delete = 0\n" +
+                    "        AND (c.status = 3 OR c.status = 5 OR c.status = 6)\n" +
+                    "        INNER JOIN\n" +
+                    "    estates e ON e.id = p.estate_id\n" +
+                    "WHERE\n" +
+                    "    p.pickup_date = ?\n" +
+                    "        AND p.collector = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, pickup_date);
+            preparedStatement.setInt(2, collector);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return count;
+    }
 }
