@@ -28,10 +28,10 @@ public class CollectorServlet extends HttpServlet {
 
         try {
             EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel stock_manager = employeeDAO.getEmployee(employee_id);
+            EmployeeModel collector = employeeDAO.getEmployee(employee_id);
 
-            if (stock_manager.geteId() != 0) {
-                if (stock_manager.getRole().equals("collector")) {
+            if (collector.geteId() != 0) {
+                if (collector.getRole().equals("collector")) {
 
                     Date currentDate = new Date();
                     Calendar calendar = Calendar.getInstance();
@@ -48,7 +48,7 @@ public class CollectorServlet extends HttpServlet {
                     SupplyDAO supplyDAO = new SupplyDAO();
 
                     List<SupplyModel> today_collections = supplyDAO.getCollectionByDay(employee_id, today);
-                    List<SupplyModel> upcoming_collections = supplyDAO.getUpcomingCollections(employee_id, today,day_after_tomorrow);
+                    List<SupplyModel> upcoming_collections = supplyDAO.getUpcomingCollections(employee_id, today, day_after_tomorrow);
                     int today_count = supplyDAO.getCollectionCount(employee_id, today);
 
                     Gson gson = new Gson();

@@ -498,4 +498,48 @@ public class SupplyDAO {
         }
         return count;
     }
+
+    //get relevant collection
+    public SupplyModel getCollection(int collection_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        SupplyModel supply = new SupplyModel();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT c.id,u.first_name,u.last_name,u.phone,p.pickup_date,p.pickup_time ,c.init_amount,c.p_method,e.location,e.area\n" +
+                    "                    FROM collections c\n" +
+                    "                    INNER JOIN pickups p ON c.id = p.collection_id INNER JOIN suppliers s ON c.sup_id = s.id INNER JOIN users u ON u.id=s.user_id INNER JOIN estates e ON e.id=p.estate_id\n" +
+                    "                    WHERE c.delete=0 AND c.status=3 AND c.id=?\n;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collection_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                supply.setId(resultSet.getInt(1));
+                supply.setName(resultSet.getString(2));
+                supply.setLast_name(resultSet.getString(3));
+                supply.setPhone(resultSet.getString(4));
+                supply.setDate(resultSet.getString(5));
+                supply.setTime(resultSet.getString(6));
+                supply.setAmount(resultSet.getInt(7));
+                supply.setPayment_method(resultSet.getString(8));
+                supply.setLocation(resultSet.getString(9));
+                supply.setArea(resultSet.getString(10));
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supply;
+    }
 }
