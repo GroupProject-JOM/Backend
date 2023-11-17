@@ -41,6 +41,18 @@ public class SupplyModel {
         this.status = status;
     }
 
+    public SupplyModel(int id, String date, String time, int amount, String name, String last_name, String phone, String location, String area) {
+        this.id = id;
+        this.date = date;
+        this.time = time;
+        this.amount = amount;
+        this.name = name;
+        this.last_name = last_name;
+        this.phone = phone;
+        this.location = location;
+        this.area = area;
+    }
+
     public int getId() {
         return id;
     }

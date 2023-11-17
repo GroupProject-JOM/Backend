@@ -15,6 +15,7 @@ public class CollectionModel {
     // 1 - pending approval
     // 2 - accepted
     // 3 - Ready to pick-up
+    //   - waiting for verification
     // 4 - reject
     // 5 - pending payment
     // 6 - paid
