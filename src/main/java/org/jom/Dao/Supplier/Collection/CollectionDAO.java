@@ -207,4 +207,217 @@ public class CollectionDAO {
     }
 
 
+    //get supplier id by collection
+    public int getSupplierId(int collection_id, int employee_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int supplier_id = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    u.id\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON p.collection_id = c.id\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id=c.sup_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    employees e\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND e.user_Id_ = ?\n" +
+                    "        AND c.delete = 0\n" +
+                    "        AND c.s_method = 'pickup'\n" +
+                    "        AND c.status = 3;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collection_id);
+            preparedStatement.setInt(2, employee_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                supplier_id = resultSet.getInt(1);
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplier_id;
+    }
+
+    //get supplier id by collection
+    public int getCollectorId(int collection_id, int supplier_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int collector_id = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    u.id\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON p.collection_id = c.id\n" +
+                    "        INNER JOIN\n" +
+                    "    employees e ON e.id = p.collector\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON e.user_Id_ = u.id\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND s.user_id = ?\n" +
+                    "        AND c.delete = 0\n" +
+                    "        AND c.s_method = 'pickup'\n" +
+                    "        AND c.status = 3;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collection_id);
+            preparedStatement.setInt(2, supplier_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                collector_id = resultSet.getInt(1);
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return collector_id;
+    }
+
+    //get supplier email by collection
+    public String getSupplierEmail(int collection_id, int employee_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        String supplier_email = null;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    u.email\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON p.collection_id = c.id\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id=c.sup_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    employees e\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND e.user_Id_ = ?\n" +
+                    "        AND c.delete = 0\n" +
+                    "        AND c.s_method = 'pickup'\n" +
+                    "        AND c.status = 3;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collection_id);
+            preparedStatement.setInt(2, employee_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                supplier_email = resultSet.getString(1);
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplier_email;
+    }
+
+    //get supplier name by collection
+    public String getSupplierName(int collection_id, int employee_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        String supplier_name = null;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    u.first_name\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON p.collection_id = c.id\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id=c.sup_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    employees e\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND e.user_Id_ = ?\n" +
+                    "        AND c.delete = 0\n" +
+                    "        AND c.s_method = 'pickup'\n" +
+                    "        AND c.status = 3;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collection_id);
+            preparedStatement.setInt(2, employee_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                supplier_name = resultSet.getString(1);
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplier_name;
+    }
+
+    // update final amount and status
+    public boolean updateFinalAmount(int amount,int collection_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean isSuccess = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE collections c SET c.final_amount = ?,c.status=5 WHERE c.id=? AND c.status=3 AND c.delete=0;  ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, amount);
+            preparedStatement.setInt(2, collection_id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                isSuccess = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return isSuccess;
+    }
 }

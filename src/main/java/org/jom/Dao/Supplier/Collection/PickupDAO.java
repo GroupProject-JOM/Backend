@@ -51,4 +51,32 @@ public class PickupDAO {
         return pickupId;
     }
 
+    // update collected date by collection id
+    public boolean updateCollectedDate(int collection_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE pickups p SET p.collected_date = NOW() WHERE p.collection_id=?; ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collection_id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
 }

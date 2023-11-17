@@ -128,4 +128,42 @@ public class SupplierDAO {
         }
         return count;
     }
+
+    public String getRole(int id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        String role = null;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    u.role\n" +
+                    "FROM\n" +
+                    "    jom_db.users u\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.user_id = u.id\n" +
+                    "WHERE\n" +
+                    "    u.id = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                role = resultSet.getString(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return role;
+    }
 }

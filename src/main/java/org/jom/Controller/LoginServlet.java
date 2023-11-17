@@ -29,20 +29,20 @@ public class LoginServlet extends HttpServlet {
             LoginModel login = gson.fromJson(bufferedReader, LoginModel.class);
             UserModel user = login.getUser();
 
-            if(user.getId() != 0){
-                if(user.getValidity() != 0) {
+            if (user.getId() != 0) {
+                if (user.getValidity() != 0) {
                     if (user.getPassword().equals(login.getPassword())) {
-                        if(user.getRole().equals("supplier")){
+                        if (user.getRole().equals("supplier")) {
                             SupplierModel supplier = new SupplierModel(user.getId());
                             supplier.getSupplier();
-                        response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\",\"name\":\"" + user.getFirst_name() + "\",\"sId\":\""+ supplier.getId() +"\"}");
-                        System.out.println("Login successful");
-                        }else{
-                            EmployeeModel employee = new EmployeeModel(user.getId(),0);
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\",\"name\":\"" + user.getFirst_name() + "\",\"sId\":\"" + supplier.getId() + "\",\"user\":\"" + user.getId() + "\"}");
+                            System.out.println("Login successful");
+                        } else {
+                            EmployeeModel employee = new EmployeeModel(user.getId(), 0);
                             employee.getEIdById();
                             response.setStatus(HttpServletResponse.SC_OK);
-                            out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\",\"name\":\"" + user.getFirst_name() + "\",\"sId\":\""+ employee.geteId() +"\"}");
+                            out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\",\"name\":\"" + user.getFirst_name() + "\",\"sId\":\"" + employee.geteId() + "\",\"user\":\"" + user.getId() + "\"}");
                             System.out.println("Login successful");
                         }
                     } else {
@@ -50,14 +50,14 @@ public class LoginServlet extends HttpServlet {
                         out.write("{\"message\": \"password\"}");
                         System.out.println("Wrong password");
                     }
-                }else{
+                } else {
                     // TODO hadle
                     System.out.println("User not validated");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     out.write("{\"message\": \"validate\"}");
                     System.out.println("Login incorrect");
                 }
-            }else{
+            } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.write("{\"message\": \"username\"}");
                 System.out.println("Login incorrect");
