@@ -1,6 +1,7 @@
 package org.jom.Controller.Collector;
 
 import com.google.gson.Gson;
+import org.jom.Dao.CollectorDAO;
 import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.Collection.PickupDAO;
@@ -95,8 +96,9 @@ public class PickupCollectionServlet extends HttpServlet {
             try {
                 PickupDAO pickupDAO = new PickupDAO();
                 CollectionDAO collectionDAO = new CollectionDAO();
+                CollectorDAO collectorDAO = new CollectorDAO();
 
-                if(pickupDAO.updateCollectedDate(collection_id) && collectionDAO.updateFinalAmount(final_amount,collection_id)) {
+                if(pickupDAO.updateCollectedDate(collection_id) && collectionDAO.updateFinalAmount(final_amount,collection_id) && collectorDAO.updateTodayAmount(final_amount,user_id)) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.write("{\"message\": \"Collection Completed\"}");
                 }else {

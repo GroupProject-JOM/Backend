@@ -1,6 +1,7 @@
 package org.jom.Controller;
 
 import com.google.gson.Gson;
+import org.jom.Dao.CollectorDAO;
 import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.OutletDAO;
 import org.jom.Email.SendEmail;
@@ -137,6 +138,14 @@ public class EmployeeServlet extends HttpServlet {
 
                     // All validations are passed then register
                     employee.Register();
+
+                    //collector to collector table
+                    if(employee.getRole().equals("collector")){
+                        CollectorDAO collectorDAO = new CollectorDAO();
+                        if(collectorDAO.register(employee.getId())){
+                            System.out.println("Collector added successfully");
+                        }
+                    }
 
                     if (employee.geteId() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
