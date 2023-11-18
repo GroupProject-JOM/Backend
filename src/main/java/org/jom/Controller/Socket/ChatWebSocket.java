@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ServerEndpoint("/chat")
+@ServerEndpoint("/chat-web")
 public class ChatWebSocket {
 
     private static final Map<String, Session> sessions = new HashMap<>();
@@ -46,7 +46,7 @@ public class ChatWebSocket {
             if (recipientSession != null) {
                 sendMessageTo(recipientSession, generateUserId(senderSession) + ": " + content);
                 ChatDAO chatDAO = new ChatDAO();
-                chatDAO.saveChatMessage(generateUserId(senderSession), recipientId, content);
+//                chatDAO.saveChatMessage(generateUserId(senderSession), recipientId, content);
             } else {
                 sendMessageTo(senderSession, "User " + recipientId + " not found");
             }
