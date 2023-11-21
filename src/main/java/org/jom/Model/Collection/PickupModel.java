@@ -11,6 +11,9 @@ public class PickupModel {
     private int estate_id;
     private int account_id;
 
+    public PickupModel() {
+    }
+
     public PickupModel(String date, String time, int supplier_id, int collection_id, int estate_id, int account_id) {
         this.date = date;
         this.time = time;

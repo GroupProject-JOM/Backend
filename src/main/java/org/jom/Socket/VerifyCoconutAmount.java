@@ -1,6 +1,5 @@
-package org.jom.Controller.Socket;
+package org.jom.Socket;
 
-import org.jom.Dao.Chat.ChatDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.UserDAO;
 import org.jom.Model.UserModel;
@@ -16,22 +15,22 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-@ServerEndpoint("/chat/{user}")
-public class Chat {
+@ServerEndpoint("/verify-amount/{user}")
+public class VerifyCoconutAmount {
     private static final Map<String, Session> sessions = new ConcurrentHashMap<>();
-    private static final Map<String, Queue<String>> pendingMessage = new ConcurrentHashMap<>();
+    private static final Map<String, Queue<String>> pendingNotifications = new ConcurrentHashMap<>();
 
     @OnOpen
     public void onOpen(Session session, @PathParam("user") int user) {
         int authenticatedUser = authenticateUser(session, user);
         if (authenticatedUser != 0) {
             sessions.put(Integer.toString(authenticatedUser), session);
-            Queue<String> notifications = pendingMessage.get(Integer.toString(user));
+            Queue<String> notifications = pendingNotifications.get(Integer.toString(user));
             if (notifications != null && !notifications.isEmpty()) {
                 for (String notification : notifications) {
-                    sendMessage(session, notification);
+                    sendNotification(session, notification);
                 }
-                pendingMessage.remove(Integer.toString(user));
+                pendingNotifications.remove(Integer.toString(user));
             }
         }
     }
@@ -39,31 +38,30 @@ public class Chat {
     @OnMessage
     public void onMessage(String message, Session session) {
         String[] parts = message.split(":");
-        ChatDAO chatDAO = new ChatDAO();
-
         if (parts.length == 3) {
             int sender_id = Integer.parseInt(parts[0].trim());
             String content = parts[1].trim();
-            int receiver_id = Integer.parseInt(parts[2].trim());
+            int collection_id = Integer.parseInt(parts[2].trim());
+            CollectionDAO collectionDAO = new CollectionDAO();
 
-            Session recipientSession = sessions.get(Integer.toString(receiver_id));
-            if (recipientSession != null) {
-                sendMessage(recipientSession, content);
+            if (content.startsWith("Collector")) {
+                int supplier = collectionDAO.getSupplierId(collection_id, sender_id);
+                Session recipientSession = sessions.get(Integer.toString(supplier));
+                if (recipientSession != null) {
+                    sendNotification(recipientSession, content);
+                } else {
+                    savePendingNotification(Integer.toString(supplier), content);
+                }
             } else {
-                savePendingMessage(Integer.toString(receiver_id), content);
-            }
-            chatDAO.saveChatMessage(sender_id,receiver_id,content);
-        } else if (parts.length == 2) {
-            int sender_id = Integer.parseInt(parts[0].trim());
-            String content = parts[1].trim();
+                int collector = collectionDAO.getCollectorId(collection_id, sender_id);
+                Session recipientSession = sessions.get(Integer.toString(collector));
 
-            Session recipientSession = sessions.get("3");
-            if (recipientSession != null) {
-                sendMessage(recipientSession, content);
-            } else {
-                savePendingMessage("3", content);
+                if (recipientSession != null) {
+                    sendNotification(recipientSession, content);
+                } else {
+                    savePendingNotification(Integer.toString(collector), content);
+                }
             }
-            chatDAO.saveChatMessage(sender_id,3,content);
         }
     }
 
@@ -73,7 +71,7 @@ public class Chat {
     }
 
 
-    private static void sendMessage(Session session, String message) {
+    private static void sendNotification(Session session, String message) {
         try {
             session.getAsyncRemote().sendText(message);
         } catch (Exception e) {
@@ -81,25 +79,25 @@ public class Chat {
         }
     }
 
-    public static void savePendingMessage(String senderId, String notification) {
-        pendingMessage.computeIfAbsent(senderId, k -> new ConcurrentLinkedQueue<>()).add(notification);
+    public static void savePendingNotification(String senderId, String notification) {
+        pendingNotifications.computeIfAbsent(senderId, k -> new ConcurrentLinkedQueue<>()).add(notification);
     }
 
     private int authenticateUser(Session session, int user_id) {
         if (user_id == 0) {
-            sendMessage(session, "Invalid user.");
+            sendNotification(session, "Invalid user.");
             return 0;
         }
 
         UserDAO userDAO = new UserDAO();
         UserModel user = userDAO.getUserById(user_id);
 
-        if (user.getRole().equals("stock-manager"))
+        if (user.getRole().equals("collector"))
             return user_id;
         else if (user.getRole().equals("supplier"))
             return user_id;
         else {
-            sendMessage(session, "Invalid user.");
+            sendNotification(session, "Invalid user.");
             return 0;
         }
 

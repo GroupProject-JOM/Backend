@@ -11,6 +11,9 @@ public class YardModel {
     private int collection_id;
     private int account_id;
 
+    public YardModel() {
+    }
+
     public YardModel(String date, String time, int supplier_id, int collection_id, int account_id) {
         this.date = date;
         this.time = time;

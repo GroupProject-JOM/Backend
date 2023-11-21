@@ -10,6 +10,8 @@ public class CollectionSingleViewModel {
     private int final_amount;
     private int status;
     private int value;
+    private int account;
+    private int estate;
 
     public CollectionSingleViewModel() {
     }
@@ -85,4 +87,21 @@ public class CollectionSingleViewModel {
     public void setValue(int value) {
         this.value = value;
     }
+
+    public int getAccount() {
+        return account;
+    }
+
+    public void setAccount(int account) {
+        this.account = account;
+    }
+
+    public int getEstate() {
+        return estate;
+    }
+
+    public void setEstate(int estate) {
+        this.estate = estate;
+    }
+
 }

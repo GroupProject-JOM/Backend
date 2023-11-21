@@ -1,5 +1,6 @@
 package org.jom.Dao.Supplier.Collection;
 
+import com.google.gson.Gson;
 import org.jom.Database.ConnectionPool;
 import org.jom.Model.AccountModel;
 import org.jom.Model.Collection.CollectionModel;
@@ -82,8 +83,44 @@ public class CollectionDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT c.id,c.p_method,c.s_method,p.pickup_date ,p.pickup_time , c.init_amount ,c.status,c.final_amount,c.value FROM pickups p INNER JOIN collections c on p.collection_id=c.id WHERE c.id = ? AND c.delete=0 AND c.sup_id=? UNION \n" +
-                    "SELECT c.id,c.p_method,c.s_method,d.delivery_date,d.delivery_time,c.init_amount ,c.status,c.final_amount,c.value FROM deliveries d INNER JOIN collections c on d.collec_id=c.id WHERE c.id = ? AND c.delete=0 AND c.sup_id=?;";
+            String sql = "SELECT \n" +
+                    "    c.id,\n" +
+                    "    c.p_method,\n" +
+                    "    c.s_method,\n" +
+                    "    p.pickup_date,\n" +
+                    "    p.pickup_time,\n" +
+                    "    c.init_amount,\n" +
+                    "    c.status,\n" +
+                    "    c.final_amount,\n" +
+                    "    c.value,\n" +
+                    "    p.estate_id,\n" +
+                    "    p.account_id\n" +
+                    "FROM\n" +
+                    "    pickups p\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON p.collection_id = c.id\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND c.delete = 0\n" +
+                    "        AND c.sup_id = ? \n" +
+                    "UNION SELECT \n" +
+                    "    c.id,\n" +
+                    "    c.p_method,\n" +
+                    "    c.s_method,\n" +
+                    "    d.delivery_date,\n" +
+                    "    d.delivery_time,\n" +
+                    "    c.init_amount,\n" +
+                    "    c.status,\n" +
+                    "    c.final_amount,\n" +
+                    "    c.value,\n" +
+                    "    d.acc_id,\n" +
+                    "    d.acc_id\n" +
+                    "FROM\n" +
+                    "    deliveries d\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON d.collec_id = c.id\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND c.delete = 0\n" +
+                    "        AND c.sup_id = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, collection_id);
             preparedStatement.setInt(2, supplier_id);
@@ -101,6 +138,8 @@ public class CollectionDAO {
                 collection.setStatus(resultSet.getInt(7));
                 collection.setFinal_amount(resultSet.getInt(8));
                 collection.setValue(resultSet.getInt(9));
+                collection.setEstate(resultSet.getInt(10));
+                collection.setAccount(resultSet.getInt(11));
             }
 
             resultSet.close();
@@ -403,6 +442,38 @@ public class CollectionDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, amount);
             preparedStatement.setInt(2, collection_id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                isSuccess = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return isSuccess;
+    }
+
+    public boolean updateCollection(CollectionModel collection) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean isSuccess = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE collections c SET c.status=1,c.init_amount=?,c.p_method=?,c.s_method=? WHERE c.id = ? AND c.delete=0 AND c.sup_id=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collection.getInitial_amount());
+            preparedStatement.setString(2, collection.getPayment_method());
+            preparedStatement.setString(3, collection.getSupply_method());
+            preparedStatement.setInt(4, collection.getId());
+            preparedStatement.setInt(5, collection.getSupplier_id());
 
             int x = preparedStatement.executeUpdate();
             if (x != 0) {
