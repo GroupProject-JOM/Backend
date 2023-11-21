@@ -1,10 +1,9 @@
-package org.jom.Controller.Socket;
+package org.jom.Socket;
 
 import org.jom.Dao.Chat.ChatDAO;
 import org.jom.Database.ConnectionPool;
 
 import javax.websocket.*;
-import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.sql.*;

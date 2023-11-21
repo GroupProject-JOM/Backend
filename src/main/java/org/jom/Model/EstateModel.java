@@ -9,24 +9,26 @@ public class EstateModel {
     private int supplier_id;
     private String estate_name;
     private String estate_location;
+    private String estate_address;
     private  String area;
 
     public EstateModel() {
     }
 
-    public EstateModel(int supplier_id, String estate_name, String estate_location, String area) {
-        this.id = 0;
+    public EstateModel(int supplier_id, String estate_name, String estate_location, String estate_address, String area) {
         this.supplier_id = supplier_id;
         this.estate_name = estate_name;
         this.estate_location = estate_location;
+        this.estate_address = estate_address;
         this.area = area;
     }
 
-    public EstateModel(int id, String estate_name, String estate_location, String area, int supplier_id) {
+    public EstateModel(int id, int supplier_id, String estate_name, String estate_location, String estate_address, String area) {
         this.id = id;
         this.supplier_id = supplier_id;
         this.estate_name = estate_name;
         this.estate_location = estate_location;
+        this.estate_address = estate_address;
         this.area = area;
     }
 
@@ -68,6 +70,14 @@ public class EstateModel {
 
     public void setArea(String area) {
         this.area = area;
+    }
+
+    public String getEstate_address() {
+        return estate_address;
+    }
+
+    public void setEstate_address(String estate_address) {
+        this.estate_address = estate_address;
     }
 
     public void addEstate(){

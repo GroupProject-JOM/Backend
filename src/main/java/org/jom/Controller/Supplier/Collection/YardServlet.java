@@ -23,14 +23,14 @@ public class YardServlet extends HttpServlet {
             BufferedReader bufferedReader = request.getReader();
             YardModel yard = gson.fromJson(bufferedReader, YardModel.class);
 
-            if(yard.getSupplier_id() == 0){
+            if (yard.getSupplier_id() == 0) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.write("{\"message\": \"UnAuthorized\"}");
                 System.out.println("UnAuthorized");
                 return;
             }
 
-            if(yard.getCollection_id() == 0){
+            if (yard.getCollection_id() == 0) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.write("{\"message\": \"UnAuthorized\"}");
                 System.out.println("UnAuthorized");
@@ -41,14 +41,14 @@ public class YardServlet extends HttpServlet {
 
             yard.addYard();
 
-            if(yard.getId() != 0){
+            if (yard.getId() != 0) {
                 CollectionDAO collectionDAO = new CollectionDAO();
-                if(collectionDAO.updateStatus(1,yard.getCollection_id())) {
+                if (collectionDAO.updateStatus(1, yard.getCollection_id())) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.write("{\"message\": \"Yard request added successfully\"}");
                     System.out.println("Yard request added successfully");
                 }
-            }else{
+            } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"Yard request is not added\"}");
                 System.out.println("Yard request is not added");

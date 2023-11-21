@@ -1,6 +1,5 @@
-package org.jom.Controller.Socket;
+package org.jom.Socket;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;

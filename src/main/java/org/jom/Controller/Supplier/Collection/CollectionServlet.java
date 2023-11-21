@@ -3,10 +3,10 @@ package org.jom.Controller.Supplier.Collection;
 import com.google.gson.Gson;
 import org.jom.Dao.Supplier.AccountDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
+import org.jom.Dao.Supplier.Collection.PickupDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
-import org.jom.Model.Collection.CollectionModel;
-import org.jom.Model.Collection.CollectionSingleViewModel;
-import org.jom.Model.Collection.SupplyModel;
+import org.jom.Dao.Supplier.Collection.YardDAO;
+import org.jom.Model.Collection.*;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -29,7 +29,7 @@ public class CollectionServlet extends HttpServlet {
             BufferedReader bufferedReader = request.getReader();
             CollectionModel collection = gson.fromJson(bufferedReader, CollectionModel.class);
 
-            if(collection.getSupplier_id() == 0){
+            if (collection.getSupplier_id() == 0) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.write("{\"message\": \"UnAuthorized\"}");
                 System.out.println("UnAuthorized");
@@ -41,11 +41,11 @@ public class CollectionServlet extends HttpServlet {
 
             collection.addCollection();
 
-            if(collection.getId() != 0){
+            if (collection.getId() != 0) {
                 response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"message\": \"Supply request added successfully\",\"id\":\""+collection.getId()+"\"}");
+                out.write("{\"message\": \"Supply request added successfully\",\"id\":\"" + collection.getId() + "\"}");
                 System.out.println("Supply request added successfully");
-            }else{
+            } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"Supply request is not added\"}");
                 System.out.println("Supply request is not added");
@@ -68,7 +68,7 @@ public class CollectionServlet extends HttpServlet {
 
         try {
             CollectionDAO collectionDAO = new CollectionDAO();
-            CollectionSingleViewModel collection = collectionDAO.getCollection(id,supplier_id);
+            CollectionSingleViewModel collection = collectionDAO.getCollection(id, supplier_id);
 
             Gson gson = new Gson();
             // Object array to json
@@ -103,16 +103,123 @@ public class CollectionServlet extends HttpServlet {
         try {
             CollectionDAO collectionDAO = new CollectionDAO();
 
-            if(collectionDAO.deleteCollection(supplier_id,collection_id)) {
+            if (collectionDAO.deleteCollection(supplier_id, collection_id)) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"message\": \"Delete Collection\"}");
                 System.out.println("Delete Collection");
-            }else {
+            } else {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 out.write("{\"message\": \"Unable to Delete Collection\"}");
                 System.out.println("Collection not deleted");
             }
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
+
+    // Edit collection
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        try {
+            Gson gson = new Gson();
+            // json data to user object
+            BufferedReader bufferedReader = request.getReader();
+            CollectionModel collection = gson.fromJson(bufferedReader, CollectionModel.class);
+
+            if (collection.getSupplier_id() == 0) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                System.out.println("UnAuthorized");
+                return;
+            }
+
+            // TODO backend validations and user exists
+
+            String objectArray = gson.toJson(collection);
+            System.out.println(objectArray);
+
+            CollectionDAO collectionDAO = new CollectionDAO();
+            PickupDAO pickupDAO = new PickupDAO();
+            YardDAO yardDAO = new YardDAO();
+
+            if (collectionDAO.updateCollection(collection)) {
+                if (collection.getSupply_method().equals("pickup")) {
+                    PickupModel pickup = pickupDAO.getPickup(collection.getId(), collection.getSupplier_id());
+
+                    pickup.setDate(collection.getDate());
+                    pickup.setTime(collection.getTime());
+                    pickup.setEstate_id(collection.getEstate());
+                    pickup.setAccount_id(collection.getAccount());
+                    pickup.setCollection_id(collection.getId());
+                    pickup.setSupplier_id(collection.getSupplier_id());
+
+                    if (pickup.getId() != 0) {
+                        if (pickupDAO.updateCollection(pickup)) {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            out.write("{\"message\": \"Supply request edited successfully\"}");
+                            System.out.println("Supply request edited successfully");
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            out.write("{\"message\": \"Supply request is not edited\"}");
+                            System.out.println("Supply request is not edited");
+                        }
+                    } else {
+                        pickup.addPickup();
+
+                        if (pickup.getId() != 0 && yardDAO.deleteYard(collection.getId(), collection.getSupplier_id())) {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            out.write("{\"message\": \"Supply request edited successfully\"}");
+                            System.out.println("Supply request edited successfully");
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            out.write("{\"message\": \"Supply request is not edited\"}");
+                            System.out.println("Supply request is not edited");
+                        }
+                    }
+                } else {
+                    YardModel yard = yardDAO.getYard(collection.getId(), collection.getSupplier_id());
+
+                    yard.setDate(collection.getDate());
+                    yard.setTime(collection.getTime());
+                    yard.setAccount_id(collection.getAccount());
+                    yard.setCollection_id(collection.getId());
+                    yard.setSupplier_id(collection.getSupplier_id());
+
+                    if (yard.getId() != 0) {
+                        if (yardDAO.updateCollection(yard)) {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            out.write("{\"message\": \"Supply request edited successfully\"}");
+                            System.out.println("Supply request edited successfully");
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            out.write("{\"message\": \"Supply request is not edited\"}");
+                            System.out.println("Supply request is not edited");
+                        }
+                    } else {
+                        yard.addYard();
+
+                        if (yard.getId() != 0 && pickupDAO.deletePickup(collection.getId(), collection.getSupplier_id())) {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            out.write("{\"message\": \"Supply request edited successfully\"}");
+                            System.out.println("Supply request edited successfully");
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            out.write("{\"message\": \"Supply request is not edited\"}");
+                            System.out.println("Supply request is not edited");
+                        }
+                    }
+                }
+
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"message\": \"Supply request is not edited\"}");
+                System.out.println("Supply request is not edited");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
