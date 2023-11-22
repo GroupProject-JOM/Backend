@@ -1,6 +1,6 @@
 package org.jom.Model;
 
-public class ChatModel {
+public class ChatModel implements Comparable {
     private int id;
     private int sender;
     private int receiver;
@@ -22,4 +22,24 @@ public class ChatModel {
         this.fist_name = fist_name;
         this.last_name = last_name;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
+    public int compareTo(Object comparestu) {
+        int compareage=((ChatModel)comparestu).getId();
+        return compareage-this.id;
+    }
+
+    @Override
+    public String toString() {
+        return "[ rollno=" + id + ", name=" + sender + ", age=" + receiver + "]";
+    }
+
 }

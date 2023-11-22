@@ -16,6 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @WebServlet("/chat")
@@ -97,6 +100,8 @@ public class ChatServlet extends HttpServlet {
 
                     ChatDAO chatDAO = new ChatDAO();
                     List<ChatModel> messages = chatDAO.loadLastChat();
+
+                    Collections.sort(messages);
 
                     Gson gson = new Gson();
                     // Object array to json
