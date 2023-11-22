@@ -14,7 +14,8 @@ public class ChatModel {
         this.content = content;
     }
 
-    public ChatModel(int sender, int receiver, String content, String fist_name, String last_name) {
+    public ChatModel(int id, int sender, int receiver, String content, String fist_name, String last_name) {
+        this.id = id;
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;
