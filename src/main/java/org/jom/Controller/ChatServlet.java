@@ -16,6 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @WebServlet("/chat")
@@ -98,11 +101,14 @@ public class ChatServlet extends HttpServlet {
                     ChatDAO chatDAO = new ChatDAO();
                     List<ChatModel> messages = chatDAO.loadLastChat();
 
+                    Collections.sort(messages);
+
                     Gson gson = new Gson();
                     // Object array to json
                     String object = gson.toJson(messages);
 
                     if (messages.size() != 0) {
+                        System.out.println(object);
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"list\": " + object + "}");
                         System.out.println("Send chat list");

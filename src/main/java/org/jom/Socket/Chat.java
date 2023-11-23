@@ -26,13 +26,13 @@ public class Chat {
             int authenticatedUser = authenticateUser(session, user);
             if (authenticatedUser != 0) {
                 sessions.put(Integer.toString(authenticatedUser), session);
-                Queue<String> notifications = pendingMessage.get(Integer.toString(user));
-                if (notifications != null && !notifications.isEmpty()) {
-                    for (String notification : notifications) {
-                        sendMessage(session, notification);
-                    }
-                    pendingMessage.remove(Integer.toString(user));
-                }
+//                Queue<String> notifications = pendingMessage.get(Integer.toString(user));
+//                if (notifications != null && !notifications.isEmpty()) {
+//                    for (String notification : notifications) {
+//                        sendMessage(session, notification);
+//                    }
+////                    pendingMessage.remove(Integer.toString(user));
+//                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -44,6 +44,7 @@ public class Chat {
         try {
             String[] parts = message.split(":");
             ChatDAO chatDAO = new ChatDAO();
+            UserDAO userDAO = new UserDAO();
 
             if (parts.length == 3) {
                 int sender_id = Integer.parseInt(parts[0].trim());
@@ -54,7 +55,7 @@ public class Chat {
                 if (recipientSession != null) {
                     sendMessage(recipientSession, content);
                 } else {
-                    savePendingMessage(Integer.toString(receiver_id), content);
+//                    savePendingMessage(Integer.toString(receiver_id), content);
                 }
                 chatDAO.saveChatMessage(sender_id, receiver_id, content);
             } else if (parts.length == 2) {
@@ -63,9 +64,11 @@ public class Chat {
 
                 Session recipientSession = sessions.get("3");
                 if (recipientSession != null) {
+                    content = content + sender_id;
                     sendMessage(recipientSession, content);
                 } else {
-                    savePendingMessage("3", content);
+                    userDAO.updateSeen(0, sender_id);
+//                    savePendingMessage("3", content);
                 }
                 chatDAO.saveChatMessage(sender_id, 3, content);
             }
