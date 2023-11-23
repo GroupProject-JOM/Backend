@@ -241,4 +241,34 @@ public class UserDAO {
         }
         return status;
     }
+
+    public static boolean updateSeen(int stat,int id){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE users SET seen = ? WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,stat);
+            preparedStatement.setInt(2,id);
+            preparedStatement.executeUpdate();
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
 }

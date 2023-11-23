@@ -104,7 +104,8 @@ public class ChatDAO {
                         "    COALESCE(c.recipient, u.id) AS recipient,\n" +
                         "    COALESCE(c.content, 'No messages') AS content,\n" +
                         "    u.first_name,\n" +
-                        "    u.last_name\n" +
+                        "    u.last_name,\n" +
+                        "    u.seen\n" +
                         "FROM\n" +
                         "    users u\n" +
                         "LEFT JOIN\n" +
@@ -129,8 +130,9 @@ public class ChatDAO {
                     String content = resultSet2.getString(4);
                     String first_name = resultSet2.getString(5);
                     String last_name = resultSet2.getString(6);
+                    int seen = resultSet2.getInt(7);
 
-                    ChatModel chat = new ChatModel(id, sender_id, receiver_id, content, first_name, last_name);
+                    ChatModel chat = new ChatModel(id, sender_id, receiver_id, content, first_name, last_name,seen);
                     messages.add(chat);
                 }
                 resultSet2.close();

@@ -7,6 +7,7 @@ public class ChatModel implements Comparable {
     private String content;
     private String fist_name;
     private String last_name;
+    private int seen;
 
     public ChatModel(int sender, int receiver, String content) {
         this.sender = sender;
@@ -14,13 +15,14 @@ public class ChatModel implements Comparable {
         this.content = content;
     }
 
-    public ChatModel(int id, int sender, int receiver, String content, String fist_name, String last_name) {
+    public ChatModel(int id, int sender, int receiver, String content, String fist_name, String last_name, int seen) {
         this.id = id;
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;
         this.fist_name = fist_name;
         this.last_name = last_name;
+        this.seen = seen;
     }
 
     public int getId() {
@@ -33,8 +35,8 @@ public class ChatModel implements Comparable {
 
     @Override
     public int compareTo(Object comparestu) {
-        int compareage=((ChatModel)comparestu).getId();
-        return compareage-this.id;
+        int compareage = ((ChatModel) comparestu).getId();
+        return compareage - this.id;
     }
 
     @Override

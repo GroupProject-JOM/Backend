@@ -44,6 +44,7 @@ public class Chat {
         try {
             String[] parts = message.split(":");
             ChatDAO chatDAO = new ChatDAO();
+            UserDAO userDAO = new UserDAO();
 
             if (parts.length == 3) {
                 int sender_id = Integer.parseInt(parts[0].trim());
@@ -57,19 +58,19 @@ public class Chat {
 //                    savePendingMessage(Integer.toString(receiver_id), content);
                 }
                 chatDAO.saveChatMessage(sender_id, receiver_id, content);
-                System.out.println(content);
             } else if (parts.length == 2) {
                 int sender_id = Integer.parseInt(parts[0].trim());
                 String content = parts[1].trim();
 
                 Session recipientSession = sessions.get("3");
                 if (recipientSession != null) {
+                    content = content + sender_id;
                     sendMessage(recipientSession, content);
                 } else {
+                    userDAO.updateSeen(0, sender_id);
 //                    savePendingMessage("3", content);
                 }
                 chatDAO.saveChatMessage(sender_id, 3, content);
-                System.out.println(content);
             }
         } catch (Exception e) {
             e.printStackTrace();
