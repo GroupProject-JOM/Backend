@@ -49,6 +49,7 @@ public class VerifyCoconutAmount {
                 Session recipientSession = sessions.get(Integer.toString(supplier));
                 if (recipientSession != null) {
                     sendNotification(recipientSession, content);
+                    System.out.println(content);
                 } else {
                     savePendingNotification(Integer.toString(supplier), content);
                 }
