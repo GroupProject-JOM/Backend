@@ -62,11 +62,11 @@ public class CollectorServlet extends HttpServlet {
                         System.out.println("Collector dashboard tables contents");
                     } else if (today_collections.size() == 0 && upcoming_collections.size() == 0) {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": \"-2\"}");
+                        out.write("{\"size\": \"-2\",\"count\":" + today_count + "}");
                         System.out.println("No collections");
                     } else if (today_collections.size() == 0) {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": \"-1\",\"upcoming\":" + upcoming_collec + "}");
+                        out.write("{\"size\": \"-1\",\"upcoming\":" + upcoming_collec + ",\"count\":" + today_count + "}");
                         System.out.println("No collections today");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);

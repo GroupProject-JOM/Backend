@@ -163,12 +163,12 @@ public class SupplyDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT c.id,u.first_name,u.last_name,u.phone,c.s_method,p.pickup_date,p.pickup_time ,c.init_amount,c.p_method,e.location,e.area,c.status\n" +
+            String sql = "SELECT c.id,u.first_name,u.last_name,u.phone,c.s_method,p.pickup_date,p.pickup_time ,c.init_amount,c.p_method,e.address,e.location,e.area,c.status\n" +
                     "                    FROM collections c\n" +
                     "                    INNER JOIN pickups p ON c.id = p.collection_id INNER JOIN suppliers s ON c.sup_id = s.id INNER JOIN users u ON u.id=s.user_id INNER JOIN estates e ON e.id=p.estate_id\n" +
                     "                    WHERE c.delete=0 AND (c.status=1 OR c.status=2) AND c.id=?\n" +
                     "                    UNION\n" +
-                    "                    SELECT c.id,u.first_name,u.last_name,u.phone,c.s_method,d.delivery_date,d.delivery_time,c.init_amount,c.p_method,d.collec_id,d.acc_id,c.status\n" +
+                    "                    SELECT c.id,u.first_name,u.last_name,u.phone,c.s_method,d.delivery_date,d.delivery_time,c.init_amount,c.p_method,d.collec_id,d.collec_id,d.acc_id,c.status\n" +
                     "                    FROM collections c\n" +
                     "                    INNER JOIN deliveries d ON c.id = d.collec_id INNER JOIN suppliers s ON c.sup_id = s.id INNER JOIN users u ON u.id=s.user_id \n" +
                     "                    WHERE c.delete=0 AND c.status=1 AND c.id=?;";
@@ -187,9 +187,10 @@ public class SupplyDAO {
                 supply.setTime(resultSet.getString(7));
                 supply.setAmount(resultSet.getInt(8));
                 supply.setPayment_method(resultSet.getString(9));
-                supply.setLocation(resultSet.getString(10));
-                supply.setArea(resultSet.getString(11));
-                supply.setStatus(resultSet.getInt(12));
+                supply.setAddress(resultSet.getString(10));
+                supply.setLocation(resultSet.getString(11));
+                supply.setArea(resultSet.getString(12));
+                supply.setStatus(resultSet.getInt(13));
             }
 
             resultSet.close();
@@ -508,7 +509,7 @@ public class SupplyDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT c.id,u.first_name,u.last_name,u.phone,p.pickup_date,p.pickup_time ,c.init_amount,c.p_method,e.location,e.area\n" +
+            String sql = "SELECT c.id,u.first_name,u.last_name,u.phone,p.pickup_date,p.pickup_time ,c.init_amount,c.p_method,e.address,e.location,e.area\n" +
                     "                    FROM collections c\n" +
                     "                    INNER JOIN pickups p ON c.id = p.collection_id INNER JOIN suppliers s ON c.sup_id = s.id INNER JOIN users u ON u.id=s.user_id INNER JOIN estates e ON e.id=p.estate_id\n" +
                     "                    WHERE c.delete=0 AND c.status=3 AND c.id=?\n;";
@@ -525,8 +526,9 @@ public class SupplyDAO {
                 supply.setTime(resultSet.getString(6));
                 supply.setAmount(resultSet.getInt(7));
                 supply.setPayment_method(resultSet.getString(8));
-                supply.setLocation(resultSet.getString(9));
-                supply.setArea(resultSet.getString(10));
+                supply.setAddress(resultSet.getString(9));
+                supply.setLocation(resultSet.getString(10));
+                supply.setArea(resultSet.getString(11));
             }
 
             resultSet.close();

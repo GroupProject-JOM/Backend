@@ -18,6 +18,7 @@ public class SupplyModel {
     private String payment_method;
     private String location;
     private String area;
+    private String address;
 
     public SupplyModel() {
     }
@@ -103,5 +104,13 @@ public class SupplyModel {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
