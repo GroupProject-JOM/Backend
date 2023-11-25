@@ -94,11 +94,16 @@ public class CollectionDAO {
                     "    c.final_amount,\n" +
                     "    c.value,\n" +
                     "    p.estate_id,\n" +
-                    "    p.account_id\n" +
+                    "    p.account_id,\n" +
+                    "    e.name,\n" +
+                    "    e.address,\n" +
+                    "    e.location,\n" +
+                    "    e.area\n" +
                     "FROM\n" +
                     "    pickups p\n" +
                     "        INNER JOIN\n" +
                     "    collections c ON p.collection_id = c.id\n" +
+                    "    inner join estates e on p.estate_id=e.id\n" +
                     "WHERE\n" +
                     "    c.id = ? AND c.delete = 0\n" +
                     "        AND c.sup_id = ? \n" +
@@ -112,6 +117,10 @@ public class CollectionDAO {
                     "    c.status,\n" +
                     "    c.final_amount,\n" +
                     "    c.value,\n" +
+                    "    d.acc_id,\n" +
+                    "    d.acc_id,\n" +
+                    "    d.acc_id,\n" +
+                    "    d.acc_id,\n" +
                     "    d.acc_id,\n" +
                     "    d.acc_id\n" +
                     "FROM\n" +
@@ -140,6 +149,10 @@ public class CollectionDAO {
                 collection.setValue(resultSet.getInt(9));
                 collection.setEstate(resultSet.getInt(10));
                 collection.setAccount(resultSet.getInt(11));
+                collection.setEstate_name(resultSet.getString(12));
+                collection.setEstate_address(resultSet.getString(13));
+                collection.setEstate_location(resultSet.getString(14));
+                collection.setEstate_area(resultSet.getString(15));
             }
 
             resultSet.close();
@@ -186,17 +199,26 @@ public class CollectionDAO {
         return count;
     }
 
-    public boolean deleteCollection(int sId, int id) {
+    public boolean deleteCollection(int sId, int id,String date) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE collections SET jom_db.collections.delete=1 WHERE sup_id = ? AND id = ? ";
+            String sql = "UPDATE collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON c.id = p.collection_id \n" +
+                    "SET \n" +
+                    "    c.delete = 1\n" +
+                    "WHERE\n" +
+                    "    c.sup_id = ? AND c.id = ?\n" +
+                    "        AND status < 5\n" +
+                    "        AND p.pickup_date < ?; ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, sId);
             preparedStatement.setInt(2, id);
+            preparedStatement.setString(3, date);
 
             int x = preparedStatement.executeUpdate();
             if (x != 0) {
@@ -438,7 +460,13 @@ public class CollectionDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE collections c SET c.final_amount = ?,c.status=5 WHERE c.id=? AND c.status=3 AND c.delete=0;  ";
+            String sql = "UPDATE collections c \n" +
+                    "SET \n" +
+                    "    c.final_amount = ?,\n" +
+                    "    c.status = 5\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND c.status = 3\n" +
+                    "        AND c.delete = 0;  ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, amount);
             preparedStatement.setInt(2, collection_id);
@@ -467,7 +495,16 @@ public class CollectionDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE collections c SET c.status=1,c.init_amount=?,c.p_method=?,c.s_method=? WHERE c.id = ? AND c.delete=0 AND c.sup_id=?";
+            String sql = "UPDATE collections c \n" +
+                    "SET \n" +
+                    "    c.status = 1,\n" +
+                    "    c.init_amount = ?,\n" +
+                    "    c.p_method = ?,\n" +
+                    "    c.s_method = ?\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND c.delete = 0\n" +
+                    "        AND c.sup_id = ?\n" +
+                    "        AND c.status < 5";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, collection.getInitial_amount());
             preparedStatement.setString(2, collection.getPayment_method());

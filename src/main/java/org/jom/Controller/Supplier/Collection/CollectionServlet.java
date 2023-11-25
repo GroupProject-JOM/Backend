@@ -15,6 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @WebServlet("/collection")
@@ -103,7 +106,17 @@ public class CollectionServlet extends HttpServlet {
         try {
             CollectionDAO collectionDAO = new CollectionDAO();
 
-            if (collectionDAO.deleteCollection(supplier_id, collection_id)) {
+            Date currentDate = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(currentDate);
+
+            calendar.add(Calendar.DAY_OF_MONTH, -7);
+            Date day_before_week = calendar.getTime();
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String date = dateFormat.format(day_before_week);
+
+            if (collectionDAO.deleteCollection(supplier_id, collection_id,date)) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"message\": \"Delete Collection\"}");
                 System.out.println("Delete Collection");

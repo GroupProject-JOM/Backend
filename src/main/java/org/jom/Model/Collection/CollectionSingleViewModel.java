@@ -12,6 +12,10 @@ public class CollectionSingleViewModel {
     private int value;
     private int account;
     private int estate;
+    private String estate_name;
+    private String estate_address;
+    private String estate_location;
+    private String estate_area;
 
     public CollectionSingleViewModel() {
     }
@@ -104,4 +108,35 @@ public class CollectionSingleViewModel {
         this.estate = estate;
     }
 
+    public String getEstate_name() {
+        return estate_name;
+    }
+
+    public void setEstate_name(String estate_name) {
+        this.estate_name = estate_name;
+    }
+
+    public String getEstate_address() {
+        return estate_address;
+    }
+
+    public void setEstate_address(String estate_address) {
+        this.estate_address = estate_address;
+    }
+
+    public String getEstate_location() {
+        return estate_location;
+    }
+
+    public void setEstate_location(String estate_location) {
+        this.estate_location = estate_location;
+    }
+
+    public String getEstate_area() {
+        return estate_area;
+    }
+
+    public void setEstate_area(String estate_area) {
+        this.estate_area = estate_area;
+    }
 }
