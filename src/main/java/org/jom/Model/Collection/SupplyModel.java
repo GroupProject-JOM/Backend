@@ -22,6 +22,10 @@ public class SupplyModel {
     private String h_name;
     private String account;
     private String bank;
+    private String c_fName;
+    private String c_lName;
+    private String c_phone;
+    private String collected_date;
 
     public SupplyModel() {
     }
@@ -43,6 +47,16 @@ public class SupplyModel {
         this.name = name;
         this.last_name = last_name;
         this.payment_method = payment_method;
+    }
+
+    public SupplyModel(int id, int amount, String name, String method, String last_name, String c_fName, String c_lName) {
+        this.id = id;
+        this.amount = amount;
+        this.name = name;
+        this.method = method;
+        this.last_name = last_name;
+        this.c_fName = c_fName;
+        this.c_lName = c_lName;
     }
 
     public SupplyModel(int id, String date, int amount, String name, String method, int status) {
@@ -208,5 +222,37 @@ public class SupplyModel {
 
     public String getArea() {
         return area;
+    }
+
+    public String getC_fName() {
+        return c_fName;
+    }
+
+    public void setC_fName(String c_fName) {
+        this.c_fName = c_fName;
+    }
+
+    public String getC_lName() {
+        return c_lName;
+    }
+
+    public void setC_lName(String c_lName) {
+        this.c_lName = c_lName;
+    }
+
+    public String getC_phone() {
+        return c_phone;
+    }
+
+    public void setC_phone(String c_phone) {
+        this.c_phone = c_phone;
+    }
+
+    public String getCollected_date() {
+        return collected_date;
+    }
+
+    public void setCollected_date(String collected_date) {
+        this.collected_date = collected_date;
     }
 }

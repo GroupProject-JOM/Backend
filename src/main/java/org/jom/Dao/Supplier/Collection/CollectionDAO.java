@@ -183,7 +183,6 @@ public class CollectionDAO {
 
             if (resultSet.next()) {
                 count = resultSet.getInt(1);
-                ;
             }
 
             resultSet.close();
@@ -200,7 +199,7 @@ public class CollectionDAO {
         return count;
     }
 
-    public boolean deleteCollection(int sId, int id,String date) {
+    public boolean deleteCollection(int sId, int id, String date) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
@@ -454,7 +453,7 @@ public class CollectionDAO {
     }
 
     // update final amount and status
-    public boolean updateFinalAmount(int amount,int collection_id) {
+    public boolean updateFinalAmount(int amount, int collection_id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean isSuccess = false;
@@ -528,5 +527,105 @@ public class CollectionDAO {
             }
         }
         return isSuccess;
+    }
+
+    public int completedRowCountByDate(String date) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int count = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    (SELECT \n" +
+                    "            COUNT(*)\n" +
+                    "        FROM\n" +
+                    "            collections c\n" +
+                    "                INNER JOIN\n" +
+                    "            pickups p ON c.id = p.collection_id\n" +
+                    "        WHERE\n" +
+                    "            (c.status = 5 OR c.status = 6)\n" +
+                    "                AND c.delete = 0\n" +
+                    "                AND p.pickup_date = ?) + (SELECT \n" +
+                    "            COUNT(*)\n" +
+                    "        FROM\n" +
+                    "            collections c\n" +
+                    "                INNER JOIN\n" +
+                    "            deliveries d ON c.id = d.collec_id\n" +
+                    "        WHERE\n" +
+                    "            (c.status = 5 OR c.status = 6)\n" +
+                    "                AND c.delete = 0\n" +
+                    "                AND d.delivery_date = ?) AS Total_Row_Count;\n";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, date);
+            preparedStatement.setString(2, date);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return count;
+    }
+
+    public int remainingRowCountByDate(String date) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int count = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    (SELECT \n" +
+                    "            COUNT(*)\n" +
+                    "        FROM\n" +
+                    "            collections c\n" +
+                    "                INNER JOIN\n" +
+                    "            pickups p ON c.id = p.collection_id\n" +
+                    "        WHERE\n" +
+                    "            c.status = 3\n" +
+                    "                AND c.delete = 0\n" +
+                    "                AND p.pickup_date = ?) + (SELECT \n" +
+                    "            COUNT(*)\n" +
+                    "        FROM\n" +
+                    "            collections c\n" +
+                    "                INNER JOIN\n" +
+                    "            deliveries d ON c.id = d.collec_id\n" +
+                    "        WHERE\n" +
+                    "            c.status = 2\n" +
+                    "                AND c.delete = 0\n" +
+                    "                AND d.delivery_date = ?) AS Total_Row_Count;\n";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, date);
+            preparedStatement.setString(2, date);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return count;
     }
 }
