@@ -1,9 +1,12 @@
 package org.jom.Dao;
 
 import org.jom.Database.ConnectionPool;
+import org.jom.Model.Collection.SupplyModel;
 import org.jom.Model.UserModel;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO {
     public int register(UserModel user){
@@ -270,5 +273,46 @@ public class UserDAO {
             }
         }
         return status;
+    }
+
+    //Get distributors (TEMP)
+    public List<UserModel> getDistributors(){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<UserModel> distributors = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    u.id, u.first_name, u.last_name, u.phone\n" +
+                    "FROM\n" +
+                    "    users u\n" +
+                    "WHERE\n" +
+                    "    u.role = 'distributor';";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String fName = resultSet.getString(2);
+                String lName = resultSet.getString(3);
+                String phone = resultSet.getString(4);
+
+                UserModel user = new UserModel(id, fName, lName, phone);
+                distributors.add(user);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return distributors;
     }
 }
