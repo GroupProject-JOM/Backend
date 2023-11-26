@@ -1,11 +1,14 @@
-package org.jom.Controller.StockManager;
+package org.jom.Controller.SalesManager;
 
 import com.google.gson.Gson;
 import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
+import org.jom.Dao.UserDAO;
 import org.jom.Model.Collection.SupplyModel;
 import org.jom.Model.EmployeeModel;
+import org.jom.Model.EstateModel;
+import org.jom.Model.UserModel;
 import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
@@ -15,36 +18,38 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
-@WebServlet("/accept-request")
-public class AcceptRequestServlet extends HttpServlet {
-    //Accept request
+@WebServlet("/payout")
+public class PayoutServlet extends HttpServlet {
+    //Get payout
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
         int collection_id = Integer.parseInt(request.getParameter("id"));
-        int employee_id = Integer.parseInt(request.getParameter("sId"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
 
         try {
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel stock_manager = employeeDAO.getEmployee(employee_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (stock_manager.geteId() != 0) {
-                if (stock_manager.getRole().equals("stock-manager")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("sales-manager")) {
 
-                    CollectionDAO collectionDAO = new CollectionDAO();
+                    SupplyDAO supplyDAO = new SupplyDAO();
+                    SupplyModel supply = supplyDAO.getPayout(collection_id);
 
-                    if (collectionDAO.updateStatus(2,collection_id)) {
+                    Gson gson = new Gson();
+                    String objectArray = gson.toJson(supply); // Object array to json
+
+                    if (supply.getId() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"message\": \"Supply request accepted\"}");
-                        System.out.println("Supply request accepted");
+                        out.write("{\"payout\": " + objectArray + "}");
+                        System.out.println("Send payout");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"message\": \"Not accepted\"}");
-                        System.out.println("Not accepted");
+                        out.write("{\"payout\": \"0\"}");
+                        System.out.println("No payout");
                     }
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -65,11 +70,10 @@ public class AcceptRequestServlet extends HttpServlet {
         }
     }
 
-    //Decline request
+    //Update payment status
     public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
-
         StringBuilder requestBody = new StringBuilder();
 
         try (BufferedReader reader = request.getReader()) {
@@ -81,42 +85,40 @@ public class AcceptRequestServlet extends HttpServlet {
 
         JSONObject jsonObject = new JSONObject(requestBody.toString());
         int collection_id = jsonObject.getInt("id");
-        int employee_id = jsonObject.getInt("sId");
+        int user_id = jsonObject.getInt("user");
 
-        try {
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel stock_manager = employeeDAO.getEmployee(employee_id);
+        UserDAO userDAO = new UserDAO();
+        UserModel user = userDAO.getUserById(user_id);
 
-            if (stock_manager.geteId() != 0) {
-                if (stock_manager.getRole().equals("stock-manager")) {
-
+        if (user.getId() != 0) {
+            if (user.getRole().equals("sales-manager")) {
+                try {
                     CollectionDAO collectionDAO = new CollectionDAO();
 
-                    if (collectionDAO.updateStatus(4,collection_id)) {
+                    if (collectionDAO.updateStatus(6,collection_id)) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"message\": \"Supply request rejected\"}");
-                        System.out.println("Supply request rejected");
+                        out.write("{\"message\": \"payment accepted\"}");
+                        System.out.println("payment accepted");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"message\": \"Not rejected\"}");
-                        System.out.println("Not rejected");
+                        out.write("{\"message\": \"Payment not accepted\"}");
+                        System.out.println("Payment not accepted");
                     }
-                } else {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    out.write("{\"message\": \"Invalid User\"}");
-                    System.out.println("Invalid User");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                } finally {
+                    out.close();
                 }
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.write("{\"message\": \"Invalid User\"}");
                 System.out.println("Invalid User");
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        } finally {
-            out.close();
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"Invalid User\"}");
+            System.out.println("Invalid User");
         }
     }
 }

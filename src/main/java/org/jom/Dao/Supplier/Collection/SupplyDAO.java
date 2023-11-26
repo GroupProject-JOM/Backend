@@ -236,35 +236,6 @@ public class SupplyDAO {
         return status;
     }
 
-    //Reject supply request
-    public boolean rejectSupply(int collection_id) {
-        ConnectionPool connectionPool = ConnectionPool.getInstance();
-        Connection connection = null;
-        boolean status = false;
-
-        try {
-            connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE collections SET status=4 WHERE id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, collection_id);
-
-            int x = preparedStatement.executeUpdate();
-            if (x != 0) {
-                status = true;
-            }
-            preparedStatement.close();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (connection != null) try {
-                connection.close();
-            } catch (Exception ignore) {
-            }
-        }
-        return status;
-    }
-
     //Collector names and their collection count
     public List<CollectorModel> getCollectionCount(String date) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
@@ -543,5 +514,157 @@ public class SupplyDAO {
             }
         }
         return supply;
+    }
+
+    //get payout
+    public SupplyModel getPayout(int collection_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        SupplyModel supply = new SupplyModel();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    c.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    u.phone,\n" +
+                    "    c.s_method,\n" +
+                    "    p.collected_date,\n" +
+                    "    c.final_amount,\n" +
+                    "    c.value,\n" +
+                    "    c.p_method,\n" +
+                    "    a.name,\n" +
+                    "    a.account_num,\n" +
+                    "    a.bank,\n" +
+                    "    c.status\n" +
+                    "FROM\n" +
+                    "    jom_db.users u\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON c.sup_id = s.id\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON c.id = p.collection_id\n" +
+                    "        LEFT JOIN\n" +
+                    "    accounts a ON a.id = p.account_id\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND (c.status = 5 OR c.status = 6)\n" +
+                    "        AND c.delete = 0 \n" +
+                    "UNION SELECT \n" +
+                    "    c.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    u.phone,\n" +
+                    "    c.s_method,\n" +
+                    "    d.delivered_time,\n" +
+                    "    c.final_amount,\n" +
+                    "    c.value,\n" +
+                    "    c.p_method,\n" +
+                    "    a.name,\n" +
+                    "    a.account_num,\n" +
+                    "    a.bank,\n" +
+                    "    c.status\n" +
+                    "FROM\n" +
+                    "    jom_db.users u\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON c.sup_id = s.id\n" +
+                    "        INNER JOIN\n" +
+                    "    deliveries d ON c.id = d.collec_id\n" +
+                    "        LEFT JOIN\n" +
+                    "    accounts a ON a.id = d.acc_id\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND (c.status = 5 OR c.status = 6)\n" +
+                    "        AND c.delete = 0;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collection_id);
+            preparedStatement.setInt(2, collection_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                supply.setId(resultSet.getInt(1));
+                supply.setName(resultSet.getString(2));
+                supply.setLast_name(resultSet.getString(3));
+                supply.setPhone(resultSet.getString(4));
+                supply.setMethod(resultSet.getString(5));
+                supply.setDate(resultSet.getString(6));
+                supply.setFinal_amount(resultSet.getInt(7));
+                supply.setValue(resultSet.getInt(8));
+                supply.setPayment_method(resultSet.getString(9));
+                supply.setH_name(resultSet.getString(10));
+                supply.setAccount(resultSet.getString(11));
+                supply.setBank(resultSet.getString(12));
+                supply.setStatus(resultSet.getInt(13));
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supply;
+    }
+
+    //get payouts
+    public List<SupplyModel> getPayouts() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    c.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    c.p_method,\n" +
+                    "    c.value,\n" +
+                    "    c.status\n" +
+                    "FROM\n" +
+                    "    jom_db.users u\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON c.sup_id = s.id\n" +
+                    "WHERE\n" +
+                    "    (c.status = 5 OR c.status = 6)\n" +
+                    "        AND c.delete = 0;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String fName = resultSet.getString(2);
+                String lName = resultSet.getString(3);
+                String payment = resultSet.getString(4);
+                int value = resultSet.getInt(5);
+                int status = resultSet.getInt(6);
+
+                SupplyModel supply = new SupplyModel(id, status, value, fName, lName, payment);
+                supplies.add(supply);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
     }
 }

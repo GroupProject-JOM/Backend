@@ -19,6 +19,9 @@ public class SupplyModel {
     private String location;
     private String area;
     private String address;
+    private String h_name;
+    private String account;
+    private String bank;
 
     public SupplyModel() {
     }
@@ -31,6 +34,15 @@ public class SupplyModel {
         this.status = status;
         this.final_amount = final_amount;
         this.value = value;
+    }
+
+    public SupplyModel(int id, int status, int value, String name, String last_name, String payment_method) {
+        this.id = id;
+        this.status = status;
+        this.value = value;
+        this.name = name;
+        this.last_name = last_name;
+        this.payment_method = payment_method;
     }
 
     public SupplyModel(int id, String date, int amount, String name, String method, int status) {
@@ -112,5 +124,89 @@ public class SupplyModel {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getH_name() {
+        return h_name;
+    }
+
+    public void setH_name(String h_name) {
+        this.h_name = h_name;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
+    }
+
+    public void setFinal_amount(int final_amount) {
+        this.final_amount = final_amount;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public int getFinal_amount() {
+        return final_amount;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public String getLast_name() {
+        return last_name;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getPayment_method() {
+        return payment_method;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getArea() {
+        return area;
     }
 }
