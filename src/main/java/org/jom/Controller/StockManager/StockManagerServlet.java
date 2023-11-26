@@ -2,9 +2,12 @@ package org.jom.Controller.StockManager;
 
 import com.google.gson.Gson;
 import org.jom.Dao.EmployeeDAO;
+import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
+import org.jom.Dao.UserDAO;
 import org.jom.Model.Collection.SupplyModel;
 import org.jom.Model.EmployeeModel;
+import org.jom.Model.UserModel;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -14,6 +17,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -24,38 +28,48 @@ public class StockManagerServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        int employee_id = Integer.parseInt(request.getParameter("sId"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
 
         try {
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel stock_manager = employeeDAO.getEmployee(employee_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (stock_manager.geteId() != 0) {
-                if (stock_manager.getRole().equals("stock-manager")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("stock-manager")) {
+
+                    Date currentDate = new Date();
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(currentDate);
+
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String today = dateFormat.format(currentDate);
 
                     SupplyDAO supplyDAO = new SupplyDAO();
-                    List<SupplyModel> supplies = supplyDAO.getAll();
-
+                    CollectionDAO collectionDAO = new CollectionDAO();
                     Gson gson = new Gson();
 
-                    if (supplies.size() != 0) {
-                        if (supplies.size() > 4) {
-                            List<SupplyModel> firstFour = new ArrayList<>(supplies.subList(0, 4));
-                            String objectArray = gson.toJson(firstFour); // Object array to json
-                            response.setStatus(HttpServletResponse.SC_OK);
-                            out.write("{\"size\": " + supplies.size() + ",\"list\":" + objectArray + "}");
-                            System.out.println("Stock manager dashboard tables contents");
-                        } else {
-                            String objectArray = gson.toJson(supplies); // Object array to json
-                            response.setStatus(HttpServletResponse.SC_OK);
-                            out.write("{\"size\": " + supplies.size() + ",\"list\":" + objectArray + "}");
-                            System.out.println("Stock manager dashboard tables contents");
-                        }
+                    List<SupplyModel> supply_requests = supplyDAO.getAll();
+                    List<SupplyModel> today_supplies = supplyDAO.getCollectionsByDate(today);
+                    int today_completed_count = collectionDAO.completedRowCountByDate(today);
+                    int today_remaining_count = collectionDAO.remainingRowCountByDate(today);
+
+                    String today_array = gson.toJson(today_supplies);
+
+                    if (supply_requests.size() > 4) {
+                        List<SupplyModel> firstFour = new ArrayList<>(supply_requests.subList(0, 4));
+                        String request_array = gson.toJson(firstFour); // Object array to json
+                        response.setStatus(HttpServletResponse.SC_OK);
+
+                        out.write("{\"size\": " + supply_requests.size() + ",\"list\":" + request_array + ",\"today_size\":" + today_supplies.size() + ",\"today\":" + today_array + ",\"completed\":"+today_completed_count+",\"remaining\":"+today_remaining_count+"}");
+                        System.out.println("Stock manager dashboard tables contents");
                     } else {
-                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": \"0\"}");
-                        System.out.println("No Supplies");
+                        String request_array = gson.toJson(supply_requests); // Object array to json
+                        response.setStatus(HttpServletResponse.SC_OK);
+
+                        out.write("{\"size\": " + supply_requests.size() + ",\"list\":" + request_array + ",\"today_size\":" + today_supplies.size() + ",\"today\":" + today_array + ",\"completed\":"+today_completed_count+",\"remaining\":"+today_remaining_count+"}");
+                        System.out.println("Stock manager dashboard tables contents");
                     }
+
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     out.write("{\"message\": \"Invalid User\"}");
