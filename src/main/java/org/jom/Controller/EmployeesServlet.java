@@ -5,10 +5,8 @@ import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.OutletDAO;
 import org.jom.Dao.Supplier.AccountDAO;
 import org.jom.Dao.Supplier.EstateDAO;
-import org.jom.Model.AccountModel;
-import org.jom.Model.EmployeeModel;
-import org.jom.Model.EstateModel;
-import org.jom.Model.OutletModel;
+import org.jom.Dao.UserDAO;
+import org.jom.Model.*;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -25,15 +23,16 @@ public class EmployeesServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        int admin_id = Integer.parseInt(request.getParameter("emp"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
 
         try {
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel admin = employeeDAO.getEmployee(admin_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (admin.geteId() != 0) {
-                if (admin.getRole().equals("admin")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("admin")) {
 
+                    EmployeeDAO employeeDAO = new EmployeeDAO();
                     List<EmployeeModel> employees = employeeDAO.getAll();
 
                     Gson gson = new Gson();
