@@ -35,7 +35,7 @@ public class AdminServlet extends HttpServlet {
                     CollectionDAO collectionDAO = new CollectionDAO();
 
                     response.setStatus(HttpServletResponse.SC_OK);
-                    out.write("{\"employees\": " + employeeDAO.rowCount() + ",\"suppliers\":" + supplierDAO.rowCount() + ",\"outlets\":" + outletDAO.rowCount() + ",\"collections\":" + collectionDAO.rowCount() + "}");
+                    out.write("{\"employees\": " + employeeDAO.rowCount() + ",\"suppliers\":" + supplierDAO.rowCount() + ",\"outlets\":" + outletDAO.rowCount() + ",\"collections\":" + collectionDAO.rowCount(2) + "}");
                     System.out.println("Send dashboard content");
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

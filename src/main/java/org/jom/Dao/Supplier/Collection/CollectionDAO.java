@@ -169,15 +169,16 @@ public class CollectionDAO {
         return collection;
     }
 
-    public int rowCount() {
+    public int rowCount(int status) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         int count = 0;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT COUNT(*) AS Row_Count FROM collections WHERE status=2 AND jom_db.collections.delete=0;";
+            String sql = "SELECT COUNT(*) AS Row_Count FROM collections WHERE status=? AND jom_db.collections.delete=0;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, status);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {

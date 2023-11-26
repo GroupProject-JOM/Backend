@@ -1,9 +1,13 @@
-package org.jom.Controller;
+package org.jom.Controller.SalesManager;
 
 import com.google.gson.Gson;
 import org.jom.Dao.EmployeeDAO;
-import org.jom.Dao.Supplier.SupplierDAO;
+import org.jom.Dao.Supplier.Collection.CollectionDAO;
+import org.jom.Dao.Supplier.Collection.SupplyDAO;
+import org.jom.Dao.UserDAO;
+import org.jom.Model.Collection.SupplyModel;
 import org.jom.Model.EmployeeModel;
+import org.jom.Model.UserModel;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,29 +15,29 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/sales-manager")
 public class SalesManagerServlet extends HttpServlet {
-    // Get sales manager dashboard content
+    //Get Dashboard content
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        int employee_id = Integer.parseInt(request.getParameter("emp"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
 
         try {
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel employee = employeeDAO.getEmployee(employee_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (employee.geteId() != 0) {
-                if (employee.getRole().equals("sales-manager")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("sales-manager")) {
+                    CollectionDAO collectionDAO = new CollectionDAO();
 
-                    SupplierDAO supplierDAO = new SupplierDAO();
-                    int pending_payments = supplierDAO.pendingPayments();
-                        response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"payments\": " + pending_payments + "}");
-                        System.out.println("Send dashboard content");
-
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out.write("{\"payouts\":" + collectionDAO.rowCount(5) + "}");
+                    System.out.println("Send dashboard content");
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     out.write("{\"message\": \"Invalid User\"}");
