@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.jom.Dao.CollectorDAO;
 import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.OutletDAO;
+import org.jom.Dao.UserDAO;
 import org.jom.Email.SendEmail;
 import org.jom.Model.*;
 
@@ -30,11 +31,11 @@ public class EmployeeServlet extends HttpServlet {
             BufferedReader bufferedReader = request.getReader();
             EmployeeModel employee = gson.fromJson(bufferedReader, EmployeeModel.class);
 
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel admin = employeeDAO.getEmployee(employee.getEmp());
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(employee.getEmp());
 
-            if (admin.geteId() != 0) {
-                if (admin.getRole().equals("admin")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("admin")) {
 
                     // Check input field is empty
                     if (employee.getFirst_name().isEmpty()) {
@@ -140,9 +141,9 @@ public class EmployeeServlet extends HttpServlet {
                     employee.Register();
 
                     //collector to collector table
-                    if(employee.getRole().equals("collector")){
+                    if (employee.getRole().equals("collector")) {
                         CollectorDAO collectorDAO = new CollectorDAO();
-                        if(collectorDAO.register(employee.getId())){
+                        if (collectorDAO.register(employee.getId())) {
                             System.out.println("Collector added successfully");
                         }
                     }
@@ -180,15 +181,16 @@ public class EmployeeServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         int employee_id = Integer.parseInt(request.getParameter("id"));
-        int admin_id = Integer.parseInt(request.getParameter("emp"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
 
         try {
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel admin = employeeDAO.getEmployee(admin_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (admin.geteId() != 0) {
-                if (admin.getRole().equals("admin")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("admin")) {
 
+                    EmployeeDAO employeeDAO = new EmployeeDAO();
                     EmployeeModel employee = employeeDAO.getEmployee(employee_id);
 
                     Gson gson = new Gson();
@@ -233,11 +235,11 @@ public class EmployeeServlet extends HttpServlet {
             BufferedReader bufferedReader = request.getReader();
             EmployeeModel employee = gson.fromJson(bufferedReader, EmployeeModel.class);
 
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel admin = employeeDAO.getEmployee(employee.getEmp());
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(employee.getEmp());
 
-            if (admin.geteId() != 0) {
-                if (admin.getRole().equals("admin")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("admin")) {
 
                     // Check input field is empty
                     if (employee.getFirst_name().isEmpty()) {
@@ -344,15 +346,16 @@ public class EmployeeServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         int employeeId = Integer.parseInt(request.getParameter("id"));
-        int admin_id = Integer.parseInt(request.getParameter("emp"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
 
         try {
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel admin = employeeDAO.getEmployee(admin_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (admin.geteId() != 0) {
-                if (admin.getRole().equals("admin")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("admin")) {
 
+                    EmployeeDAO employeeDAO = new EmployeeDAO();
                     EmployeeModel employee = new EmployeeModel(employeeId);
                     employee.getUserId();
                     if (employeeDAO.deleteUser(employee.getId())) {

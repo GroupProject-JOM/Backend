@@ -54,7 +54,19 @@ public class EmployeeDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT employees.id, users.first_name, users.role, users.phone, users.add_line_3 FROM employees inner join users where users.id = employees.user_id_ ;";
+            String sql = "SELECT \n" +
+                    "    e.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.role,\n" +
+                    "    u.phone,\n" +
+                    "    u.add_line_3\n" +
+                    "FROM\n" +
+                    "    employees e\n" +
+                    "        INNER JOIN\n" +
+                    "    users u\n" +
+                    "WHERE\n" +
+                    "    u.id = e.user_id_\n" +
+                    "        AND u.role <> 'admin';";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -91,7 +103,25 @@ public class EmployeeDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT users.first_name,users.last_name, users.email, users.phone,users.add_line_1,users.add_line_2, users.add_line_3,employees.dob,employees.nic,employees.gender,users.role,employees.id FROM employees inner join users where users.id = employees.user_id_ and  employees.id= ?;";
+            String sql = "SELECT \n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    u.email,\n" +
+                    "    u.phone,\n" +
+                    "    u.add_line_1,\n" +
+                    "    u.add_line_2,\n" +
+                    "    u.add_line_3,\n" +
+                    "    e.dob,\n" +
+                    "    e.nic,\n" +
+                    "    e.gender,\n" +
+                    "    u.role,\n" +
+                    "    e.id\n" +
+                    "FROM\n" +
+                    "    employees e\n" +
+                    "        INNER JOIN\n" +
+                    "    users u\n" +
+                    "WHERE\n" +
+                    "    u.id = e.user_id_ AND e.id = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();

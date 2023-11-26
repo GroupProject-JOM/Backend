@@ -5,10 +5,8 @@ import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.OutletDAO;
 import org.jom.Dao.Supplier.AccountDAO;
 import org.jom.Dao.Supplier.EstateDAO;
-import org.jom.Model.AccountModel;
-import org.jom.Model.EmployeeModel;
-import org.jom.Model.EstateModel;
-import org.jom.Model.OutletModel;
+import org.jom.Dao.UserDAO;
+import org.jom.Model.*;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -25,14 +23,14 @@ public class OutletsServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        int employee_id = Integer.parseInt(request.getParameter("emp"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
 
         try {
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel employee = employeeDAO.getEmployee(employee_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (employee.geteId() != 0) {
-                if (employee.getRole().equals("distributor") || employee.getRole().equals("admin") || employee.getRole().equals("sales-manager")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("distributor") || user.getRole().equals("admin") || user.getRole().equals("sales-manager")) {
                     OutletDAO outletDAO = new OutletDAO();
                     List<OutletModel> outlets = outletDAO.getAll();
 

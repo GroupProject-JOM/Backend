@@ -4,10 +4,8 @@ import com.google.gson.Gson;
 import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.OutletDAO;
 import org.jom.Dao.Supplier.AccountDAO;
-import org.jom.Model.AccountModel;
-import org.jom.Model.EmployeeModel;
-import org.jom.Model.EstateModel;
-import org.jom.Model.OutletModel;
+import org.jom.Dao.UserDAO;
+import org.jom.Model.*;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -29,11 +27,11 @@ public class OutletServlet extends HttpServlet {
             BufferedReader bufferedReader = request.getReader();
             OutletModel outlet = gson.fromJson(bufferedReader, OutletModel.class);
 
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel employee = employeeDAO.getEmployee(outlet.getEmp_id());
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(outlet.getUser());
 
-            if (employee.geteId() != 0) {
-                if (employee.getRole().equals("distributor") || employee.getRole().equals("admin") || employee.getRole().equals("sales-manager")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("distributor") || user.getRole().equals("admin") || user.getRole().equals("sales-manager")) {
 
                     outlet.addOutlet();
                     if (outlet.getId() != 0) {
@@ -69,17 +67,17 @@ public class OutletServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         int outlet_id = Integer.parseInt(request.getParameter("id"));
-        int employee_id = Integer.parseInt(request.getParameter("emp"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
 
         try {
             OutletDAO outletDAO = new OutletDAO();
             OutletModel outlet = outletDAO.getOutlet(outlet_id);
 
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel employee = employeeDAO.getEmployee(employee_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (employee.geteId() != 0) {
-                if (employee.getRole().equals("distributor") || employee.getRole().equals("admin") || employee.getRole().equals("sales-manager")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("distributor") || user.getRole().equals("admin") || user.getRole().equals("sales-manager")) {
                     if (outlet.getId() != 0) {
                         Gson gson = new Gson();
                         // Object array to json
@@ -122,11 +120,11 @@ public class OutletServlet extends HttpServlet {
             BufferedReader bufferedReader = request.getReader();
             OutletModel outlet = gson.fromJson(bufferedReader, OutletModel.class);
 
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel employee = employeeDAO.getEmployee(outlet.getEmp_id());
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(outlet.getUser());
 
-            if (employee.geteId() != 0) {
-                if (employee.getRole().equals("distributor") || employee.getRole().equals("admin") || employee.getRole().equals("sales-manager")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("distributor") || user.getRole().equals("admin") || user.getRole().equals("sales-manager")) {
 
                     if (outlet.updateOutlet()) {
                         response.setStatus(HttpServletResponse.SC_OK);
@@ -161,16 +159,16 @@ public class OutletServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         int outlet_id = Integer.parseInt(request.getParameter("id"));
-        int employee_id = Integer.parseInt(request.getParameter("emp"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
 
         try {
             OutletDAO outletDAO = new OutletDAO();
 
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel employee = employeeDAO.getEmployee(employee_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (employee.geteId() != 0) {
-                if (employee.getRole().equals("distributor") || employee.getRole().equals("admin") || employee.getRole().equals("sales-manager")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("distributor") || user.getRole().equals("admin") || user.getRole().equals("sales-manager")) {
                     if (outletDAO.deleteOutlet(outlet_id)) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"Delete Outlet\"}");

@@ -5,7 +5,9 @@ import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.OutletDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.SupplierDAO;
+import org.jom.Dao.UserDAO;
 import org.jom.Model.EmployeeModel;
+import org.jom.Model.UserModel;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -21,18 +23,19 @@ public class AdminServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        int admin_id = Integer.parseInt(request.getParameter("emp"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
 
         try {
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel admin = employeeDAO.getEmployee(admin_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (admin.geteId() != 0) {
-                if (admin.getRole().equals("admin")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("admin")) {
 
                     SupplierDAO supplierDAO = new SupplierDAO();
                     OutletDAO outletDAO = new OutletDAO();
                     CollectionDAO collectionDAO = new CollectionDAO();
+                    EmployeeDAO employeeDAO = new EmployeeDAO();
 
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.write("{\"employees\": " + employeeDAO.rowCount() + ",\"suppliers\":" + supplierDAO.rowCount() + ",\"outlets\":" + outletDAO.rowCount() + ",\"collections\":" + collectionDAO.rowCount(2) + "}");

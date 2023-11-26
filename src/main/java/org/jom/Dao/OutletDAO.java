@@ -25,7 +25,7 @@ public class OutletDAO {
             preparedStatement.setString(4,outlet.getAddress1());
             preparedStatement.setString(5,outlet.getStreet());
             preparedStatement.setString(6,outlet.getCity());
-            preparedStatement.setInt(7,outlet.getEmp_id());
+            preparedStatement.setInt(7,outlet.getUser());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
