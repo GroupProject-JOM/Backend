@@ -41,11 +41,11 @@ public class PickupCollectionServlet extends HttpServlet {
                     Gson gson = new Gson();
                     String object = gson.toJson(collection); // Object array to json
 
-                    if(collection.getId() !=0){
+                    if (collection.getId() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"collection\": "+ object +"}");
+                        out.write("{\"collection\": " + object + "}");
                         System.out.println("Send collection");
-                    }else{
+                    } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
                         out.write("{\"collection\": \"No collection\"}");
                         System.out.println("No collection");
@@ -91,17 +91,22 @@ public class PickupCollectionServlet extends HttpServlet {
         UserModel user = userDAO.getUserById(user_id);
 
         //check if emails are correct
-        if(user.getRole().equals("collector") || user.getRole().equals("admin")) {
+        if (user.getRole().equals("collector") || user.getRole().equals("admin")) {
+
+            if (user.getRole().equals("admin")) {
+                SupplyDAO supplyDAO = new SupplyDAO();
+                user_id = supplyDAO.getCollectorUserIDByCollectionID(collection_id);
+            }
 
             try {
                 PickupDAO pickupDAO = new PickupDAO();
                 CollectionDAO collectionDAO = new CollectionDAO();
                 CollectorDAO collectorDAO = new CollectorDAO();
 
-                if(pickupDAO.updateCollectedDate(collection_id) && collectionDAO.updateFinalAmount(final_amount,collection_id) && collectorDAO.updateTodayAmount(final_amount,user_id)) {
+                if (pickupDAO.updateCollectedDate(collection_id) && collectionDAO.updateFinalAmount(final_amount, collection_id) && collectorDAO.updateTodayAmount(final_amount, user_id)) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.write("{\"message\": \"Collection Completed\"}");
-                }else {
+                } else {
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                     out.write("{\"message\": \"Not completed\"}");
                 }
@@ -111,7 +116,7 @@ public class PickupCollectionServlet extends HttpServlet {
             } finally {
                 out.close();
             }
-        } else{
+        } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             out.write("{\"message\": \"Invalid User\"}");
         }
