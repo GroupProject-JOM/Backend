@@ -38,7 +38,7 @@ public class VerifyAmountServlet extends HttpServlet {
         UserDAO userDAO = new UserDAO();
         UserModel user = userDAO.getUserById(user_id);
 
-        if (user.getRole().equals("collector")) {
+        if (user.getRole().equals("collector") || user.getRole().equals("admin")) {
 
             OTPDAO otpDao = new OTPDAO();
             OTPModel record = otpDao.getRecord(otpId);

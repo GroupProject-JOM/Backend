@@ -39,7 +39,7 @@ public class OptionalVerificationServlet extends HttpServlet {
         UserModel user = userDAO.getUserById(user_id);
 
         //check if emails are correct
-        if(user.getRole().equals("collector")) {
+        if(user.getRole().equals("collector") || user.getRole().equals("admin")) {
 
             CollectionDAO collectionDAO = new CollectionDAO();
             String supplier_email = collectionDAO.getSupplierEmail(collection_id,user_id);

@@ -47,20 +47,27 @@ public class VerifyCoconutAmount {
             if (content.startsWith("Collector")) {
                 int supplier = collectionDAO.getSupplierId(collection_id, sender_id);
                 Session recipientSession = sessions.get(Integer.toString(supplier));
-                if (recipientSession != null) {
+                if (recipientSession != null)
                     sendNotification(recipientSession, content);
-                    System.out.println(content);
-                } else {
+                else
                     savePendingNotification(Integer.toString(supplier), content);
-                }
+
             } else {
                 int collector = collectionDAO.getCollectorId(collection_id, sender_id);
                 Session recipientSession = sessions.get(Integer.toString(collector));
 
-                if (recipientSession != null) {
+                if (recipientSession != null)
                     sendNotification(recipientSession, content);
-                } else {
+                else {
                     savePendingNotification(Integer.toString(collector), content);
+
+                    // to admin
+                    Session recipientSession2 = sessions.get("7");
+                    if (recipientSession2 != null)
+                        sendNotification(recipientSession2, content);
+                    else
+                        savePendingNotification("7", content);
+
                 }
             }
         }
@@ -96,6 +103,8 @@ public class VerifyCoconutAmount {
         if (user.getRole().equals("collector"))
             return user_id;
         else if (user.getRole().equals("supplier"))
+            return user_id;
+        else if (user.getRole().equals("admin"))
             return user_id;
         else {
             sendNotification(session, "Invalid user.");

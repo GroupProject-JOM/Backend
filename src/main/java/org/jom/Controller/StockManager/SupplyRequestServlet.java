@@ -3,8 +3,10 @@ package org.jom.Controller.StockManager;
 import com.google.gson.Gson;
 import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
+import org.jom.Dao.UserDAO;
 import org.jom.Model.Collection.SupplyModel;
 import org.jom.Model.EmployeeModel;
+import org.jom.Model.UserModel;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -22,14 +24,14 @@ public class SupplyRequestServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         int collection_id = Integer.parseInt(request.getParameter("id"));
-        int employee_id = Integer.parseInt(request.getParameter("sId"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
 
         try {
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel stock_manager = employeeDAO.getEmployee(employee_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (stock_manager.geteId() != 0) {
-                if (stock_manager.getRole().equals("stock-manager")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("stock-manager") || user.getRole().equals("admin")) {
 
                     SupplyDAO supplyDAO = new SupplyDAO();
                     SupplyModel supply = supplyDAO.getSupply(collection_id);
