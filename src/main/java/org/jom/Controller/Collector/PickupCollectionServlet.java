@@ -26,15 +26,15 @@ public class PickupCollectionServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        int employee_id = Integer.parseInt(request.getParameter("sId"));
+        int user_id = Integer.parseInt(request.getParameter("user"));
         int collection_id = Integer.parseInt(request.getParameter("id"));
 
         try {
-            EmployeeDAO employeeDAO = new EmployeeDAO();
-            EmployeeModel collector = employeeDAO.getEmployee(employee_id);
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
-            if (collector.geteId() != 0) {
-                if (collector.getRole().equals("collector")) {
+            if (user.getId() != 0) {
+                if (user.getRole().equals("collector") || user.getRole().equals("admin")) {
                     SupplyDAO supplyDAO = new SupplyDAO();
                     SupplyModel collection = supplyDAO.getCollection(collection_id);
 
@@ -91,7 +91,7 @@ public class PickupCollectionServlet extends HttpServlet {
         UserModel user = userDAO.getUserById(user_id);
 
         //check if emails are correct
-        if(user.getRole().equals("collector")) {
+        if(user.getRole().equals("collector") || user.getRole().equals("admin")) {
 
             try {
                 PickupDAO pickupDAO = new PickupDAO();

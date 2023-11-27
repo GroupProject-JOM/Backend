@@ -804,8 +804,72 @@ public class SupplyDAO {
                 String method = resultSet.getString(5);
                 String c_fName = resultSet.getString(6);
                 String c_lName = resultSet.getString(7);
+                String time = resultSet.getString(8);
 
-                SupplyModel supply = new SupplyModel(id, amount, fName,method, lName, c_fName,c_lName);
+                SupplyModel supply = new SupplyModel(id, amount, fName,method, lName, c_fName,c_lName,time);
+                supplies.add(supply);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
+    }
+
+    //get pickups by date
+    public List<SupplyModel> getPickupsByDate(String date) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    c.id,\n" +
+                    "    u_supplier.first_name AS supplier_first_name,\n" +
+                    "    u_supplier.last_name AS supplier_last_name,\n" +
+                    "    c.init_amount,\n" +
+                    "    u_collector.first_name AS collector_first_name,\n" +
+                    "    u_collector.last_name AS collector_last_name,\n" +
+                    "    p.pickup_time\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON c.id = p.collection_id\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON c.sup_id = s.id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u_supplier ON u_supplier.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    employees e ON e.id = p.collector\n" +
+                    "        INNER JOIN\n" +
+                    "    users u_collector ON u_collector.id = e.user_id_\n" +
+                    "WHERE\n" +
+                    "    c.delete = 0 AND c.status = 3\n" +
+                    "        AND p.pickup_date = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, date);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String fName = resultSet.getString(2);
+                String lName = resultSet.getString(3);
+                int amount = resultSet.getInt(4);
+                String c_fName = resultSet.getString(5);
+                String c_lName = resultSet.getString(6);
+                String time = resultSet.getString(7);
+
+                SupplyModel supply = new SupplyModel(id, amount, fName, lName, c_fName,c_lName,time);
                 supplies.add(supply);
             }
 
