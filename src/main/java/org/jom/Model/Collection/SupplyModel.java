@@ -49,6 +49,16 @@ public class SupplyModel {
         this.payment_method = payment_method;
     }
 
+    public SupplyModel(int id, int amount, int status, String name, String last_name, String phone, String area) {
+        this.id = id;
+        this.amount = amount;
+        this.status = status;
+        this.name = name;
+        this.last_name = last_name;
+        this.phone = phone;
+        this.area = area;
+    }
+
     public SupplyModel(int id, int amount, String name, String last_name, String c_fName, String c_lName, String time) {
         this.id = id;
         this.amount = amount;
