@@ -70,6 +70,7 @@ public class Chat {
                     userDAO.updateSeen(0, sender_id);
 //                    savePendingMessage("3", content);
                 }
+                content = content.substring(0, content.length() - 1);
                 chatDAO.saveChatMessage(sender_id, 3, content);
             }
         } catch (Exception e) {
