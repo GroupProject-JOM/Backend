@@ -276,35 +276,6 @@ public class SupplyDAO {
         return supply;
     }
 
-    //Accept supply request
-    public boolean acceptSupply(int collection_id) {
-        ConnectionPool connectionPool = ConnectionPool.getInstance();
-        Connection connection = null;
-        boolean status = false;
-
-        try {
-            connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE collections SET status=2 WHERE id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, collection_id);
-
-            int x = preparedStatement.executeUpdate();
-            if (x != 0) {
-                status = true;
-            }
-            preparedStatement.close();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (connection != null) try {
-                connection.close();
-            } catch (Exception ignore) {
-            }
-        }
-        return status;
-    }
-
     //Collector names and their collection count
     public List<CollectorModel> getCollectionCount(String date) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
@@ -885,5 +856,48 @@ public class SupplyDAO {
             }
         }
         return supplies;
+    }
+
+    //Get collector's user id by collection id
+    public int getCollectorUserIDByCollectionID(int collectin_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        int collector_id=0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    u.id\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON p.collection_id = c.id\n" +
+                    "        INNER JOIN\n" +
+                    "    employees e ON e.id = p.collector\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = e.user_Id_\n" +
+                    "WHERE\n" +
+                    "    c.id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collectin_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                collector_id = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return collector_id;
     }
 }
