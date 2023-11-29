@@ -63,8 +63,8 @@ public class Chat {
                 String content = parts[1].trim();
 
                 Session recipientSession = sessions.get("3");
+                content = content + sender_id;
                 if (recipientSession != null) {
-                    content = content + sender_id;
                     sendMessage(recipientSession, content);
                 } else {
                     userDAO.updateSeen(0, sender_id);
