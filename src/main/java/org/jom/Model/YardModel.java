@@ -15,7 +15,7 @@ public class YardModel {
         this.days = days;
     }
 
-    public YardModel(int id, int count, int days, String date) {
+    public YardModel(int id, int days, int count, String date) {
         this.id = id;
         this.count = count;
         this.days = days;
