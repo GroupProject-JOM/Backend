@@ -35,21 +35,22 @@ public class CollectionsServlet extends HttpServlet {
 
         try {
             SupplyDAO supplyDAO = new SupplyDAO();
-            List<SupplyModel> supplies = supplyDAO.getAll(supplier_id);
+            List<SupplyModel> ongoing = supplyDAO.getAllOngoing(supplier_id);
+            List<SupplyModel> past = supplyDAO.getAllPast(supplier_id);
             int income = supplyDAO.getIncome(supplier_id, monthPattern);
 
             Gson gson = new Gson();
-            // Object array to json
-            String objectArray = gson.toJson(supplies);
+            String ongoing_array = gson.toJson(ongoing);
+            String past_array = gson.toJson(past);
 
-            if (supplies.size() != 0) {
+            if (ongoing.size() != 0) {
                 response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"size\": " + supplies.size() + ",\"list\":" + objectArray + ",\"income\":" + income + "}");
+                out.write("{\"ongoing\": " + ongoing_array + ",\"past\":" + past_array + ",\"income\":" + income + "}");
                 System.out.println("Supplier dashboard tables contents");
             } else{
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                out.write("{\"size\": \"0\",\"income\":" + income + "}");
-                System.out.println("No Supplies");
+                out.write("{\"size\": \"0\",\"past\":" + past_array + ",\"income\":" + income + "}");
+                System.out.println("No Ongoing Supplies");
             }
 
         } catch (Exception e) {
