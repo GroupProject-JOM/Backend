@@ -200,6 +200,7 @@ public class SupplyDAO {
                     "    c.delete = 0\n" +
                     "        AND (c.status = 1 OR c.status = 2\n" +
                     "        OR c.status = 3\n" +
+                    "        OR c.status = 4\n" +
                     "        OR c.status = 5\n" +
                     "        OR c.status = 6)\n" +
                     "        AND c.id = ? \n" +
@@ -233,6 +234,7 @@ public class SupplyDAO {
                     "WHERE\n" +
                     "    c.delete = 0\n" +
                     "        AND (c.status = 1 OR c.status = 2\n" +
+                    "        OR c.status = 4\n" +
                     "        OR c.status = 5\n" +
                     "        OR c.status = 6)\n" +
                     "        AND c.id = ?;";
@@ -951,6 +953,245 @@ public class SupplyDAO {
                 int status = resultSet.getInt(7);
 
                 SupplyModel supply = new SupplyModel(id, amount, status, fist_name, last_name, phone, area);
+                supplies.add(supply);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
+    }
+
+    //get all accepted collections
+    public List<SupplyModel> getAccepted() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    c.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    c.init_amount,\n" +
+                    "    c.s_method,\n" +
+                    "    p.pickup_date,\n" +
+                    "    u_collec.first_name AS collec_fname,\n" +
+                    "    u_collec.last_name AS collec_lname\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON c.sup_id = s.id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON p.collection_id = c.id\n" +
+                    "        INNER JOIN\n" +
+                    "    employees e ON e.id = p.collector\n" +
+                    "        INNER JOIN\n" +
+                    "    users u_collec ON u_collec.id = e.user_Id_\n" +
+                    "WHERE\n" +
+                    "    c.status < 4 AND c.status > 0 \n" +
+                    "UNION SELECT \n" +
+                    "    c.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    c.init_amount,\n" +
+                    "    c.s_method,\n" +
+                    "    d.delivery_date,\n" +
+                    "    d.delivery_date,\n" +
+                    "    d.delivery_date\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON c.sup_id = s.id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    deliveries d ON d.collec_id = c.id\n" +
+                    "WHERE\n" +
+                    "    c.status < 4 AND c.status > 0\n" +
+                    "ORDER BY pickup_date DESC;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String fist_name = resultSet.getString(2);
+                String last_name = resultSet.getString(3);
+                int initial_amount = resultSet.getInt(4);
+                String method = resultSet.getString(5);
+                String date = resultSet.getString(6);
+                String collec_fist_name = resultSet.getString(7);
+                String collec_last_name = resultSet.getString(8);
+
+                SupplyModel supply = new SupplyModel(id, initial_amount, fist_name, method, last_name, collec_fist_name, collec_last_name, date);
+                supplies.add(supply);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
+    }
+
+    //get all rejected collections
+    public List<SupplyModel> getRejected() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    c.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    c.init_amount,\n" +
+                    "    c.s_method,\n" +
+                    "    p.pickup_date\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id = c.sup_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON p.collection_id = c.id\n" +
+                    "WHERE\n" +
+                    "    c.status = 4 \n" +
+                    "UNION SELECT \n" +
+                    "    c.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    c.init_amount,\n" +
+                    "    c.s_method,\n" +
+                    "    d.delivery_date\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id = c.sup_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    deliveries d ON d.collec_id = c.id\n" +
+                    "WHERE\n" +
+                    "    c.status = 4\n" +
+                    "ORDER BY pickup_date DESC;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String fist_name = resultSet.getString(2);
+                String last_name = resultSet.getString(3);
+                int initial_amount = resultSet.getInt(4);
+                String method = resultSet.getString(5);
+                String date = resultSet.getString(6);
+
+                SupplyModel supply = new SupplyModel(id, date, initial_amount, fist_name, method, last_name);
+                supplies.add(supply);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
+    }
+
+    //get all completed collections
+    public List<SupplyModel> getCompleted() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    c.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    c.final_amount,\n" +
+                    "    c.s_method,\n" +
+                    "    p.collected_date,\n" +
+                    "    u_collec.first_name AS collec_fname,\n" +
+                    "    u_collec.last_name AS collec_lname\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON c.sup_id = s.id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON p.collection_id = c.id\n" +
+                    "        INNER JOIN\n" +
+                    "    employees e ON e.id = p.collector\n" +
+                    "        INNER JOIN\n" +
+                    "    users u_collec ON u_collec.id = e.user_Id_\n" +
+                    "WHERE\n" +
+                    "    c.status > 4 \n" +
+                    "UNION SELECT \n" +
+                    "    c.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    c.final_amount,\n" +
+                    "    c.s_method,\n" +
+                    "    d.delivered_time,\n" +
+                    "    d.delivered_time,\n" +
+                    "    d.delivered_time\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON c.sup_id = s.id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = s.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    deliveries d ON d.collec_id = c.id\n" +
+                    "WHERE\n" +
+                    "    c.status > 4\n" +
+                    "ORDER BY collected_date DESC;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String fist_name = resultSet.getString(2);
+                String last_name = resultSet.getString(3);
+                int final_amount = resultSet.getInt(4);
+                String method = resultSet.getString(5);
+                String date = resultSet.getString(6);
+                String collec_fist_name = resultSet.getString(7);
+                String collec_last_name = resultSet.getString(8);
+
+                SupplyModel supply = new SupplyModel(id, final_amount, fist_name, method, last_name, collec_fist_name, collec_last_name, date);
                 supplies.add(supply);
             }
 

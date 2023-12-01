@@ -80,6 +80,16 @@ public class SupplyModel {
         this.time = time;
     }
 
+    // get all delete collections
+    public SupplyModel(int id, String date, int amount, String name, String method, String last_name) {
+        this.id = id;
+        this.date = date;
+        this.amount = amount;
+        this.name = name;
+        this.method = method;
+        this.last_name = last_name;
+    }
+
     public SupplyModel(int id, String date, int amount, String name, String method, int status) {
         this.id = id;
         this.date = date;
