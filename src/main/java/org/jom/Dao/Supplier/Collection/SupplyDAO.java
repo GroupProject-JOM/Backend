@@ -58,8 +58,8 @@ public class SupplyDAO {
         return supplies;
     }
 
-    //for relevant supplier dashboard
-    public List<SupplyModel> getAll(int supplier_id) {
+    //for relevant supplier dashboard ongoing table
+    public List<SupplyModel> getAllOngoing(int supplier_id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
 
@@ -67,15 +67,38 @@ public class SupplyDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT c.id,p.pickup_date ,p.pickup_time , c.init_amount ,c.status,c.final_amount,c.value \n" +
-                    "FROM collections c\n" +
-                    "INNER JOIN pickups p ON c.id = p.collection_id\n" +
-                    "WHERE c.sup_id = ? AND c.delete=0\n" +
-                    "UNION\n" +
-                    "SELECT c.id,d.delivery_date,d.delivery_time,c.init_amount ,c.status,c.final_amount,c.value\n" +
-                    "FROM collections c\n" +
-                    "INNER JOIN deliveries d ON c.id = d.collec_id\n" +
-                    "WHERE c.sup_id = ? AND c.delete=0 ORDER BY pickup_date;";
+            String sql = "SELECT \n" +
+                    "    c.id,\n" +
+                    "    p.pickup_date,\n" +
+                    "    p.pickup_time,\n" +
+                    "    c.init_amount,\n" +
+                    "    c.s_method,\n" +
+                    "    c.status\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON c.id = p.collection_id\n" +
+                    "WHERE\n" +
+                    "    c.sup_id = ? AND c.delete = 0\n" +
+                    "        AND (c.status = 1 OR c.status = 2\n" +
+                    "        OR c.status = 3\n" +
+                    "        OR c.status = 4) \n" +
+                    "UNION SELECT \n" +
+                    "    c.id,\n" +
+                    "    d.delivery_date,\n" +
+                    "    d.delivery_time,\n" +
+                    "    c.init_amount,\n" +
+                    "    c.s_method,\n" +
+                    "    c.status\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    deliveries d ON c.id = d.collec_id\n" +
+                    "WHERE\n" +
+                    "    c.sup_id = ? AND c.delete = 0\n" +
+                    "        AND (c.status = 1 OR c.status = 2\n" +
+                    "        OR c.status = 4)\n" +
+                    "ORDER BY pickup_date;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, supplier_id);
             preparedStatement.setInt(2, supplier_id);
@@ -86,11 +109,79 @@ public class SupplyDAO {
                 String date = resultSet.getString(2);
                 String time = resultSet.getString(3);
                 int initial_amount = resultSet.getInt(4);
-                int status = resultSet.getInt(5);
-                int final_amoount = resultSet.getInt(6);
-                int value = resultSet.getInt(7);
+                String method = resultSet.getString(5);
+                int status = resultSet.getInt(6);
 
-                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, status, final_amoount, value);
+                SupplyModel supply = new SupplyModel(collection_id, date, initial_amount, time, method, status);
+                supplies.add(supply);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
+    }
+
+    //for relevant supplier dashboard past table
+    public List<SupplyModel> getAllPast(int supplier_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    c.id,\n" +
+                    "    p.collected_date,\n" +
+                    "    c.final_amount,\n" +
+                    "    c.s_method,\n" +
+                    "    c.value,\n" +
+                    "    c.status\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    pickups p ON c.id = p.collection_id\n" +
+                    "WHERE\n" +
+                    "    c.sup_id = ? AND c.delete = 0\n" +
+                    "        AND (c.status = 5 OR c.status = 6) \n" +
+                    "UNION SELECT \n" +
+                    "    c.id,\n" +
+                    "    d.delivered_time,\n" +
+                    "    c.final_amount,\n" +
+                    "    c.s_method,\n" +
+                    "    c.value,\n" +
+                    "    c.status\n" +
+                    "FROM\n" +
+                    "    collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    deliveries d ON c.id = d.collec_id\n" +
+                    "WHERE\n" +
+                    "    c.sup_id = ? AND c.delete = 0\n" +
+                    "        AND (c.status = 5 OR c.status = 6)\n" +
+                    "ORDER BY collected_date DESC;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, supplier_id);
+            preparedStatement.setInt(2, supplier_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int collection_id = resultSet.getInt(1);
+                String date = resultSet.getString(2);
+                int final_amount = resultSet.getInt(3);
+                String method = resultSet.getString(4);
+                int value = resultSet.getInt(5);
+                int status = resultSet.getInt(6);
+
+                SupplyModel supply = new SupplyModel(collection_id, date, status, final_amount, value, method);
                 supplies.add(supply);
             }
 

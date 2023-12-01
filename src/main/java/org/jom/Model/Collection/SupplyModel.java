@@ -69,6 +69,16 @@ public class SupplyModel {
         this.time = time;
     }
 
+    // for past supply table supplier dashboard
+    public SupplyModel(int id, String date, int status, int final_amount, int value, String method) {
+        this.id = id;
+        this.date = date;
+        this.status = status;
+        this.final_amount = final_amount;
+        this.value = value;
+        this.method = method;
+    }
+
     public SupplyModel(int id, int amount, String name, String method, String last_name, String c_fName, String c_lName, String time) {
         this.id = id;
         this.amount = amount;
