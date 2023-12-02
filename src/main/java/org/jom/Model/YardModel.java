@@ -9,6 +9,11 @@ public class YardModel {
     public YardModel() {
     }
 
+    public YardModel(int count, String date) {
+        this.count = count;
+        this.date = date;
+    }
+
     public YardModel(int id, int count, int days) {
         this.id = id;
         this.count = count;
