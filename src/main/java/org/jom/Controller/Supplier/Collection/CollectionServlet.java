@@ -113,10 +113,14 @@ public class CollectionServlet extends HttpServlet {
             calendar.add(Calendar.DAY_OF_MONTH, -7);
             Date day_before_week = calendar.getTime();
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String date = dateFormat.format(day_before_week);
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            Date next_day = calendar.getTime();
 
-            if (collectionDAO.deleteCollection(supplier_id, collection_id,date)) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String min_date = dateFormat.format(day_before_week);
+            String max_date = dateFormat.format(next_day);
+
+            if (collectionDAO.deleteCollection(supplier_id, collection_id,min_date,max_date)) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"message\": \"Delete Collection\"}");
                 System.out.println("Delete Collection");
