@@ -362,4 +362,75 @@ public class EmployeeDAO {
         }
         return employeeId;
     }
+
+    //get user
+    public EmployeeModel getUser(int id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        EmployeeModel employee = new EmployeeModel();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    u.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    u.email,\n" +
+                    "    u.phone,\n" +
+                    "    CASE\n" +
+                    "        WHEN u.role = 'supplier' THEN NULL\n" +
+                    "        ELSE e.nic\n" +
+                    "    END AS nic,\n" +
+                    "    CASE\n" +
+                    "        WHEN u.role = 'supplier' THEN NULL\n" +
+                    "        ELSE e.dob\n" +
+                    "    END AS dob,\n" +
+                    "    CASE\n" +
+                    "        WHEN u.role = 'supplier' THEN NULL\n" +
+                    "        ELSE e.gender\n" +
+                    "    END AS gender,\n" +
+                    "    u.add_line_1,\n" +
+                    "    u.add_line_2,\n" +
+                    "    u.add_line_3,\n" +
+                    "    u.role\n" +
+                    "FROM\n" +
+                    "    users u\n" +
+                    "        LEFT JOIN\n" +
+                    "    employees e ON u.id = e.user_id_\n" +
+                    "        AND u.role != 'supplier'\n" +
+                    "WHERE\n" +
+                    "    u.id = ?;\n";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                employee.setId(resultSet.getInt(1));
+                employee.setFirst_name(resultSet.getString(2));
+                employee.setLast_name(resultSet.getString(3));
+                employee.setEmail(resultSet.getString(4));
+                employee.setPhone(resultSet.getString(5));
+                employee.setNic(resultSet.getString(6));
+                employee.setDob(resultSet.getString(7));
+                employee.setGender(resultSet.getString(8));
+                employee.setAdd_line_1(resultSet.getString(9));
+                employee.setAdd_line_2(resultSet.getString(10));
+                employee.setAdd_line_3(resultSet.getString(11));
+                employee.setRole(resultSet.getString(12));
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return employee;
+    }
 }
