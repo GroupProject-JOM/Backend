@@ -199,26 +199,40 @@ public class CollectionDAO {
         return count;
     }
 
-    public boolean deleteCollection(int sId, int id, String date) {
+    public boolean deleteCollection(int sId, int id, String min_date,String max_date) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE collections c\n" +
-                    "        INNER JOIN\n" +
-                    "    pickups p ON c.id = p.collection_id \n" +
+            String sql = "UPDATE collections c \n" +
                     "SET \n" +
                     "    c.delete = 1\n" +
                     "WHERE\n" +
                     "    c.sup_id = ? AND c.id = ?\n" +
-                    "        AND status < 5\n" +
-                    "        AND p.pickup_date < ?; ";
+                    "        AND c.status < 5\n" +
+                    "        AND ((c.id IN (SELECT \n" +
+                    "            collection_id\n" +
+                    "        FROM\n" +
+                    "            pickups\n" +
+                    "        WHERE\n" +
+                    "            (pickup_date < ?\n" +
+                    "                OR pickup_date > ?)))\n" +
+                    "        OR (c.id IN (SELECT \n" +
+                    "            collec_id\n" +
+                    "        FROM\n" +
+                    "            deliveries\n" +
+                    "        WHERE\n" +
+                    "            (delivery_date < ?\n" +
+                    "                OR delivery_date > ?))));";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, sId);
             preparedStatement.setInt(2, id);
-            preparedStatement.setString(3, date);
+            preparedStatement.setString(3, min_date);
+            preparedStatement.setString(4, max_date);
+            preparedStatement.setString(5, min_date);
+            preparedStatement.setString(6, max_date);
 
             int x = preparedStatement.executeUpdate();
             if (x != 0) {
