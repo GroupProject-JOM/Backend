@@ -1299,4 +1299,51 @@ public class SupplyDAO {
         }
         return supplies;
     }
+
+    //get collectors collection count by date
+    public int getCollectorCollectionsCount(int collector, String date) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        int count=0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    COUNT(*) AS Row_Count\n" +
+                    "FROM\n" +
+                    "    pickups p\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON c.id = p.collection_id\n" +
+                    "        INNER JOIN\n" +
+                    "    employees e ON p.collector = e.id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = e.user_Id_\n" +
+                    "WHERE\n" +
+                    "    u.id = ?\n" +
+                    "        AND p.pickup_date = ?\n" +
+                    "        AND c.delete = 0\n" +
+                    "        AND c.status = 3;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collector);
+            preparedStatement.setString(2, date);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return count;
+    }
 }
