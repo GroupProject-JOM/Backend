@@ -47,7 +47,7 @@ public class YardsServlet extends HttpServlet {
 
                     if (yard1.size() != 0 && yard2.size() != 0 && yard3.size() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"yard1\": " + yard1_data + ",\"yard2\": " + yard3_data + ",\"yard3\": " + yard3_data + "}");
+                        out.write("{\"yard1\": " + yard1_data + ",\"yard2\": " + yard2_data + ",\"yard3\": " + yard3_data + "}");
                         System.out.println("Send yards data");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
