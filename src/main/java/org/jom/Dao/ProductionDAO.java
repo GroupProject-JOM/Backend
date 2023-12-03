@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ProductionDAO {
     //create production request
-    public int createProductionRequest(ProductionModel productionModel){
+    public int createProductionRequest(ProductionModel productionModel) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         int productionId = 0;
@@ -20,9 +20,9 @@ public class ProductionDAO {
             connection = connectionPool.dataSource.getConnection();
             String sql = "INSERT INTO productions (yard,block,amount) VALUES (?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setInt(1,productionModel.getYard());
-            preparedStatement.setInt(2,productionModel.getBlock());
-            preparedStatement.setInt(3,productionModel.getAmount());
+            preparedStatement.setInt(1, productionModel.getYard());
+            preparedStatement.setInt(2, productionModel.getBlock());
+            preparedStatement.setInt(3, productionModel.getAmount());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
@@ -60,7 +60,7 @@ public class ProductionDAO {
                     "WHERE\n" +
                     "    p.delete = 0 AND p.id = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -113,7 +113,7 @@ public class ProductionDAO {
                 int status = resultSet.getInt(5);
                 String date = resultSet.getString(7);
 
-                ProductionModel productionModel = new ProductionModel(id,yard,block,amount,status,date);
+                ProductionModel productionModel = new ProductionModel(id, yard, block, amount, status, date);
                 productionModels.add(productionModel);
             }
 
@@ -132,22 +132,22 @@ public class ProductionDAO {
     }
 
     // update production request
-    public boolean updateProductionRequest(ProductionModel productionModel){
+    public boolean updateProductionRequest(ProductionModel productionModel) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE productions SET p.yard=?,p.block=?,p.amount=?,p.status=1 WHERE p.id = ? AND p.delete=0 AND p.status<3";
+            String sql = "UPDATE productions p SET p.yard=?,p.block=?,p.amount=?,p.status=1,p.date=CURRENT_TIMESTAMP WHERE p.id = ? AND p.delete=0 AND p.status<4";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,productionModel.getYard());
-            preparedStatement.setInt(2,productionModel.getBlock());
-            preparedStatement.setInt(3,productionModel.getAmount());
-            preparedStatement.setInt(4,productionModel.getId());
+            preparedStatement.setInt(1, productionModel.getYard());
+            preparedStatement.setInt(2, productionModel.getBlock());
+            preparedStatement.setInt(3, productionModel.getAmount());
+            preparedStatement.setInt(4, productionModel.getId());
 
             int x = preparedStatement.executeUpdate();
-            if(x !=0){
+            if (x != 0) {
                 status = true;
             }
             preparedStatement.close();
@@ -164,7 +164,7 @@ public class ProductionDAO {
     }
 
     // delete production request
-    public boolean deleteProductionRequest(int id){
+    public boolean deleteProductionRequest(int id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
@@ -173,10 +173,10 @@ public class ProductionDAO {
             connection = connectionPool.dataSource.getConnection();
             String sql = "UPDATE productions SET jom_db.productions.delete=1 WHERE id = ? AND status<4";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(1, id);
 
             int x = preparedStatement.executeUpdate();
-            if(x !=0){
+            if (x != 0) {
                 status = true;
             }
             preparedStatement.close();
@@ -219,7 +219,7 @@ public class ProductionDAO {
                 int status = resultSet.getInt(5);
                 String date = resultSet.getString(7);
 
-                ProductionModel productionModel = new ProductionModel(id,yard,block,amount,status,date);
+                ProductionModel productionModel = new ProductionModel(id, yard, block, amount, status, date);
                 productionModels.add(productionModel);
             }
 
