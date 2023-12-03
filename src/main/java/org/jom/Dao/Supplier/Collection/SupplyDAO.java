@@ -1092,7 +1092,7 @@ public class SupplyDAO {
                     "        INNER JOIN\n" +
                     "    users u_collec ON u_collec.id = e.user_Id_\n" +
                     "WHERE\n" +
-                    "    c.status < 4 AND c.status > 0 \n" +
+                    "    c.status < 4 AND c.status > 0 AND c.delete = 0\n" +
                     "UNION SELECT \n" +
                     "    c.id,\n" +
                     "    u.first_name,\n" +
@@ -1111,7 +1111,7 @@ public class SupplyDAO {
                     "        INNER JOIN\n" +
                     "    deliveries d ON d.collec_id = c.id\n" +
                     "WHERE\n" +
-                    "    c.status < 4 AND c.status > 0\n" +
+                    "    c.status < 4 AND c.status > 0 AND c.delete = 0\n" +
                     "ORDER BY pickup_date DESC;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();

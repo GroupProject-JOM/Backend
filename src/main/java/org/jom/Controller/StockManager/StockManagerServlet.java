@@ -2,11 +2,13 @@ package org.jom.Controller.StockManager;
 
 import com.google.gson.Gson;
 import org.jom.Dao.EmployeeDAO;
+import org.jom.Dao.ProductionDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
 import org.jom.Dao.UserDAO;
 import org.jom.Model.Collection.SupplyModel;
 import org.jom.Model.EmployeeModel;
+import org.jom.Model.ProductionModel;
 import org.jom.Model.UserModel;
 
 import javax.servlet.annotation.WebServlet;
@@ -46,27 +48,30 @@ public class StockManagerServlet extends HttpServlet {
 
                     SupplyDAO supplyDAO = new SupplyDAO();
                     CollectionDAO collectionDAO = new CollectionDAO();
+                    ProductionDAO productionDAO = new ProductionDAO();
                     Gson gson = new Gson();
 
                     List<SupplyModel> supply_requests = supplyDAO.getAll();
                     List<SupplyModel> today_supplies = supplyDAO.getCollectionsByDate(today);
                     int today_completed_count = collectionDAO.completedRowCountByDate(today);
                     int today_remaining_count = collectionDAO.remainingRowCountByDate(today);
+                    List<ProductionModel> production_requests = productionDAO.getAllPendingProductionRequests();
 
                     String today_array = gson.toJson(today_supplies);
+                    String production_array = gson.toJson(production_requests);
 
                     if (supply_requests.size() > 4) {
                         List<SupplyModel> firstFour = new ArrayList<>(supply_requests.subList(0, 4));
                         String request_array = gson.toJson(firstFour); // Object array to json
                         response.setStatus(HttpServletResponse.SC_OK);
 
-                        out.write("{\"size\": " + supply_requests.size() + ",\"list\":" + request_array + ",\"today_size\":" + today_supplies.size() + ",\"today\":" + today_array + ",\"completed\":"+today_completed_count+",\"remaining\":"+today_remaining_count+"}");
+                        out.write("{\"size\": " + supply_requests.size() + ",\"list\":" + request_array + ",\"today_size\":" + today_supplies.size() + ",\"today\":" + today_array + ",\"completed\":" + today_completed_count + ",\"remaining\":" + today_remaining_count + ",\"p_request\":" + production_requests.size() + ",\"production\":" + production_array + "}");
                         System.out.println("Stock manager dashboard tables contents");
                     } else {
                         String request_array = gson.toJson(supply_requests); // Object array to json
                         response.setStatus(HttpServletResponse.SC_OK);
 
-                        out.write("{\"size\": " + supply_requests.size() + ",\"list\":" + request_array + ",\"today_size\":" + today_supplies.size() + ",\"today\":" + today_array + ",\"completed\":"+today_completed_count+",\"remaining\":"+today_remaining_count+"}");
+                        out.write("{\"size\": " + supply_requests.size() + ",\"list\":" + request_array + ",\"today_size\":" + today_supplies.size() + ",\"today\":" + today_array + ",\"completed\":" + today_completed_count + ",\"remaining\":" + today_remaining_count + ",\"p_request\":" + production_requests.size() + ",\"production\":" + production_array + "}");
                         System.out.println("Stock manager dashboard tables contents");
                     }
 

@@ -181,6 +181,7 @@ public class UserDAO {
         }
     }
 
+    // update with role from admin
     public boolean updateUser(UserModel user){
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
@@ -314,5 +315,71 @@ public class UserDAO {
             }
         }
         return distributors;
+    }
+
+    // Update password
+    public static boolean updatePassword(int id,String password){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE users SET password = ? WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,password);
+            preparedStatement.setInt(2,id);
+            preparedStatement.executeUpdate();
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
+
+    // update without role from them self
+    public boolean updateProfile(UserModel user){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE users SET first_name=?,last_name=?,phone=?,add_line_1=?,add_line_2=?,add_line_3=? WHERE id=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,user.getFirst_name());
+            preparedStatement.setString(2,user.getLast_name());
+            preparedStatement.setString(3,user.getPhone());
+            preparedStatement.setString(4,user.getAdd_line_1());
+            preparedStatement.setString(5,user.getAdd_line_2());
+            preparedStatement.setString(6,user.getAdd_line_3());
+            preparedStatement.setInt(7,user.getId());
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
     }
 }
