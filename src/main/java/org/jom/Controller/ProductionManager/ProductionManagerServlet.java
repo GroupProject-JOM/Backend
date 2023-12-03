@@ -28,7 +28,7 @@ public class ProductionManagerServlet extends HttpServlet {
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getRole().equals("production-manager")) {
+                if (user.getRole().equals("production-manager") || user.getRole().equals("stock-manager")) {
                     ProductionDAO productionDAO = new ProductionDAO();
                     List<ProductionModel> productionModels = productionDAO.getAllProductionRequests();
 
