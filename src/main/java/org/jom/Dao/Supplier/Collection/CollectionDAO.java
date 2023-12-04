@@ -644,4 +644,40 @@ public class CollectionDAO {
         }
         return count;
     }
+
+    public String getRequestedDateById(int id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        String date = "";
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    c.date\n" +
+                    "FROM\n" +
+                    "    jom_db.collections c\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND c.delete = 0\n" +
+                    "        AND (c.status = 2 OR c.status = 3);";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                date = resultSet.getString(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return date;
+    }
 }

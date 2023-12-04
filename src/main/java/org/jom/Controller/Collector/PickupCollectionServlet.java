@@ -107,12 +107,14 @@ public class PickupCollectionServlet extends HttpServlet {
                 CollectionDAO collectionDAO = new CollectionDAO();
                 CollectorDAO collectorDAO = new CollectorDAO();
 
+                String date = collectionDAO.getRequestedDateById(collection_id);
+
                 CocoRateDAO cocoRateDAO = new CocoRateDAO();
-                CocoModel cocoRate = cocoRateDAO.getLastRecord();
+                CocoModel cocoRate = cocoRateDAO.getRateByDate(date.substring(0, 10));
 
-                float value = final_amount*parseFloat(cocoRate.getPrice());
+                float value = final_amount * parseFloat(cocoRate.getPrice());
 
-                if (pickupDAO.updateCollectedDate(collection_id) && collectionDAO.updateFinalAmount(final_amount,value ,collection_id) && collectorDAO.updateTodayAmount(final_amount, user_id)) {
+                if (pickupDAO.updateCollectedDate(collection_id) && collectionDAO.updateFinalAmount(final_amount, value, collection_id) && collectorDAO.updateTodayAmount(final_amount, user_id)) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.write("{\"message\": \"Collection Completed\"}");
                 } else {
