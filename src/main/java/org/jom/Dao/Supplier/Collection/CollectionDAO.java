@@ -199,7 +199,7 @@ public class CollectionDAO {
         return count;
     }
 
-    public boolean deleteCollection(int sId, int id, String min_date,String max_date) {
+    public boolean deleteCollection(int sId, int id, String min_date, String max_date) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
@@ -467,7 +467,7 @@ public class CollectionDAO {
     }
 
     // update final amount and status
-    public boolean updateFinalAmount(int amount, int collection_id) {
+    public boolean updateFinalAmount(int amount, float value, int collection_id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean isSuccess = false;
@@ -477,13 +477,15 @@ public class CollectionDAO {
             String sql = "UPDATE collections c \n" +
                     "SET \n" +
                     "    c.final_amount = ?,\n" +
-                    "    c.status = 5\n" +
+                    "    c.status = 5\n," +
+                    "    c.value = ?\n" +
                     "WHERE\n" +
                     "    c.id = ? AND c.status = 3\n" +
                     "        AND c.delete = 0;  ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, amount);
-            preparedStatement.setInt(2, collection_id);
+            preparedStatement.setFloat(2, value);
+            preparedStatement.setInt(3, collection_id);
 
             int x = preparedStatement.executeUpdate();
             if (x != 0) {

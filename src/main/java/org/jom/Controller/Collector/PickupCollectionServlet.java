@@ -1,12 +1,14 @@
 package org.jom.Controller.Collector;
 
 import com.google.gson.Gson;
+import org.jom.Dao.CocoRateDAO;
 import org.jom.Dao.CollectorDAO;
 import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.Collection.PickupDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
 import org.jom.Dao.UserDAO;
+import org.jom.Model.CocoModel;
 import org.jom.Model.Collection.SupplyModel;
 import org.jom.Model.EmployeeModel;
 import org.jom.Model.UserModel;
@@ -19,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import static java.lang.Float.parseFloat;
 
 @WebServlet("/pickup-collection")
 public class PickupCollectionServlet extends HttpServlet {
@@ -103,7 +107,12 @@ public class PickupCollectionServlet extends HttpServlet {
                 CollectionDAO collectionDAO = new CollectionDAO();
                 CollectorDAO collectorDAO = new CollectorDAO();
 
-                if (pickupDAO.updateCollectedDate(collection_id) && collectionDAO.updateFinalAmount(final_amount, collection_id) && collectorDAO.updateTodayAmount(final_amount, user_id)) {
+                CocoRateDAO cocoRateDAO = new CocoRateDAO();
+                CocoModel cocoRate = cocoRateDAO.getLastRecord();
+
+                float value = final_amount*parseFloat(cocoRate.getPrice());
+
+                if (pickupDAO.updateCollectedDate(collection_id) && collectionDAO.updateFinalAmount(final_amount,value ,collection_id) && collectorDAO.updateTodayAmount(final_amount, user_id)) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.write("{\"message\": \"Collection Completed\"}");
                 } else {
