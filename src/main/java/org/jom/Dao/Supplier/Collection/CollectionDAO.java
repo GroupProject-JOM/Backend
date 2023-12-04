@@ -199,7 +199,7 @@ public class CollectionDAO {
         return count;
     }
 
-    public boolean deleteCollection(int sId, int id, String min_date,String max_date) {
+    public boolean deleteCollection(int sId, int id, String min_date, String max_date) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
@@ -467,7 +467,7 @@ public class CollectionDAO {
     }
 
     // update final amount and status
-    public boolean updateFinalAmount(int amount, int collection_id) {
+    public boolean updateFinalAmount(int amount, float value, int collection_id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean isSuccess = false;
@@ -477,13 +477,15 @@ public class CollectionDAO {
             String sql = "UPDATE collections c \n" +
                     "SET \n" +
                     "    c.final_amount = ?,\n" +
-                    "    c.status = 5\n" +
+                    "    c.status = 5\n," +
+                    "    c.value = ?\n" +
                     "WHERE\n" +
                     "    c.id = ? AND c.status = 3\n" +
                     "        AND c.delete = 0;  ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, amount);
-            preparedStatement.setInt(2, collection_id);
+            preparedStatement.setFloat(2, value);
+            preparedStatement.setInt(3, collection_id);
 
             int x = preparedStatement.executeUpdate();
             if (x != 0) {
@@ -641,5 +643,41 @@ public class CollectionDAO {
             }
         }
         return count;
+    }
+
+    public String getRequestedDateById(int id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        String date = "";
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    c.date\n" +
+                    "FROM\n" +
+                    "    jom_db.collections c\n" +
+                    "WHERE\n" +
+                    "    c.id = ? AND c.delete = 0\n" +
+                    "        AND (c.status = 2 OR c.status = 3);";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                date = resultSet.getString(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return date;
     }
 }

@@ -104,4 +104,41 @@ public class CocoRateDAO {
         }
         return status;
     }
+
+    //get rate by date
+    public CocoModel getRateByDate(String date) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        CocoModel cocoModel = new CocoModel();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    *\n" +
+                    "FROM\n" +
+                    "    coco_rate c\n" +
+                    "WHERE\n" +
+                    "    c.date = ?";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                cocoModel.setId(resultSet.getInt(1));
+                cocoModel.setDate(resultSet.getString(2));
+                cocoModel.setPrice(resultSet.getString(3));
+            }
+
+            resultSet.close();
+            statement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return cocoModel;
+    }
 }
