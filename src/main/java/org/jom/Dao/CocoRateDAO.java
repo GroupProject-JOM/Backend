@@ -2,10 +2,13 @@ package org.jom.Dao;
 
 import org.jom.Database.ConnectionPool;
 import org.jom.Model.CocoModel;
+import org.jom.Model.Collection.SupplyModel;
 import org.jom.Model.OTPModel;
 import org.jom.Model.OutletModel;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CocoRateDAO {
     public CocoModel getLastRecord() {
@@ -141,4 +144,90 @@ public class CocoRateDAO {
         }
         return cocoModel;
     }
+
+    //get last 6 months records
+    public List<CocoModel> getLastSixMonthRecords() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<CocoModel> cocoModels = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    *\n" +
+                    "FROM\n" +
+                    "    jom_db.coco_rate\n" +
+                    "ORDER BY date DESC\n" +
+                    "LIMIT 180;";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String date = resultSet.getString(2);
+                String price = resultSet.getString(3);
+
+                CocoModel cocoModel = new CocoModel(id,date,price);
+                cocoModels.add(cocoModel);
+            }
+
+            resultSet.close();
+            statement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return cocoModels;
+    }
+
+    //get average by month
+    public List<Float> getMonthlyAverageRate() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<Float> avg = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    DATE_FORMAT(date, '%Y-%m') AS month,\n" +
+                    "    COUNT(*) AS number_of_records,\n" +
+                    "    SUM(price) AS total_price,\n" +
+                    "    AVG(price) AS average_price\n" +
+                    "FROM \n" +
+                    "    coco_rate\n" +
+                    "GROUP BY \n" +
+                    "    DATE_FORMAT(date, '%Y-%m');\n";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                float val = resultSet.getFloat(4);
+
+                avg.add(val);
+            }
+
+            resultSet.close();
+            statement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return avg;
+    }
+
+//    past supply table empty error view in supplier dashboard table
+//    chat user id last id show 119 like users in supplier side
+//    msg time
+//    time past error view
+//    password need to clear in cahnge password
 }

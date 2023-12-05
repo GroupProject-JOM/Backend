@@ -14,6 +14,12 @@ public class CocoModel {
         this.price = price;
     }
 
+    public CocoModel(int id, String date, String price) {
+        this.id = id;
+        this.date = date;
+        this.price = price;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
