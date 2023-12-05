@@ -122,8 +122,9 @@ public class CocoRateDAO {
                     "    coco_rate c\n" +
                     "WHERE\n" +
                     "    c.date = ?";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, date);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
                 cocoModel.setId(resultSet.getInt(1));
@@ -132,7 +133,7 @@ public class CocoRateDAO {
             }
 
             resultSet.close();
-            statement.close();
+            preparedStatement.close();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
