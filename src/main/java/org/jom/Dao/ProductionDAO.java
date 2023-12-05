@@ -100,7 +100,7 @@ public class ProductionDAO {
                     "FROM\n" +
                     "    productions p\n" +
                     "WHERE\n" +
-                    "    p.delete = 0\n" +
+                    "    p.delete = 0 AND p.status <> 0\n" +
                     "ORDER BY p.date DESC;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
