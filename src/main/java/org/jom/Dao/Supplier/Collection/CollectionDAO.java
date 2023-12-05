@@ -98,12 +98,20 @@ public class CollectionDAO {
                     "    e.name,\n" +
                     "    e.address,\n" +
                     "    e.location,\n" +
-                    "    e.area\n" +
+                    "    e.area,\n" +
+                    "    col_u.first_name,\n" +
+                    "    col_u.last_name,\n" +
+                    "    col_u.phone\n" +
                     "FROM\n" +
                     "    pickups p\n" +
                     "        INNER JOIN\n" +
                     "    collections c ON p.collection_id = c.id\n" +
-                    "    inner join estates e on p.estate_id=e.id\n" +
+                    "        INNER JOIN\n" +
+                    "    estates e ON p.estate_id = e.id\n" +
+                    "        INNER JOIN\n" +
+                    "    employees emp ON emp.id = p.collector\n" +
+                    "        INNER JOIN\n" +
+                    "    users col_u ON col_u.id = emp.user_Id_\n" +
                     "WHERE\n" +
                     "    c.id = ? AND c.delete = 0\n" +
                     "        AND c.sup_id = ? \n" +
@@ -117,6 +125,9 @@ public class CollectionDAO {
                     "    c.status,\n" +
                     "    c.final_amount,\n" +
                     "    c.value,\n" +
+                    "    d.acc_id,\n" +
+                    "    d.acc_id,\n" +
+                    "    d.acc_id,\n" +
                     "    d.acc_id,\n" +
                     "    d.acc_id,\n" +
                     "    d.acc_id,\n" +
@@ -153,6 +164,9 @@ public class CollectionDAO {
                 collection.setEstate_address(resultSet.getString(13));
                 collection.setEstate_location(resultSet.getString(14));
                 collection.setEstate_area(resultSet.getString(15));
+                collection.setCol_fname(resultSet.getString(16));
+                collection.setCol_lname(resultSet.getString(17));
+                collection.setCol_phone(resultSet.getString(18));
             }
 
             resultSet.close();

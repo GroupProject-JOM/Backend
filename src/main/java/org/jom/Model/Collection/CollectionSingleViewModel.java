@@ -16,6 +16,9 @@ public class CollectionSingleViewModel {
     private String estate_address;
     private String estate_location;
     private String estate_area;
+    private String col_fname;
+    private String col_lname;
+    private  String col_phone;
 
     public CollectionSingleViewModel() {
     }
@@ -138,5 +141,29 @@ public class CollectionSingleViewModel {
 
     public void setEstate_area(String estate_area) {
         this.estate_area = estate_area;
+    }
+
+    public String getCol_fname() {
+        return col_fname;
+    }
+
+    public void setCol_fname(String col_fname) {
+        this.col_fname = col_fname;
+    }
+
+    public String getCol_lname() {
+        return col_lname;
+    }
+
+    public void setCol_lname(String col_lname) {
+        this.col_lname = col_lname;
+    }
+
+    public String getCol_phone() {
+        return col_phone;
+    }
+
+    public void setCol_phone(String col_phone) {
+        this.col_phone = col_phone;
     }
 }
