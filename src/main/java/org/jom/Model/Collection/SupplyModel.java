@@ -26,6 +26,11 @@ public class SupplyModel {
     private String c_lName;
     private String c_phone;
     private String collected_date;
+    private String reason;
+    private int supplier_id;
+    private String ename;
+    private int estate_id;
+    private int account_id;
 
     public SupplyModel() {
     }
@@ -295,5 +300,45 @@ public class SupplyModel {
 
     public void setCollected_date(String collected_date) {
         this.collected_date = collected_date;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public int getSupplier_id() {
+        return supplier_id;
+    }
+
+    public void setSupplier_id(int supplier_id) {
+        this.supplier_id = supplier_id;
+    }
+
+    public String getEname() {
+        return ename;
+    }
+
+    public void setEname(String ename) {
+        this.ename = ename;
+    }
+
+    public int getEstate_id() {
+        return estate_id;
+    }
+
+    public void setEstate_id(int estate_id) {
+        this.estate_id = estate_id;
+    }
+
+    public int getAccount_id() {
+        return account_id;
+    }
+
+    public void setAccount_id(int account_id) {
+        this.account_id = account_id;
     }
 }

@@ -272,7 +272,15 @@ public class SupplyDAO {
                     "    u_collector.last_name,\n" +
                     "    u_collector.phone,\n" +
                     "    c.final_amount,\n" +
-                    "    p.collected_date\n" +
+                    "    p.collected_date,\n" +
+                    "    c.reason,\n" +
+                    "    c.sup_id,\n" +
+                    "    e.name,\n" +
+                    "    e.id,\n" +
+                    "    acc.id,\n" +
+                    "    acc.name,\n" +
+                    "    acc.account_num,\n" +
+                    "    acc.bank\n" +
                     "FROM\n" +
                     "    collections c\n" +
                     "        INNER JOIN\n" +
@@ -287,6 +295,8 @@ public class SupplyDAO {
                     "    employees emp ON emp.id = p.collector\n" +
                     "        LEFT JOIN\n" +
                     "    users u_collector ON u_collector.id = emp.user_id_\n" +
+                    "        LEFT JOIN\n" +
+                    "    accounts acc ON acc.id = p.account_id\n" +
                     "WHERE\n" +
                     "    c.delete = 0\n" +
                     "        AND (c.status = 1 OR c.status = 2\n" +
@@ -313,7 +323,15 @@ public class SupplyDAO {
                     "    c.status,\n" +
                     "    c.status,\n" +
                     "    c.final_amount,\n" +
-                    "    d.delivered_time\n" +
+                    "    d.delivered_time,\n" +
+                    "    c.reason,\n" +
+                    "    c.sup_id,\n" +
+                    "    c.sup_id,\n" +
+                    "    c.sup_id,\n" +
+                    "    acc.id,\n" +
+                    "    acc.name,\n" +
+                    "    acc.account_num,\n" +
+                    "    acc.bank\n" +
                     "FROM\n" +
                     "    collections c\n" +
                     "        INNER JOIN\n" +
@@ -322,6 +340,8 @@ public class SupplyDAO {
                     "    suppliers s ON c.sup_id = s.id\n" +
                     "        INNER JOIN\n" +
                     "    users u_supplier ON u_supplier.id = s.user_id\n" +
+                    "        LEFT JOIN\n" +
+                    "    accounts acc ON acc.id = d.acc_id\n" +
                     "WHERE\n" +
                     "    c.delete = 0\n" +
                     "        AND (c.status = 1 OR c.status = 2\n" +
@@ -353,6 +373,14 @@ public class SupplyDAO {
                 supply.setC_phone(resultSet.getString(16));
                 supply.setFinal_amount(resultSet.getInt(17));
                 supply.setCollected_date(resultSet.getString(18));
+                supply.setReason(resultSet.getString(19));
+                supply.setSupplier_id(resultSet.getInt(20));
+                supply.setEname(resultSet.getString(21));
+                supply.setEstate_id(resultSet.getInt(22));
+                supply.setAccount_id(resultSet.getInt(23));
+                supply.setH_name(resultSet.getString(24));
+                supply.setAccount(resultSet.getString(25));
+                supply.setBank(resultSet.getString(26));
             }
 
             resultSet.close();
@@ -1305,7 +1333,7 @@ public class SupplyDAO {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
 
-        int count=0;
+        int count = 0;
 
         try {
             connection = connectionPool.dataSource.getConnection();

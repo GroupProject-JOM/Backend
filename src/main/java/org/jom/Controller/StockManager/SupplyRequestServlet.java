@@ -31,7 +31,7 @@ public class SupplyRequestServlet extends HttpServlet {
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getRole().equals("stock-manager") || user.getRole().equals("admin")) {
+                if (user.getRole().equals("stock-manager") || user.getRole().equals("admin") || user.getRole().equals("supplier")) {
 
                     SupplyDAO supplyDAO = new SupplyDAO();
                     SupplyModel supply = supplyDAO.getSupply(collection_id);
