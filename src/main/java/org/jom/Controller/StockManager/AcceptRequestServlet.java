@@ -82,6 +82,7 @@ public class AcceptRequestServlet extends HttpServlet {
         JSONObject jsonObject = new JSONObject(requestBody.toString());
         int collection_id = jsonObject.getInt("id");
         int employee_id = jsonObject.getInt("sId");
+        String reason = jsonObject.getString("reason");
 
         try {
             EmployeeDAO employeeDAO = new EmployeeDAO();
@@ -92,7 +93,7 @@ public class AcceptRequestServlet extends HttpServlet {
 
                     CollectionDAO collectionDAO = new CollectionDAO();
 
-                    if (collectionDAO.updateStatus(4,collection_id)) {
+                    if (collectionDAO.updateStatus(4,collection_id) && collectionDAO.updateReason(collection_id,reason)) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"Supply request rejected\"}");
                         System.out.println("Supply request rejected");

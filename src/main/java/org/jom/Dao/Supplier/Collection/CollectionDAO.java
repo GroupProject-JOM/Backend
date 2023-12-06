@@ -694,4 +694,33 @@ public class CollectionDAO {
         }
         return date;
     }
+
+    public boolean updateReason(int id,String reason) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean isSuccess = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE collections SET reason=? WHERE id = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, reason);
+            preparedStatement.setInt(2, id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                isSuccess = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return isSuccess;
+    }
 }
