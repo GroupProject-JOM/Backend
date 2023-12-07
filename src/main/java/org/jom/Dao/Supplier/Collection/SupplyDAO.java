@@ -280,7 +280,8 @@ public class SupplyDAO {
                     "    acc.id,\n" +
                     "    acc.name,\n" +
                     "    acc.account_num,\n" +
-                    "    acc.bank\n" +
+                    "    acc.bank,\n" +
+                    "    c.reason\n" +
                     "FROM\n" +
                     "    collections c\n" +
                     "        INNER JOIN\n" +
@@ -331,7 +332,8 @@ public class SupplyDAO {
                     "    acc.id,\n" +
                     "    acc.name,\n" +
                     "    acc.account_num,\n" +
-                    "    acc.bank\n" +
+                    "    acc.bank,\n" +
+                    "    c.reason\n" +
                     "FROM\n" +
                     "    collections c\n" +
                     "        INNER JOIN\n" +
@@ -381,6 +383,7 @@ public class SupplyDAO {
                 supply.setH_name(resultSet.getString(24));
                 supply.setAccount(resultSet.getString(25));
                 supply.setBank(resultSet.getString(26));
+                supply.setReason(resultSet.getString(27));
             }
 
             resultSet.close();
