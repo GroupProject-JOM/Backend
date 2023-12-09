@@ -1,5 +1,8 @@
 package org.jom.Auth;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -9,6 +12,8 @@ import org.json.JSONObject;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.time.Instant;
@@ -82,28 +87,34 @@ public class JwtUtils {
         }
     }
 
-    public boolean isJwtExpired() {
-        Jws<Claims> claimsJws = Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
-                .build()
-                .parseClaimsJws(this.authorizationHeader);
+    public boolean isJwtExpired(String payload) {
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = jsonParser.parse(payload).getAsJsonObject();
+        String exp = jsonObject.get("exp").getAsString();
 
-        Date expiration = claimsJws.getBody().getExpiration();
+        // Convert to Instant
+        Instant instant = Instant.ofEpochSecond(Long.parseLong(exp));
+
+        Date expiration = Date.from(instant);
         Date now = new Date();
 
-        return expiration.before(now);
+        if (expiration != null && expiration.before(now)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean verifyJwtAuthentication() {
-        if (isJwtExpired()) return false;
-
         String[] jwtSegments = getJwtSegmentsFromAuthHeader();
 
         if (jwtSegments != null && jwtSegments.length == 3) {
             String header = new String(Base64.getUrlDecoder().decode(jwtSegments[0]));
             String payload = new String(Base64.getUrlDecoder().decode(jwtSegments[1]));
-            System.out.println(header);
-            System.out.println(payload);
+//            System.out.println(header);
+//            System.out.println(payload);
+
+            if (isJwtExpired(payload)) return false;
 
             String signature = jwtSegments[2];
             String base64UrlHeaderAndPayload = jwtSegments[0] + "." + jwtSegments[1];
@@ -113,11 +124,11 @@ public class JwtUtils {
                 System.out.println("JWT signature verification failed as the signature is not matching");
                 return false;
             }
+            return true;
         } else {
             System.out.println("Invalid authorization header");
             return false;
         }
-        return true;
     }
 
     public JSONObject getAuthPayload() {
@@ -129,12 +140,9 @@ public class JwtUtils {
 
     private String[] getJwtSegmentsFromAuthHeader() {
         String[] jwtSegments = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String jwt = authorizationHeader.substring(7); // Extracts the jwt token removing the word Bearer prefix
-            System.out.println(jwt);
+        if (authorizationHeader != null)
+            jwtSegments = authorizationHeader.split("\\.");
 
-            jwtSegments = jwt.split("\\.");
-        }
         return jwtSegments;
     }
 }
