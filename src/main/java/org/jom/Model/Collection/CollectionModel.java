@@ -24,16 +24,14 @@ public class CollectionModel {
     private String date;
     private String time;
 
-    public CollectionModel(int supplier_id, int initial_amount, String payment_method, String supply_method) {
-        this.supplier_id = supplier_id;
+    public CollectionModel(int initial_amount, String payment_method, String supply_method) {
         this.initial_amount = initial_amount;
         this.payment_method = payment_method;
         this.supply_method = supply_method;
     }
 
-    public CollectionModel(int id, int supplier_id, int initial_amount, String payment_method, String supply_method, int account, int estate, String date, String time) {
+    public CollectionModel(int id, int initial_amount, String payment_method, String supply_method, int account, int estate, String date, String time) {
         this.id = id;
-        this.supplier_id = supplier_id;
         this.initial_amount = initial_amount;
         this.payment_method = payment_method;
         this.supply_method = supply_method;
@@ -139,7 +137,7 @@ public class CollectionModel {
         this.time = time;
     }
 
-    public void addCollection(){
+    public void addCollection() {
         CollectionDAO collectionDAO = new CollectionDAO();
         this.id = collectionDAO.addCollection(this);
     }

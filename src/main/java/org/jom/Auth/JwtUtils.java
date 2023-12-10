@@ -46,8 +46,8 @@ public class JwtUtils {
         String signature = generateJwtSignature(base64UrlHeaderAndPayload);
 
         String jwt = base64UrlHeaderAndPayload + "." + signature;
-        System.out.println("JWT token is generated\n");
-        System.out.println(jwt);
+//        System.out.println("JWT token is generated\n");
+//        System.out.println(jwt);
 
         return jwt;
     }

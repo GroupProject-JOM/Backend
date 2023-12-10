@@ -1,12 +1,15 @@
 package org.jom.Controller.Supplier;
 
 import com.google.gson.Gson;
+import org.jom.Auth.JwtUtils;
 import org.jom.Dao.Supplier.AccountDAO;
 import org.jom.Dao.Supplier.EstateDAO;
 import org.jom.Model.AccountModel;
 import org.jom.Model.EstateModel;
+import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,21 +23,59 @@ public class AccountServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
+
+        // Get all cookies from the request
+        Cookie[] cookies = request.getCookies();
+        JSONObject jsonObject = new JSONObject();
+        int supplier_id = 0;
+        boolean jwtCookieFound = false;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
+                    if (!jwtUtils.verifyJwtAuthentication()) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        out.write("{\"message\": \"UnAuthorized\"}");
+                        System.out.println("UnAuthorized1");
+                        return;
+                    }
+                    jsonObject = jwtUtils.getAuthPayload();
+                    jwtCookieFound = true;
+                    break;  // No need to continue checking if "jwt" cookie is found
+                }
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized\"}");
+            System.out.println("No cookies found in the request.");
+            return;
+        }
+
+        // If "jwt" cookie is not found, respond with unauthorized status
+        if (!jwtCookieFound) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
+            System.out.println("UnAuthorized - JWT cookie not found");
+            return;
+        }
+
+        supplier_id = (int) jsonObject.get("sId");
+
         try {
             Gson gson = new Gson();
             // json data to user object
             BufferedReader bufferedReader = request.getReader();
             AccountModel account = gson.fromJson(bufferedReader, AccountModel.class);
-
-            // TODO backend validations
+            account.setSupplier_id(supplier_id);
 
             account.addAccount();
 
-            if(account.getId() != 0){
+            if (account.getId() != 0) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"message\": \"Account added successfully\"}");
                 System.out.println("Account added successfully");
-            }else{
+            } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"Account is not added\"}");
                 System.out.println("Account is not added");
@@ -52,22 +93,58 @@ public class AccountServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        int supplier_id = Integer.parseInt(request.getParameter("sId"));
+        // Get all cookies from the request
+        Cookie[] cookies = request.getCookies();
+        JSONObject jsonObject = new JSONObject();
+        int supplier_id = 0;
+        boolean jwtCookieFound = false;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
+                    if (!jwtUtils.verifyJwtAuthentication()) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        out.write("{\"message\": \"UnAuthorized\"}");
+                        System.out.println("UnAuthorized1");
+                        return;
+                    }
+                    jsonObject = jwtUtils.getAuthPayload();
+                    jwtCookieFound = true;
+                    break;  // No need to continue checking if "jwt" cookie is found
+                }
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized\"}");
+            System.out.println("No cookies found in the request.");
+            return;
+        }
+
+        // If "jwt" cookie is not found, respond with unauthorized status
+        if (!jwtCookieFound) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
+            System.out.println("UnAuthorized - JWT cookie not found");
+            return;
+        }
+
+        supplier_id = (int) jsonObject.get("sId");
         int account_id = Integer.parseInt(request.getParameter("id"));
 
         try {
             AccountDAO accountDAO = new AccountDAO();
-            AccountModel account = accountDAO.getAccount(supplier_id,account_id);
+            AccountModel account = accountDAO.getAccount(supplier_id, account_id);
 
             Gson gson = new Gson();
             // Object array to json
             String object = gson.toJson(account);
 
-            if(account.getId() !=0){
+            if (account.getId() != 0) {
                 response.setStatus(HttpServletResponse.SC_OK);
-                out.write("{\"account\": "+ object +"}");
+                out.write("{\"account\": " + object + "}");
                 System.out.println("Send Account");
-            }else{
+            } else {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 out.write("{\"account\": \"No account\"}");
                 System.out.println("No Account");
@@ -86,13 +163,53 @@ public class AccountServlet extends HttpServlet {
     public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
+
+        // Get all cookies from the request
+        Cookie[] cookies = request.getCookies();
+        JSONObject jsonObject = new JSONObject();
+        int supplier_id = 0;
+        boolean jwtCookieFound = false;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
+                    if (!jwtUtils.verifyJwtAuthentication()) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        out.write("{\"message\": \"UnAuthorized\"}");
+                        System.out.println("UnAuthorized1");
+                        return;
+                    }
+                    jsonObject = jwtUtils.getAuthPayload();
+                    jwtCookieFound = true;
+                    break;  // No need to continue checking if "jwt" cookie is found
+                }
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized\"}");
+            System.out.println("No cookies found in the request.");
+            return;
+        }
+
+        // If "jwt" cookie is not found, respond with unauthorized status
+        if (!jwtCookieFound) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
+            System.out.println("UnAuthorized - JWT cookie not found");
+            return;
+        }
+
+        supplier_id = (int) jsonObject.get("sId");
+
         try {
             Gson gson = new Gson();
             // json data to user object
             BufferedReader bufferedReader = request.getReader();
             AccountModel account = gson.fromJson(bufferedReader, AccountModel.class);
+            account.setSupplier_id(supplier_id);
 
-            if(account.getSupplier_id() == 0){
+            if (account.getSupplier_id() == 0) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.write("{\"message\": \"UnAuthorized\"}");
                 System.out.println("UnAuthorized");
@@ -101,12 +218,12 @@ public class AccountServlet extends HttpServlet {
             // TODO backend validations and user exists
 
 
-            if(account.updateAccount()){
+            if (account.updateAccount()) {
 
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"message\": \"Account Updated successfully\"}");
                 System.out.println("Account Update successfully");
-            }else{
+            } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"Account is not updated\"}");
                 System.out.println("Account is not Updated");
@@ -124,17 +241,53 @@ public class AccountServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        int supplier_id = Integer.parseInt(request.getParameter("sId"));
+        // Get all cookies from the request
+        Cookie[] cookies = request.getCookies();
+        JSONObject jsonObject = new JSONObject();
+        int supplier_id = 0;
+        boolean jwtCookieFound = false;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
+                    if (!jwtUtils.verifyJwtAuthentication()) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        out.write("{\"message\": \"UnAuthorized\"}");
+                        System.out.println("UnAuthorized1");
+                        return;
+                    }
+                    jsonObject = jwtUtils.getAuthPayload();
+                    jwtCookieFound = true;
+                    break;  // No need to continue checking if "jwt" cookie is found
+                }
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized\"}");
+            System.out.println("No cookies found in the request.");
+            return;
+        }
+
+        // If "jwt" cookie is not found, respond with unauthorized status
+        if (!jwtCookieFound) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
+            System.out.println("UnAuthorized - JWT cookie not found");
+            return;
+        }
+
+        supplier_id = (int) jsonObject.get("sId");
         int account_id = Integer.parseInt(request.getParameter("id"));
 
         try {
             AccountDAO accountDAO = new AccountDAO();
 
-            if(accountDAO.deleteAccount(supplier_id,account_id)) {
+            if (accountDAO.deleteAccount(supplier_id, account_id)) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 out.write("{\"message\": \"Delete Account\"}");
                 System.out.println("Delete Account");
-            }else {
+            } else {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 out.write("{\"message\": \"Unable to Delete Account\"}");
                 System.out.println("Account not deleted");

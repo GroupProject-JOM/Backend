@@ -62,9 +62,8 @@ public class AccountDAO {
                 String holder_name = resultSet.getString(2);
                 String account_number = resultSet.getString(3);
                 String bank = resultSet.getString(4);
-                int supplier_id = resultSet.getInt(5);
 
-                AccountModel account = new AccountModel(account_id,supplier_id,account_number,bank,holder_name);
+                AccountModel account = new AccountModel(account_id,account_number,bank,holder_name);
                 accounts.add(account);
             }
 
