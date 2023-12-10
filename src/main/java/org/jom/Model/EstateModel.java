@@ -15,17 +15,15 @@ public class EstateModel {
     public EstateModel() {
     }
 
-    public EstateModel(int supplier_id, String estate_name, String estate_location, String estate_address, String area) {
-        this.supplier_id = supplier_id;
+    public EstateModel(String estate_name, String estate_location, String estate_address, String area) {
         this.estate_name = estate_name;
         this.estate_location = estate_location;
         this.estate_address = estate_address;
         this.area = area;
     }
 
-    public EstateModel(int id, int supplier_id, String estate_name, String estate_location, String estate_address, String area) {
+    public EstateModel(int id, String estate_name, String estate_location, String estate_address, String area) {
         this.id = id;
-        this.supplier_id = supplier_id;
         this.estate_name = estate_name;
         this.estate_location = estate_location;
         this.estate_address = estate_address;

@@ -1,6 +1,7 @@
 package org.jom.Controller.StockManager;
 
 import com.google.gson.Gson;
+import org.jom.Auth.JwtUtils;
 import org.jom.Dao.CocoRateDAO;
 import org.jom.Dao.UserDAO;
 import org.jom.Model.CocoModel;
@@ -9,6 +10,7 @@ import org.jom.Model.UserModel;
 import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,6 +27,44 @@ public class CocoRateServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
+
+        // Get all cookies from the request
+        Cookie[] cookies = request.getCookies();
+        JSONObject jsonObject = new JSONObject();
+        int user_id = 0;
+        boolean jwtCookieFound = false;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
+                    if (!jwtUtils.verifyJwtAuthentication()) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        out.write("{\"message\": \"UnAuthorized\"}");
+                        System.out.println("UnAuthorized1");
+                        return;
+                    }
+                    jsonObject = jwtUtils.getAuthPayload();
+                    jwtCookieFound = true;
+                    break;  // No need to continue checking if "jwt" cookie is found
+                }
+            }
+        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized\"}");
+            System.out.println("No cookies found in the request.");
+            return;
+        }
+
+        // If "jwt" cookie is not found, respond with unauthorized status
+        if (!jwtCookieFound) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
+            System.out.println("UnAuthorized - JWT cookie not found");
+            return;
+        }
+
+        user_id = (int) jsonObject.get("user");
+
         try {
             StringBuilder requestBody = new StringBuilder();
 
@@ -35,9 +75,8 @@ public class CocoRateServlet extends HttpServlet {
                 }
             }
 
-            JSONObject jsonObject = new JSONObject(requestBody.toString());
-            String price = jsonObject.getString("price");
-            int user_id = jsonObject.getInt("user");
+            JSONObject json_data = new JSONObject(requestBody.toString());
+            String price = json_data.getString("price");
 
             UserDAO userDAO = new UserDAO();
             UserModel user = userDAO.getUserById(user_id);
@@ -100,7 +139,42 @@ public class CocoRateServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
 
-            int user_id = Integer.parseInt(request.getParameter("user"));
+            // Get all cookies from the request
+            Cookie[] cookies = request.getCookies();
+            JSONObject jsonObject = new JSONObject();
+            int user_id = 0;
+            boolean jwtCookieFound = false;
+
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("jwt".equals(cookie.getName())) {
+                        JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
+                        if (!jwtUtils.verifyJwtAuthentication()) {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            out.write("{\"message\": \"UnAuthorized\"}");
+                            System.out.println("UnAuthorized1");
+                            return;
+                        }
+                        jsonObject = jwtUtils.getAuthPayload();
+                        jwtCookieFound = true;
+                        break;  // No need to continue checking if "jwt" cookie is found
+                    }
+                }
+            } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                System.out.println("No cookies found in the request.");
+                return;
+            }
+
+            // If "jwt" cookie is not found, respond with unauthorized status
+            if (!jwtCookieFound) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
+                System.out.println("UnAuthorized - JWT cookie not found");
+                return;
+            }
+
+            user_id = (int) jsonObject.get("user");
 
             UserDAO userDAO = new UserDAO();
             UserModel user = userDAO.getUserById(user_id);

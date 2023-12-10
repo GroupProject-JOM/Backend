@@ -100,9 +100,8 @@ public class EstateDAO {
                 String estate_address = resultSet.getString(3);
                 String estate_location = resultSet.getString(4);
                 String estate_area = resultSet.getString(5);
-                int supplier_id = resultSet.getInt(7);
 
-                EstateModel estate = new EstateModel(estate_id,supplier_id,estate_name,estate_location,estate_address,estate_area);
+                EstateModel estate = new EstateModel(estate_id,estate_name,estate_location,estate_address,estate_area);
                 estates.add(estate);
             }
 
