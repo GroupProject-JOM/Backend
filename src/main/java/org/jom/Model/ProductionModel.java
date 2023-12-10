@@ -83,4 +83,8 @@ public class ProductionModel {
     public void setDate(String date) {
         this.date = date;
     }
+
+    public void setUser(int user) {
+        this.user = user;
+    }
 }
