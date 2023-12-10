@@ -226,6 +226,55 @@ public class CocoRateDAO {
         return avg;
     }
 
+    //get total value and amount for month by year
+    public List<CocoModel> getMonthlyTotal(int year,int supplier_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<CocoModel> collections = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    months.month AS month,\n" +
+                    "    COALESCE(SUM(c.value), 0) AS total_value,\n" +
+                    "    COALESCE(SUM(c.final_amount), 0) AS total_final_amount\n" +
+                    "FROM\n" +
+                    "    (SELECT 1 AS month UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) months\n" +
+                    "        LEFT JOIN\n" +
+                    "    jom_db.collections c ON months.month = MONTH(c.date)\n" +
+                    "        AND YEAR(c.date) = ?\n" +
+                    "        AND c.sup_id = ?\n" +
+                    "        AND c.delete = 0\n" +
+                    "        AND c.status = 6\n" +
+                    "GROUP BY months.month;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, year);
+            preparedStatement.setInt(2, supplier_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int month = resultSet.getInt(1);
+                String value = resultSet.getString(2);
+                String amount = resultSet.getString(3);
+
+                CocoModel collection = new CocoModel(month,amount,value);
+                collections.add(collection);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return collections;
+    }
+
 //    past supply table empty error view in supplier dashboard table
 //    chat user id last id show 119 like users in supplier side
 //    msg time

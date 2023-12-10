@@ -71,6 +71,7 @@ public class PickupCollectionsServlet extends HttpServlet {
 
         user_id = (int) jsonObject.get("user");
         int collector = Integer.parseInt(request.getParameter("id"));
+        String date = request.getParameter("date");
 
         try {
             UserDAO userDAO = new UserDAO();
@@ -95,7 +96,6 @@ public class PickupCollectionsServlet extends HttpServlet {
                     Date lastDayOfMonth = calendar.getTime();
 
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    String today = dateFormat.format(currentDate);
 
                     // Loop through all days of the month
                     calendar.setTime(firstDayOfMonth);
@@ -114,12 +114,11 @@ public class PickupCollectionsServlet extends HttpServlet {
                         calendar.add(Calendar.DAY_OF_MONTH, 1);
                     }
 
-                    List<SupplyModel> collections = supplyDAO.getAllCollectionByDate(collector, today);
+                    List<SupplyModel> collections = supplyDAO.getAllCollectionByDate(collector, date);
 
                     Gson gson = new Gson();
                     String object = gson.toJson(collections); // Object array to json
                     String collection_count_array = gson.toJson(collections_count);
-                    System.out.println(collection_count_array);
 
                     if (collections.size() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);

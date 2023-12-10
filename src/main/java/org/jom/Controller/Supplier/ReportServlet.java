@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.List;
 
 @WebServlet("/report")
@@ -29,7 +30,7 @@ public class ReportServlet extends HttpServlet {
         // Get all cookies from the request
         Cookie[] cookies = request.getCookies();
         JSONObject jsonObject = new JSONObject();
-        int user_id = 0;
+        int user_id = 0, supplier_id = 0;
         boolean jwtCookieFound = false;
 
         if (cookies != null) {
@@ -63,6 +64,7 @@ public class ReportServlet extends HttpServlet {
         }
 
         user_id = (int) jsonObject.get("user");
+        supplier_id = (int) jsonObject.get("sId");
 
         try {
             UserDAO userDAO = new UserDAO();
@@ -70,25 +72,30 @@ public class ReportServlet extends HttpServlet {
 
             if (user.getId() != 0) {
                 if (user.getRole().equals("supplier")) {
+                    Date d = new Date();
+                    int year = d.getYear();
+                    int thisYear = year + 1900;
+                    int lastYear = year + 1900 - 1;
+
                     CocoRateDAO cocoRateDAO = new CocoRateDAO();
                     CocoModel cocoRate = cocoRateDAO.getLastRecord();
                     List<CocoModel> last_six_records = cocoRateDAO.getLastSixMonthRecords();
                     List<Float> average_list = cocoRateDAO.getMonthlyAverageRate();
 
-                    if (cocoRate.getId() != 0) {
-                        Gson gson = new Gson();
-                        String object = gson.toJson(cocoRate); // Object array to json
-                        String last_six = gson.toJson(last_six_records);
-                        String avg = gson.toJson(average_list);
+                    List<CocoModel> last_year_records = cocoRateDAO.getMonthlyTotal(lastYear, supplier_id);
+                    List<CocoModel> this_year_records = cocoRateDAO.getMonthlyTotal(thisYear, supplier_id);
 
-                        response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"rate\": " + object + ",\"last_six\":" + last_six + ",\"size\":" + last_six_records.size() + ",\"avg\":" + avg + ",\"avg_size\":" + average_list.size() + "}");
-                        System.out.println("Send rate");
-                    } else {
-                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"rate\": \"No rates\"}");
-                        System.out.println("No rates");
-                    }
+                    Gson gson = new Gson();
+                    String object = gson.toJson(cocoRate); // Object array to json
+                    String last_six = gson.toJson(last_six_records);
+                    String avg = gson.toJson(average_list);
+                    String this_year = gson.toJson(this_year_records);
+                    String last_year = gson.toJson(last_year_records);
+
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out.write("{\"rate\": " + object + ",\"last_six\":" + last_six + ",\"size\":" + last_six_records.size() + ",\"avg\":" + avg + ",\"avg_size\":" + average_list.size() + ",\"this\":" + this_year + ",\"last\":" + last_year + "}");
+                    System.out.println("Send rate");
+
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     out.write("{\"message\": \"Invalid User\"}");
