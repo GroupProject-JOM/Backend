@@ -3,6 +3,7 @@ package org.jom.Dao.Supplier.Collection;
 import com.google.gson.Gson;
 import org.jom.Database.ConnectionPool;
 import org.jom.Model.AccountModel;
+import org.jom.Model.CocoModel;
 import org.jom.Model.Collection.CollectionModel;
 import org.jom.Model.Collection.CollectionSingleViewModel;
 
