@@ -70,6 +70,7 @@ public class ProductionDAO {
                 productionModel.setAmount(resultSet.getInt(4));
                 productionModel.setStatus(resultSet.getInt(5));
                 productionModel.setDate(resultSet.getString(7));
+                productionModel.setReason(resultSet.getString(8));
             }
 
             resultSet.close();
@@ -235,5 +236,63 @@ public class ProductionDAO {
             }
         }
         return productionModels;
+    }
+
+    // delete production request
+    public boolean acceptProductionRequest(int id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE productions p SET p.status=2 WHERE id = ? AND p.delete=0";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
+
+    public boolean rejectProductionRequest(int id,String reason) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE productions p SET p.status=3,p.reason=? WHERE id = ? AND p.delete=0";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, reason);
+            preparedStatement.setInt(2, id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
     }
 }

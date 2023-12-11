@@ -12,6 +12,7 @@ public class ProductionModel {
     // 4 completed
     private String date;
     private int user;
+    private String reason;
 
     public ProductionModel() {
     }
@@ -86,5 +87,13 @@ public class ProductionModel {
 
     public void setUser(int user) {
         this.user = user;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }
