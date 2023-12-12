@@ -66,8 +66,8 @@ public class JwtUtils {
         Instant issuedAt = Instant.now();
         this.payload.put("iat", issuedAt.getEpochSecond());
 
-        // Adding expiration time (exp), e.g., 1 hour from now
-        Instant expirationTime = issuedAt.plus(1, ChronoUnit.HOURS);
+        // Adding expiration time (exp), e.g., 24 hour from now
+        Instant expirationTime = issuedAt.plus(24, ChronoUnit.HOURS);
         this.payload.put("exp", expirationTime.getEpochSecond());
 
         return Base64.getUrlEncoder().withoutPadding().encodeToString(this.payload.toString().getBytes());
