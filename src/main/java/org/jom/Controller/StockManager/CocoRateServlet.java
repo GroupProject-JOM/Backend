@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @WebServlet("/coco-rate")
 public class CocoRateServlet extends HttpServlet {
@@ -49,7 +50,8 @@ public class CocoRateServlet extends HttpServlet {
                     break;  // No need to continue checking if "jwt" cookie is found
                 }
             }
-        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             out.write("{\"message\": \"UnAuthorized\"}");
             System.out.println("No cookies found in the request.");
             return;
@@ -90,7 +92,7 @@ public class CocoRateServlet extends HttpServlet {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     String today = dateFormat.format(currentDate);
 
-                    CocoModel cocoModel = new CocoModel(today,price);
+                    CocoModel cocoModel = new CocoModel(today, price);
 
                     CocoRateDAO cocoRateDAO = new CocoRateDAO();
                     CocoModel cocoRate = cocoRateDAO.getLastRecord();
@@ -160,7 +162,8 @@ public class CocoRateServlet extends HttpServlet {
                         break;  // No need to continue checking if "jwt" cookie is found
                     }
                 }
-            } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.write("{\"message\": \"UnAuthorized\"}");
                 System.out.println("No cookies found in the request.");
                 return;
@@ -184,13 +187,15 @@ public class CocoRateServlet extends HttpServlet {
 
                     CocoRateDAO cocoRateDAO = new CocoRateDAO();
                     CocoModel cocoRate = cocoRateDAO.getLastRecord();
+                    List<CocoModel> last_seven_cocoRate = cocoRateDAO.getLastSevenRecords();
 
                     if (cocoRate.getId() != 0) {
                         Gson gson = new Gson();
                         String object = gson.toJson(cocoRate); // Object array to json
+                        String cocoRate_array = gson.toJson(last_seven_cocoRate);
 
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"rate\": " + object + "}");
+                        out.write("{\"rate\": " + object + ",\"last_seven\":" + cocoRate_array + "}");
                         System.out.println("Send rate");
                     } else {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

@@ -275,6 +275,46 @@ public class CocoRateDAO {
         return collections;
     }
 
+    //get last 7 records
+    public List<CocoModel> getLastSevenRecords() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<CocoModel> cocoModels = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    *\n" +
+                    "FROM\n" +
+                    "    jom_db.coco_rate\n" +
+                    "ORDER BY id DESC\n" +
+                    "LIMIT 7;";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String date = resultSet.getString(2);
+                String price = resultSet.getString(3);
+
+                CocoModel cocoModel = new CocoModel(id,date,price);
+                cocoModels.add(cocoModel);
+            }
+
+            resultSet.close();
+            statement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return cocoModels;
+    }
+
 //    past supply table empty error view in supplier dashboard table
 //    chat user id last id show 119 like users in supplier side
 //    msg time

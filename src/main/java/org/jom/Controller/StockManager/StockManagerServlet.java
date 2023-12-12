@@ -2,11 +2,13 @@ package org.jom.Controller.StockManager;
 
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
+import org.jom.Dao.CocoRateDAO;
 import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.ProductionDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
 import org.jom.Dao.UserDAO;
+import org.jom.Model.CocoModel;
 import org.jom.Model.Collection.SupplyModel;
 import org.jom.Model.EmployeeModel;
 import org.jom.Model.ProductionModel;
@@ -88,6 +90,7 @@ public class StockManagerServlet extends HttpServlet {
                     SupplyDAO supplyDAO = new SupplyDAO();
                     CollectionDAO collectionDAO = new CollectionDAO();
                     ProductionDAO productionDAO = new ProductionDAO();
+                    CocoRateDAO cocoRateDAO = new CocoRateDAO();
                     Gson gson = new Gson();
 
                     List<SupplyModel> supply_requests = supplyDAO.getAll();
