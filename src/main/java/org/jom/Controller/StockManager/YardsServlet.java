@@ -70,7 +70,7 @@ public class YardsServlet extends HttpServlet {
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getRole().equals("production-manager") || user.getRole().equals("stock-manager")) {
+                if (user.getRole().equals("production-manager") || user.getRole().equals("stock-manager") || user.getRole().equals("admin")) {
 
                     YardDAO yardDAO = new YardDAO();
                     List<YardModel> yard1 = yardDAO.getYards("yard1");
@@ -170,7 +170,7 @@ public class YardsServlet extends HttpServlet {
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getRole().equals("production-manager") || user.getRole().equals("stock-manager")) {
+                if (user.getRole().equals("production-manager") || user.getRole().equals("stock-manager") || user.getRole().equals("admin")) {
 
                     YardDAO yardDAO = new YardDAO();
                     List<YardModel> yard = yardDAO.getYards("yard" + yard_id);

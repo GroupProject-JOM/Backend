@@ -53,7 +53,7 @@ public class YardDAO {
     }
 
     //Get relevent block
-    public YardModel getBlockData(String yard_name,int block_id) {
+    public YardModel getBlockData(String yard_name, int block_id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         YardModel block = new YardModel();
@@ -67,7 +67,7 @@ public class YardDAO {
                     "WHERE\n" +
                     "    id = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,block_id);
+            preparedStatement.setInt(1, block_id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -89,5 +89,38 @@ public class YardDAO {
             }
         }
         return block;
+    }
+
+    //Get relevent block
+    public boolean updateBlockData(String yard_name, YardModel yard) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE " + yard_name + " SET days=?,count=?,update_date=NOW() WHERE id=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,yard.getDays());
+            preparedStatement.setInt(2, yard.getCount());
+            preparedStatement.setInt(3, yard.getId());
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                status = true;
+            }
+            preparedStatement.close();
+
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
     }
 }
