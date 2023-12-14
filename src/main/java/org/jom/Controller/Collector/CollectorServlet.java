@@ -2,8 +2,10 @@ package org.jom.Controller.Collector;
 
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
+import org.jom.Dao.CocoRateDAO;
 import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
+import org.jom.Model.CocoModel;
 import org.jom.Model.Collection.SupplyModel;
 import org.jom.Model.EmployeeModel;
 import org.json.JSONObject;
@@ -48,7 +50,8 @@ public class CollectorServlet extends HttpServlet {
                     break;  // No need to continue checking if "jwt" cookie is found
                 }
             }
-        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             out.write("{\"message\": \"UnAuthorized\"}");
             System.out.println("No cookies found in the request.");
             return;
@@ -89,14 +92,18 @@ public class CollectorServlet extends HttpServlet {
                     List<SupplyModel> upcoming_collections = supplyDAO.getUpcomingCollections(employee_id, today, day_after_tomorrow);
                     int today_count = supplyDAO.getCollectionCount(employee_id, today);
 
+                    CocoRateDAO cocoRateDAO = new CocoRateDAO();
+                    CocoModel cocoRate = cocoRateDAO.getLastRecord();
+
                     Gson gson = new Gson();
 
                     String today_collec = gson.toJson(today_collections); // Object array to json
                     String upcoming_collec = gson.toJson(upcoming_collections); // Object array to json
+                    String object = gson.toJson(cocoRate);
 
                     if (today_collections.size() != 0 && upcoming_collections.size() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"size\": " + today_collections.size() + ",\"today\":" + today_collec + ",\"upcoming\":" + upcoming_collec + ",\"count\":" + today_count + "}");
+                        out.write("{\"size\": " + today_collections.size() + ",\"today\":" + today_collec + ",\"upcoming\":" + upcoming_collec + ",\"count\":" + today_count + ",\"rate\": " + object + "}");
                         System.out.println("Collector dashboard tables contents");
                     } else if (today_collections.size() == 0 && upcoming_collections.size() == 0) {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
@@ -104,11 +111,11 @@ public class CollectorServlet extends HttpServlet {
                         System.out.println("No collections");
                     } else if (today_collections.size() == 0) {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": \"-1\",\"upcoming\":" + upcoming_collec + ",\"count\":" + today_count + "}");
+                        out.write("{\"size\": \"-1\",\"upcoming\":" + upcoming_collec + ",\"count\":" + today_count + ",\"rate\": " + object + "}");
                         System.out.println("No collections today");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": " + today_collections.size() + ",\"today\":" + today_collec + ",\"count\":" + today_count + "}");
+                        out.write("{\"size\": " + today_collections.size() + ",\"today\":" + today_collec + ",\"count\":" + today_count + ",\"rate\": " + object + "}");
                         System.out.println("No upcoming collections");
                     }
                 } else {
