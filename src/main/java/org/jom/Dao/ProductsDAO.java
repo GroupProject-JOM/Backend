@@ -150,4 +150,36 @@ public class ProductsDAO {
         }
         return product;
     }
+
+    // update product
+    public boolean updateProduct(ProductModel product){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE products p SET p.type=?,p.category=?,p.price=? WHERE p.id = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,product.getType());
+            preparedStatement.setString(2,product.getCategory());
+            preparedStatement.setString(3,product.getPrice());
+            preparedStatement.setInt(4,product.getId());
+
+            int x = preparedStatement.executeUpdate();
+            if(x !=0){
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
 }
