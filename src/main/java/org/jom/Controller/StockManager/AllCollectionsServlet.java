@@ -71,7 +71,7 @@ public class AllCollectionsServlet extends HttpServlet {
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getRole().equals("stock-manager")) {
+                if (user.getRole().equals("stock-manager") || user.getRole().equals("admin")) {
 
                     SupplyDAO supplyDAO = new SupplyDAO();
                     List<SupplyModel> accepted = supplyDAO.getAccepted();

@@ -75,7 +75,7 @@ public class CollectionByDateServlet extends HttpServlet {
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getRole().equals("stock-manager")) {
+                if (user.getRole().equals("stock-manager") || user.getRole().equals("admin")) {
                     SupplyDAO supplyDAO = new SupplyDAO();
                     Gson gson = new Gson();
 
