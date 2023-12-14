@@ -5,6 +5,7 @@ public class YardModel {
     private int count;
     private int days;
     private String date;
+    private int yard;
 
     public YardModel() {
     }
@@ -25,6 +26,13 @@ public class YardModel {
         this.count = count;
         this.days = days;
         this.date = date;
+    }
+
+    public YardModel(int id, int count, int days, int yard) {
+        this.id = id;
+        this.count = count;
+        this.days = days;
+        this.yard = yard;
     }
 
     public int getId() {
