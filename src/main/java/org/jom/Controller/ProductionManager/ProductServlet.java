@@ -237,23 +237,23 @@ public class ProductServlet extends HttpServlet {
             Gson gson = new Gson();
             // json data to user object
             BufferedReader bufferedReader = request.getReader();
-            OutletModel outlet = gson.fromJson(bufferedReader, OutletModel.class);
-            outlet.setUser(user_id);
+            ProductModel product = gson.fromJson(bufferedReader, ProductModel.class);
 
             UserDAO userDAO = new UserDAO();
-            UserModel user = userDAO.getUserById(outlet.getUser());
+            ProductsDAO productsDAO = new ProductsDAO();
+            UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getRole().equals("distributor") || user.getRole().equals("admin") || user.getRole().equals("sales-manager")) {
+                if (user.getRole().equals("production-manager") || user.getRole().equals("admin") || user.getRole().equals("sales-manager")) {
 
-                    if (outlet.updateOutlet()) {
+                    if (productsDAO.updateProduct(product)) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"message\": \"Outlet Updated successfully\"}");
-                        System.out.println("Outlet Update successfully");
+                        out.write("{\"message\": \"Product Updated successfully\"}");
+                        System.out.println("Product Update successfully");
                     } else {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.write("{\"message\": \"Outlet is not updated\"}");
-                        System.out.println("Outlet is not Updated");
+                        out.write("{\"message\": \"Product is not updated\"}");
+                        System.out.println("Product is not Updated");
                     }
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
