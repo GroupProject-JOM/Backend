@@ -19,7 +19,7 @@ public class ConnectionPool {
         p.setUrl(DB_URL);
         p.setDriverClassName("com.mysql.cj.jdbc.Driver");
         p.setUsername(DB_USER);
-        p.setPassword("");
+        p.setPassword(DB_PASSWORD);
         p.setJmxEnabled(true);
         p.setTestWhileIdle(false);
         p.setTestOnBorrow(true);
