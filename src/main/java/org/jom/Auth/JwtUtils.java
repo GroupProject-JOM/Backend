@@ -24,7 +24,7 @@ public class JwtUtils {
     private int user;
     private String page;
     private String authorizationHeader;
-    private static final String SECRET_KEY = "shaka bum";
+    private static final String SECRET_KEY = System.getenv("SECRET_KEY");
     private JSONObject payload;
 
     public JwtUtils() {
