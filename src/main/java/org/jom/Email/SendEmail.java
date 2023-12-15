@@ -13,8 +13,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 public class SendEmail {
 
-    private static String from = "saumyasewwandi05@gmail.com";
-    private static String pin = "auzciwkhdnhnzofw";
+    private static String from = System.getenv("EMAIL");
+    private static String pin = System.getenv("PIN");
     public static int SendOTP (String email){
         int otpvalue = 0;
         // sending otp
