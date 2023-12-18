@@ -34,13 +34,14 @@ public class SendEmailOTPServlet extends HttpServlet {
         String email = jsonObject.getString("email");
         int id = jsonObject.getInt("id");
         UserDAO userDAO = new UserDAO();
-        UserModel user = UserDAO.getUserById(id);
+        UserModel user = userDAO.getUserById(id);
 
         //check if emails are correct
         if(user.getEmail().equals(email)) {
             try {
                 SendEmail sendEmail = new SendEmail();
-                int otp = SendEmail.SendOTP(email);
+                String subject = "Email Verification";
+                int otp = SendEmail.SendOTP(email,subject);
                 System.out.println(otp);
 
                 OTPModel record = new OTPModel(id,email,otp);
