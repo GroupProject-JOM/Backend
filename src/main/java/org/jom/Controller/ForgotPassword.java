@@ -14,9 +14,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-
-@WebServlet("/email")
-public class SendEmailOTPServlet extends HttpServlet {
+@WebServlet("/forgot-password")
+public class ForgotPassword extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -32,19 +31,19 @@ public class SendEmailOTPServlet extends HttpServlet {
 
         JSONObject jsonObject = new JSONObject(requestBody.toString());
         String email = jsonObject.getString("email");
-        int id = jsonObject.getInt("id");
-        UserDAO userDAO = new UserDAO();
-        UserModel user = userDAO.getUserById(id);
 
-        //check if emails are correct
-        if(user.getEmail().equals(email)) {
+        UserDAO userDAO = new UserDAO();
+        UserModel user = userDAO.getUserByEmail(email);
+
+        //check if email exists
+        if(user.getId() != 0) {
             try {
                 SendEmail sendEmail = new SendEmail();
-                String subject = "Email Verification";
-                int otp = SendEmail.SendOTP(email,subject);
+                String subject = "Password Recovery";
+                int otp = sendEmail.SendOTP(email,subject);
                 System.out.println(otp);
 
-                OTPModel record = new OTPModel(id,email,otp);
+                OTPModel record = new OTPModel(user.getId(),email,otp);
                 record.saveOTP();
 
                 if(record.getId() != 0) {
@@ -62,7 +61,7 @@ public class SendEmailOTPServlet extends HttpServlet {
             }
         } else{
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"Invalid User\"}");
+            out.write("{\"message\": \"Invalid Email\"}");
         }
 
     }

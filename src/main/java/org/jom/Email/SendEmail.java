@@ -15,7 +15,7 @@ public class SendEmail {
 
     private static String from = System.getenv("EMAIL");
     private static String pin = System.getenv("PIN");
-    public static int SendOTP (String email){
+    public static int SendOTP (String email,String subject){
         int otpvalue = 0;
         // sending otp
         Random rand = new Random();
@@ -39,7 +39,7 @@ public class SendEmail {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(email));// change accordingly
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            message.setSubject("Email Verification");
+            message.setSubject(subject);
             message.setText("your OTP is: " + otpvalue);
             // send message
             Transport.send(message);
@@ -143,7 +143,7 @@ public class SendEmail {
             message.setFrom(new InternetAddress(email));// change accordingly
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             message.setSubject("Optional Verification");
-            message.setText("Hello "+name+",\n\nSupplier entered coconut amount is: " + amount +"\n\nIf you are agree with this amount tell collector to this OTP : <b>"+otpvalue+"</b> to complete collection.");
+            message.setText("Hello "+name+",\n\nSupplier entered coconut amount is: " + amount +"\n\nIf you are agree with this amount tell collector to this OTP : "+otpvalue+" to complete collection.");
             // send message
             Transport.send(message);
             System.out.println("Email otp sent successfully");
