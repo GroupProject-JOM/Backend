@@ -295,4 +295,48 @@ public class ProductionDAO {
         }
         return status;
     }
+
+    //get all accepted requests
+    public List<ProductionModel> getAllAcceptedRequests() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<ProductionModel> productionModels = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    *\n" +
+                    "FROM\n" +
+                    "    productions p\n" +
+                    "WHERE\n" +
+                    "    p.delete = 0 AND p.status =2 ;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                int yard = resultSet.getInt(2);
+                int block = resultSet.getInt(3);
+                int amount = resultSet.getInt(4);
+                int status = resultSet.getInt(5);
+                String date = resultSet.getString(7);
+
+                ProductionModel productionModel = new ProductionModel(id, yard, block, amount, status, date);
+                productionModels.add(productionModel);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return productionModels;
+    }
 }
