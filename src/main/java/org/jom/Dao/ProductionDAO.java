@@ -18,11 +18,12 @@ public class ProductionDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "INSERT INTO productions (yard,block,amount) VALUES (?,?,?)";
+            String sql = "INSERT INTO productions (yard,block,amount,actual) VALUES (?,?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, productionModel.getYard());
             preparedStatement.setInt(2, productionModel.getBlock());
             preparedStatement.setInt(3, productionModel.getAmount());
+            preparedStatement.setInt(4, productionModel.getAmount());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
@@ -140,12 +141,13 @@ public class ProductionDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE productions p SET p.yard=?,p.block=?,p.amount=?,p.status=1,p.date=CURRENT_TIMESTAMP WHERE p.id = ? AND p.delete=0 AND p.status<4";
+            String sql = "UPDATE productions p SET p.yard=?,p.block=?,p.amount=?,p.status=1,p.date=CURRENT_TIMESTAMP,p.actual=? WHERE p.id = ? AND p.delete=0 AND p.status<4";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, productionModel.getYard());
             preparedStatement.setInt(2, productionModel.getBlock());
             preparedStatement.setInt(3, productionModel.getAmount());
-            preparedStatement.setInt(4, productionModel.getId());
+            preparedStatement.setInt(4, productionModel.getAmount());
+            preparedStatement.setInt(5, productionModel.getId());
 
             int x = preparedStatement.executeUpdate();
             if (x != 0) {
@@ -238,17 +240,18 @@ public class ProductionDAO {
         return productionModels;
     }
 
-    // delete production request
-    public boolean acceptProductionRequest(int id) {
+    // update status production request
+    public boolean updateProductionRequestStatus(int id,int st) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE productions p SET p.status=2 WHERE id = ? AND p.delete=0";
+            String sql = "UPDATE productions p SET p.status=? WHERE id = ? AND p.delete=0";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(1, st);
+            preparedStatement.setInt(2, id);
 
             int x = preparedStatement.executeUpdate();
             if (x != 0) {
@@ -267,7 +270,7 @@ public class ProductionDAO {
         return status;
     }
 
-    public boolean rejectProductionRequest(int id,String reason) {
+    public boolean rejectProductionRequest(int id, String reason) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
@@ -321,8 +324,9 @@ public class ProductionDAO {
                 int amount = resultSet.getInt(4);
                 int status = resultSet.getInt(5);
                 String date = resultSet.getString(7);
+                int actual = resultSet.getInt(9);
 
-                ProductionModel productionModel = new ProductionModel(id, yard, block, amount, status, date);
+                ProductionModel productionModel = new ProductionModel(id, yard, block, amount, status, date, actual);
                 productionModels.add(productionModel);
             }
 
@@ -338,5 +342,35 @@ public class ProductionDAO {
             }
         }
         return productionModels;
+    }
+
+    // update actual amount of production request
+    public boolean updateActualAmount(int id,int amount) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE productions p SET p.actual=? WHERE id = ? AND p.delete=0";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, amount);
+            preparedStatement.setInt(2, id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
     }
 }

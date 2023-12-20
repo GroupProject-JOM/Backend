@@ -170,16 +170,33 @@ public class ProductionBatchServlet extends HttpServlet {
             JSONArray requestsArray = json_data.getJSONArray("requests");
             JSONArray amountsArray = json_data.getJSONArray("amounts");
             JSONArray productsArray = json_data.getJSONArray("products");
+            JSONArray actualArray = json_data.getJSONArray("actual");
 
             // Convert JSONArrays to String arrays
             int[] requests = new int[requestsArray.length()];
             int[] amounts = new int[requestsArray.length()];
+            int[] actual = new int[requestsArray.length()];
             int[] products = new int[productsArray.length()];
             int total_amount = 0;
+
+            ProductionDAO productionDAO = new ProductionDAO();
 
             for (int i = 0; i < requestsArray.length(); i++) {
                 requests[i] = requestsArray.getInt(i);
                 amounts[i] = amountsArray.getInt(i);
+                actual[i] = actualArray.getInt(i);
+                if (amounts[i] < actual[i]) {
+                    actual[i] = actual[i] - amounts[i];
+                    productionDAO.updateActualAmount(requests[i], actual[i]);
+                } else if (amounts[i] == actual[i]) {
+                    actual[i] = 0;
+                    productionDAO.updateProductionRequestStatus(requests[i], 4);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.write("{\"message\": \"Production batch is not created\"}");
+                    System.out.println("Production batch is not created");
+                    return;
+                }
                 total_amount += amounts[i];
             }
 

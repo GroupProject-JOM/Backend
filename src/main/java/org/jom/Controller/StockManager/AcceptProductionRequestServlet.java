@@ -72,7 +72,7 @@ public class AcceptProductionRequestServlet extends HttpServlet {
 
                     ProductionDAO productionDAO = new ProductionDAO();
 
-                    if (productionDAO.acceptProductionRequest(collection_id)) {
+                    if (productionDAO.updateProductionRequestStatus(collection_id,2)) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"production request accepted\"}");
                         System.out.println("production request accepted");
