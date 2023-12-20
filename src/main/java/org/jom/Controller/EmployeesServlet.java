@@ -47,7 +47,8 @@ public class EmployeesServlet extends HttpServlet {
                     break;  // No need to continue checking if "jwt" cookie is found
                 }
             }
-        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             out.write("{\"message\": \"UnAuthorized\"}");
             System.out.println("No cookies found in the request.");
             return;
@@ -72,18 +73,20 @@ public class EmployeesServlet extends HttpServlet {
 
                     EmployeeDAO employeeDAO = new EmployeeDAO();
                     List<EmployeeModel> employees = employeeDAO.getAll();
+                    List<EmployeeModel> previous = employeeDAO.getAllPrevious();
 
                     Gson gson = new Gson();
                     // Object array to json
                     String objectArray = gson.toJson(employees);
+                    String object = gson.toJson(previous);
 
                     if (employees.size() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"size\": " + employees.size() + ",\"list\":" + objectArray + "}");
+                        out.write("{\"size\": " + employees.size() + ",\"list\":" + objectArray + ",\"previous\":" + object + "}");
                         System.out.println("View all Employees");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": \"0\"}");
+                        out.write("{\"size\": \"0\",\"previous\":" + object + "}");
                         System.out.println("No employee");
                     }
                 } else {

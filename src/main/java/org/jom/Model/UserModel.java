@@ -15,6 +15,7 @@ public class UserModel {
     private String add_line_3;
     private String role;
     private int validity;
+    private int delete;
 
     public UserModel() {
     }
@@ -153,6 +154,14 @@ public class UserModel {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getDelete() {
+        return delete;
+    }
+
+    public void setDelete(int delete) {
+        this.delete = delete;
     }
 
     public void Register(){
