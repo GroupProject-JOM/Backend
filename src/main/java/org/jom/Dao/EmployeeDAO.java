@@ -66,7 +66,57 @@ public class EmployeeDAO {
                     "    users u\n" +
                     "WHERE\n" +
                     "    u.id = e.user_id_\n" +
-                    "        AND u.role <> 'admin';";
+                    "        AND u.role <> 'admin' AND u.delete=0;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String first_name = resultSet.getString(2);
+                String role = resultSet.getString(3);
+                String phone = resultSet.getString(4);
+                String city = resultSet.getString(5);
+
+                EmployeeModel employee = new EmployeeModel(id,first_name,phone,city,role);
+                employees.add(employee);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return employees;
+    }
+
+    // get all previous employees
+    public List<EmployeeModel> getAllPrevious() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<EmployeeModel> employees = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    e.id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.role,\n" +
+                    "    u.phone,\n" +
+                    "    u.add_line_3\n" +
+                    "FROM\n" +
+                    "    employees e\n" +
+                    "        INNER JOIN\n" +
+                    "    users u\n" +
+                    "WHERE\n" +
+                    "    u.id = e.user_id_\n" +
+                    "        AND u.role <> 'admin' AND u.delete=1;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -111,6 +161,7 @@ public class EmployeeDAO {
                     "    u.add_line_1,\n" +
                     "    u.add_line_2,\n" +
                     "    u.add_line_3,\n" +
+                    "    u.delete,\n" +
                     "    e.dob,\n" +
                     "    e.nic,\n" +
                     "    e.gender,\n" +
@@ -134,11 +185,12 @@ public class EmployeeDAO {
                 employee.setAdd_line_1(resultSet.getString(5));
                 employee.setAdd_line_2(resultSet.getString(6));
                 employee.setAdd_line_3(resultSet.getString(7));
-                employee.setDob(resultSet.getString(8));
-                employee.setNic(resultSet.getString(9));
-                employee.setGender(resultSet.getString(10));
-                employee.setRole(resultSet.getString(11));
-                employee.seteId(resultSet.getInt(12));
+                employee.setDelete(resultSet.getInt(8));
+                employee.setDob(resultSet.getString(9));
+                employee.setNic(resultSet.getString(10));
+                employee.setGender(resultSet.getString(11));
+                employee.setRole(resultSet.getString(12));
+                employee.seteId(resultSet.getInt(13));
             }
 
             resultSet.close();
@@ -223,7 +275,7 @@ public class EmployeeDAO {
         boolean status = false;
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "DELETE FROM users WHERE id = ? ";
+            String sql = "UPDATE users u SET u.delete=1 WHERE id=?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
 
