@@ -5,8 +5,11 @@ import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.ProductionDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.UserDAO;
+import org.jom.Dao.YardDAO;
 import org.jom.Model.EmployeeModel;
+import org.jom.Model.ProductionModel;
 import org.jom.Model.UserModel;
+import org.jom.Model.YardModel;
 import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
@@ -46,7 +49,8 @@ public class AcceptProductionRequestServlet extends HttpServlet {
                     break;  // No need to continue checking if "jwt" cookie is found
                 }
             }
-        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             out.write("{\"message\": \"UnAuthorized\"}");
             System.out.println("No cookies found in the request.");
             return;
@@ -61,7 +65,7 @@ public class AcceptProductionRequestServlet extends HttpServlet {
         }
 
         user_id = (int) jsonObject.get("user");
-        int collection_id = Integer.parseInt(request.getParameter("id"));
+        int request_id = Integer.parseInt(request.getParameter("id"));
 
         try {
             UserDAO userDAO = new UserDAO();
@@ -71,8 +75,13 @@ public class AcceptProductionRequestServlet extends HttpServlet {
                 if (user.getRole().equals("stock-manager")) {
 
                     ProductionDAO productionDAO = new ProductionDAO();
+                    ProductionModel productionModel = productionDAO.getProductionRequest(request_id);
 
-                    if (productionDAO.updateProductionRequestStatus(collection_id,2)) {
+                    YardDAO yardDAO = new YardDAO();
+                    YardModel yardModel = yardDAO.getBlockData("yard" + productionModel.getYard(), productionModel.getBlock());
+                    yardDAO.updateBlockAmount("yard" + productionModel.getYard(), yardModel.getCount() - productionModel.getAmount(), productionModel.getBlock());
+
+                    if (productionDAO.updateProductionRequestStatus(request_id, 2)) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"production request accepted\"}");
                         System.out.println("production request accepted");
@@ -126,7 +135,8 @@ public class AcceptProductionRequestServlet extends HttpServlet {
                     break;  // No need to continue checking if "jwt" cookie is found
                 }
             }
-        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             out.write("{\"message\": \"UnAuthorized\"}");
             System.out.println("No cookies found in the request.");
             return;
@@ -152,7 +162,7 @@ public class AcceptProductionRequestServlet extends HttpServlet {
         }
 
         JSONObject json_data = new JSONObject(requestBody.toString());
-        int collection_id = json_data.getInt("id");
+        int request_id = json_data.getInt("id");
         String reason = json_data.getString("reason");
 
         try {
@@ -164,7 +174,7 @@ public class AcceptProductionRequestServlet extends HttpServlet {
 
                     ProductionDAO productionDAO = new ProductionDAO();
 
-                    if (productionDAO.rejectProductionRequest(collection_id,reason)) {
+                    if (productionDAO.rejectProductionRequest(request_id, reason)) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"production request rejected\"}");
                         System.out.println("production request rejected");
