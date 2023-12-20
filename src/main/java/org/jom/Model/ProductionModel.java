@@ -13,6 +13,7 @@ public class ProductionModel {
     private String date;
     private int user;
     private String reason;
+    private int actual;
 
     public ProductionModel() {
     }
@@ -39,6 +40,16 @@ public class ProductionModel {
         this.amount = amount;
         this.status = status;
         this.date = date;
+    }
+
+    public ProductionModel(int id, int yard, int block, int amount, int status, String date, int actual) {
+        this.id = id;
+        this.yard = yard;
+        this.block = block;
+        this.amount = amount;
+        this.status = status;
+        this.date = date;
+        this.actual = actual;
     }
 
     public int getId() {

@@ -52,7 +52,7 @@ public class YardDAO {
         return yard;
     }
 
-    //Get relevent block
+    //Get relevant block
     public YardModel getBlockData(String yard_name, int block_id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
@@ -91,7 +91,7 @@ public class YardDAO {
         return block;
     }
 
-    //Get relevent block
+    //Update relevant block
     public boolean updateBlockData(String yard_name, YardModel yard) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
@@ -104,6 +104,38 @@ public class YardDAO {
             preparedStatement.setInt(1,yard.getDays());
             preparedStatement.setInt(2, yard.getCount());
             preparedStatement.setInt(3, yard.getId());
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                status = true;
+            }
+            preparedStatement.close();
+
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
+
+    //Update count of relevant yard relevant block
+    public boolean updateBlockAmount(String yard_name, int count,int block) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE " + yard_name + " SET count=? WHERE id=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, count);
+            preparedStatement.setInt(2, block);
 
             int x = preparedStatement.executeUpdate();
             if (x != 0) {
