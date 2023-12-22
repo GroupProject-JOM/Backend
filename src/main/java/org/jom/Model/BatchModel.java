@@ -8,6 +8,7 @@ public class BatchModel {
     private String amount_by;
     private String requests;
     private String products;
+    private String create_date;
     private int status;
 
     public BatchModel(int amount, String amount_by, String requests, String products) {
@@ -15,6 +16,14 @@ public class BatchModel {
         this.amount_by = amount_by;
         this.requests = requests;
         this.products = products;
+    }
+
+    public BatchModel(int id, int amount, String products, String create_date, int status) {
+        this.id = id;
+        this.amount = amount;
+        this.products = products;
+        this.create_date = create_date;
+        this.status = status;
     }
 
     public BatchModel(int id, int amount, int status, String amount_by, String requests, String products) {
