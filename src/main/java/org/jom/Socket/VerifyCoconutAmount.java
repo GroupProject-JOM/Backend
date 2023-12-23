@@ -44,29 +44,29 @@ public class VerifyCoconutAmount {
             int collection_id = Integer.parseInt(parts[2].trim());
             CollectionDAO collectionDAO = new CollectionDAO();
 
-            if (content.startsWith("Collector")) {
+            if (!content.startsWith("O") && !content.startsWith("D")) {
                 int supplier = collectionDAO.getSupplierId(collection_id, sender_id);
                 Session recipientSession = sessions.get(Integer.toString(supplier));
                 if (recipientSession != null)
-                    sendNotification(recipientSession, content);
+                    sendNotification(recipientSession, content + ":" + collection_id);
                 else
-                    savePendingNotification(Integer.toString(supplier), content);
+                    savePendingNotification(Integer.toString(supplier), content + ":" + collection_id);
 
             } else {
                 int collector = collectionDAO.getCollectorId(collection_id, sender_id);
                 Session recipientSession = sessions.get(Integer.toString(collector));
 
                 if (recipientSession != null)
-                    sendNotification(recipientSession, content);
+                    sendNotification(recipientSession, content + ":" + collection_id);
                 else {
-                    savePendingNotification(Integer.toString(collector), content);
+                    savePendingNotification(Integer.toString(collector), content + ":" + collection_id);
 
                     // to admin
                     Session recipientSession2 = sessions.get("7");
                     if (recipientSession2 != null)
-                        sendNotification(recipientSession2, content);
+                        sendNotification(recipientSession2, content + ":" + collection_id);
                     else
-                        savePendingNotification("7", content);
+                        savePendingNotification("7", content + ":" + collection_id);
 
                 }
             }
