@@ -382,4 +382,52 @@ public class UserDAO {
         }
         return status;
     }
+
+    //get few user data for supplier invoice
+    public UserModel reportData(int id){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        UserModel user = new UserModel();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    u.add_line_1,\n" +
+                    "    u.add_line_2,\n" +
+                    "    u.add_line_3,\n" +
+                    "    u.phone,\n" +
+                    "    u.email\n" +
+                    "FROM\n" +
+                    "    jom_db.users u\n" +
+                    "WHERE\n" +
+                    "    id = ? AND u.role = 'supplier';";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                user.setFirst_name(resultSet.getString(1));
+                user.setLast_name(resultSet.getString(2));
+                user.setAdd_line_1(resultSet.getString(3));
+                user.setAdd_line_2(resultSet.getString(4));
+                user.setAdd_line_3(resultSet.getString(5));
+                user.setPhone(resultSet.getString(6));
+                user.setEmail(resultSet.getString(7));
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return user;
+    }
 }

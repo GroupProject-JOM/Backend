@@ -88,7 +88,7 @@ public class BatchesServlet extends HttpServlet {
                         out.write("{\"batches\": " + object + "}");
                         System.out.println("Send production batches");
                     } else {
-                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
                         out.write("{\"message\": \"No production request\"}");
                         System.out.println("No production batches");
                     }

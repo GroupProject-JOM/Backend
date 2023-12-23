@@ -6,6 +6,7 @@ import org.jom.Model.AccountModel;
 import org.jom.Model.CocoModel;
 import org.jom.Model.Collection.CollectionModel;
 import org.jom.Model.Collection.CollectionSingleViewModel;
+import org.jom.Model.UserModel;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -696,7 +697,7 @@ public class CollectionDAO {
         return date;
     }
 
-    public boolean updateReason(int id,String reason) {
+    public boolean updateReason(int id, String reason) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean isSuccess = false;
@@ -723,5 +724,66 @@ public class CollectionDAO {
             }
         }
         return isSuccess;
+    }
+
+    //Get completed collections between two days
+    public List<CollectionModel> getPaidCollections(String sDate, String eDate, int user_id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<CollectionModel> collections = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    c.date,\n" +
+                    "    CASE\n" +
+                    "        WHEN c.s_method = 'pickup' THEN 'Pickup from Estate'\n" +
+                    "        WHEN c.s_method = 'yard' THEN 'Delivered to Yard'\n" +
+                    "        ELSE 'Unknown Method'\n" +
+                    "    END AS supply_method,\n" +
+                    "    CASE\n" +
+                    "        WHEN c.p_method = 'cash' THEN 'Cash on Pickup'\n" +
+                    "        WHEN c.p_method = 'bank' THEN 'Transfer to Bank'\n" +
+                    "        ELSE 'Unknown Method'\n" +
+                    "    END AS payment_method,\n" +
+                    "    c.final_amount,\n" +
+                    "    c.value\n" +
+                    "FROM\n" +
+                    "    jom_db.collections c\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id = c.sup_id\n" +
+                    "WHERE\n" +
+                    "    c.status = 6\n" +
+                    "        AND c.date BETWEEN ? AND ?\n" +
+                    "        AND s.user_id = ?;\n";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, sDate);
+            preparedStatement.setString(2, eDate);
+            preparedStatement.setInt(3, user_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String date = resultSet.getString(1);
+                String supply_method = resultSet.getString(2);
+                String payment_method = resultSet.getString(3);
+                int final_amount = resultSet.getInt(4);
+                int value = resultSet.getInt(5);
+
+                CollectionModel collection = new CollectionModel(final_amount, value, payment_method, supply_method, date);
+                collections.add(collection);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return collections;
     }
 }
