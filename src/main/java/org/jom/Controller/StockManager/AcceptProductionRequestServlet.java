@@ -81,7 +81,7 @@ public class AcceptProductionRequestServlet extends HttpServlet {
                     YardModel yardModel = yardDAO.getBlockData("yard" + productionModel.getYard(), productionModel.getBlock());
                     yardDAO.updateBlockAmount("yard" + productionModel.getYard(), yardModel.getCount() - productionModel.getAmount(), productionModel.getBlock());
 
-                    if (productionDAO.updateProductionRequestStatus(request_id, 2)) {
+                    if (productionDAO.acceptProductionRequestStatus(request_id, 2, yardModel.getDays())) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"production request accepted\"}");
                         System.out.println("production request accepted");

@@ -72,6 +72,7 @@ public class ProductionDAO {
                 productionModel.setStatus(resultSet.getInt(5));
                 productionModel.setDate(resultSet.getString(7));
                 productionModel.setReason(resultSet.getString(8));
+                productionModel.setDays(resultSet.getInt(10));
             }
 
             resultSet.close();
@@ -252,6 +253,37 @@ public class ProductionDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, st);
             preparedStatement.setInt(2, id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
+
+    // accept status production request
+    public boolean acceptProductionRequestStatus(int id,int st,int days) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE productions p SET p.status=?,p.days=? WHERE id = ? AND p.delete=0";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, st);
+            preparedStatement.setInt(2, days);
+            preparedStatement.setInt(3, id);
 
             int x = preparedStatement.executeUpdate();
             if (x != 0) {
