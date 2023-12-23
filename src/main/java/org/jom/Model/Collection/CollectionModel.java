@@ -30,6 +30,14 @@ public class CollectionModel {
         this.supply_method = supply_method;
     }
 
+    public CollectionModel(int final_amount, int value, String payment_method, String supply_method, String date) {
+        this.final_amount = final_amount;
+        this.value = value;
+        this.payment_method = payment_method;
+        this.supply_method = supply_method;
+        this.date = date;
+    }
+
     public CollectionModel(int id, int initial_amount, String payment_method, String supply_method, int account, int estate, String date, String time) {
         this.id = id;
         this.initial_amount = initial_amount;
