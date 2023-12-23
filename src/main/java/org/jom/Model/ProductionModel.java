@@ -14,6 +14,7 @@ public class ProductionModel {
     private int user;
     private String reason;
     private int actual;
+    private int days;
 
     public ProductionModel() {
     }
@@ -106,5 +107,29 @@ public class ProductionModel {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public int getActual() {
+        return actual;
+    }
+
+    public void setActual(int actual) {
+        this.actual = actual;
+    }
+
+    public int getDays() {
+        return days;
+    }
+
+    public void setDays(int days) {
+        this.days = days;
     }
 }
