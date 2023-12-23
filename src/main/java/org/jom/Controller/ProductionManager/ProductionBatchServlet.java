@@ -171,11 +171,13 @@ public class ProductionBatchServlet extends HttpServlet {
             JSONArray amountsArray = json_data.getJSONArray("amounts");
             JSONArray productsArray = json_data.getJSONArray("products");
             JSONArray actualArray = json_data.getJSONArray("actual");
+            JSONArray daysArray = json_data.getJSONArray("days");
 
             // Convert JSONArrays to String arrays
             int[] requests = new int[requestsArray.length()];
             int[] amounts = new int[requestsArray.length()];
             int[] actual = new int[requestsArray.length()];
+            int[] days = new int[requestsArray.length()];
             int[] products = new int[productsArray.length()];
             int total_amount = 0;
 
@@ -183,6 +185,7 @@ public class ProductionBatchServlet extends HttpServlet {
 
             for (int i = 0; i < requestsArray.length(); i++) {
                 requests[i] = requestsArray.getInt(i);
+                days[i] = daysArray.getInt(i);
                 amounts[i] = amountsArray.getInt(i);
                 actual[i] = actualArray.getInt(i);
                 if (amounts[i] < actual[i]) {
@@ -206,9 +209,10 @@ public class ProductionBatchServlet extends HttpServlet {
 
             String requests_string = intArrayToString(requests);
             String amounts_string = intArrayToString(amounts);
+            String days_string = intArrayToString(days);
             String products_string = intArrayToString(products);
 
-            BatchModel batchModel = new BatchModel(total_amount, amounts_string, requests_string, products_string);
+            BatchModel batchModel = new BatchModel(total_amount, amounts_string, requests_string, products_string, days_string);
 
             UserDAO userDAO = new UserDAO();
             UserModel user = userDAO.getUserById(user_id);

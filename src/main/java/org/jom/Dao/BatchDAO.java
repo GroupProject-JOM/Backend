@@ -17,12 +17,13 @@ public class BatchDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "INSERT INTO batches (amount,requests,amount_by,products) VALUES (?,?,?,?)";
+            String sql = "INSERT INTO batches (amount,requests,amount_by,products,days) VALUES (?,?,?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, batchModel.getAmount());
             preparedStatement.setString(2, batchModel.getRequests());
             preparedStatement.setString(3, batchModel.getAmount_by());
             preparedStatement.setString(4, batchModel.getProducts());
+            preparedStatement.setString(5, batchModel.getDays());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
