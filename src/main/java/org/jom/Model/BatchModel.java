@@ -11,6 +11,7 @@ public class BatchModel {
     private String create_date;
     private int status;
     private String days;
+    private String products_count;
 
     public BatchModel() {
     }
@@ -107,5 +108,13 @@ public class BatchModel {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getProducts_count() {
+        return products_count;
+    }
+
+    public void setProducts_count(String products_count) {
+        this.products_count = products_count;
     }
 }

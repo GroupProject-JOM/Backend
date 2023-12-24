@@ -153,6 +153,7 @@ public class BatchDAO {
                 batchModel.setCreate_date(resultSet.getString(6));
                 batchModel.setStatus(resultSet.getInt(7));
                 batchModel.setDays(resultSet.getString(8));
+                batchModel.setProducts_count(resultSet.getString(9));
             }
 
             resultSet.close();
