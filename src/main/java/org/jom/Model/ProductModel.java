@@ -10,6 +10,12 @@ public class ProductModel {
     public ProductModel() {
     }
 
+    public ProductModel(int id, String type, String category) {
+        this.id = id;
+        this.type = type;
+        this.category = category;
+    }
+
     public ProductModel(int id, String type, String category, String price, int status) {
         this.id = id;
         this.type = type;

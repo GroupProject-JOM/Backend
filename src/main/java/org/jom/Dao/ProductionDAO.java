@@ -357,8 +357,9 @@ public class ProductionDAO {
                 int status = resultSet.getInt(5);
                 String date = resultSet.getString(7);
                 int actual = resultSet.getInt(9);
+                int days = resultSet.getInt(10);
 
-                ProductionModel productionModel = new ProductionModel(id, yard, block, amount, status, date, actual);
+                ProductionModel productionModel = new ProductionModel(id, yard, block, amount, status, date, actual,days);
                 productionModels.add(productionModel);
             }
 

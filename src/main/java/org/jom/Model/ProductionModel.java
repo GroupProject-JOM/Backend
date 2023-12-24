@@ -43,7 +43,7 @@ public class ProductionModel {
         this.date = date;
     }
 
-    public ProductionModel(int id, int yard, int block, int amount, int status, String date, int actual) {
+    public ProductionModel(int id, int yard, int block, int amount, int status, String date, int actual, int days) {
         this.id = id;
         this.yard = yard;
         this.block = block;
@@ -51,6 +51,7 @@ public class ProductionModel {
         this.status = status;
         this.date = date;
         this.actual = actual;
+        this.days = days;
     }
 
     public int getId() {

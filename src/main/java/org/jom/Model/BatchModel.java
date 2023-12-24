@@ -10,12 +10,18 @@ public class BatchModel {
     private String products;
     private String create_date;
     private int status;
+    private String days;
+    private String products_count;
 
-    public BatchModel(int amount, String amount_by, String requests, String products) {
+    public BatchModel() {
+    }
+
+    public BatchModel(int amount, String amount_by, String requests, String products, String days) {
         this.amount = amount;
         this.amount_by = amount_by;
         this.requests = requests;
         this.products = products;
+        this.days = days;
     }
 
     public BatchModel(int id, int amount, String products, String create_date, int status) {
@@ -75,6 +81,22 @@ public class BatchModel {
         this.products = products;
     }
 
+    public String getCreate_date() {
+        return create_date;
+    }
+
+    public void setCreate_date(String create_date) {
+        this.create_date = create_date;
+    }
+
+    public String getDays() {
+        return days;
+    }
+
+    public void setDays(String days) {
+        this.days = days;
+    }
+
     public int createBatch() {
         BatchDAO batchDAO = new BatchDAO();
         return batchDAO.createProductionBatch(this);
@@ -86,5 +108,13 @@ public class BatchModel {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getProducts_count() {
+        return products_count;
+    }
+
+    public void setProducts_count(String products_count) {
+        this.products_count = products_count;
     }
 }
