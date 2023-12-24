@@ -182,4 +182,57 @@ public class ProductsDAO {
         }
         return status;
     }
+
+    //get production released products list
+    public List<ProductModel> getProductionProducts(List<Integer> idList) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<ProductModel> products = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+
+            // Construct the SQL query with the appropriate number of placeholders
+            StringBuilder sqlBuilder = new StringBuilder("SELECT p.id, p.type, p.category FROM jom_db.products p WHERE p.delete = 0 AND p.id IN (");
+            for (int i = 0; i < idList.size(); i++) {
+                sqlBuilder.append("?");
+                if (i < idList.size() - 1) {
+                    sqlBuilder.append(", ");
+                }
+            }
+            sqlBuilder.append(")");
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlBuilder.toString());
+
+            // Set the parameters
+            for (int i = 0; i < idList.size(); i++) {
+                preparedStatement.setInt(i + 1, idList.get(i));
+            }
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String type = resultSet.getString(2);
+                String category = resultSet.getString(3);
+
+                ProductModel product = new ProductModel(id, type, category);
+                products.add(product);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return products;
+    }
+
 }

@@ -12,6 +12,9 @@ public class BatchModel {
     private int status;
     private String days;
 
+    public BatchModel() {
+    }
+
     public BatchModel(int amount, String amount_by, String requests, String products, String days) {
         this.amount = amount;
         this.amount_by = amount_by;

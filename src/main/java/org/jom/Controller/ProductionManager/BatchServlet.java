@@ -2,6 +2,7 @@ package org.jom.Controller.ProductionManager;
 
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
+import org.jom.Dao.BatchDAO;
 import org.jom.Dao.ProductionDAO;
 import org.jom.Dao.ProductsDAO;
 import org.jom.Dao.UserDAO;
@@ -20,11 +21,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@WebServlet("/production-batch")
-public class ProductionBatchServlet extends HttpServlet {
-    //send start data to new production
+@WebServlet("/batch")
+public class BatchServlet extends HttpServlet {
+    //send a batch
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -66,6 +69,7 @@ public class ProductionBatchServlet extends HttpServlet {
         }
 
         user_id = (int) jsonObject.get("user");
+        int batch_id = Integer.parseInt(request.getParameter("id"));
 
         try {
 
@@ -75,23 +79,28 @@ public class ProductionBatchServlet extends HttpServlet {
             if (user.getId() != 0) {
                 if (user.getRole().equals("production-manager")) {
 
-                    ProductionDAO productionDAO = new ProductionDAO();
+                    BatchDAO batchDAO = new BatchDAO();
+                    BatchModel batchModel = batchDAO.getBatch(batch_id);
+
+                    List<Integer> idList = Arrays.stream(batchModel.getProducts().split(","))
+                            .map(Integer::parseInt)
+                            .collect(Collectors.toList());
+
                     ProductsDAO productsDAO = new ProductsDAO();
-                    List<ProductionModel> productionModels = productionDAO.getAllAcceptedRequests();
-                    List<ProductModel> products = productsDAO.getProducts();
+                    List<ProductModel> products = productsDAO.getProductionProducts(idList);
 
                     Gson gson = new Gson();
-                    String object = gson.toJson(productionModels);
+                    String object = gson.toJson(batchModel);
                     String objectArray = gson.toJson(products);
 
-                    if (productionModels.size() != 0) {
+                    if (batchModel.getId() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"accepted\": " + object + ",\"products\":" + objectArray + "}");
-                        System.out.println("Send production request");
+                        out.write("{\"batch\": " + object + ",\"products\":" + objectArray + "}");
+                        System.out.println("Send batch");
                     } else {
-                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.write("{\"accepted\": \"No production request\",\"products\":" + objectArray + "}");
-                        System.out.println("No production request");
+                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                        out.write("{\"message\": \"No Batch\"}");
+                        System.out.println("No batch");
                     }
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -112,8 +121,8 @@ public class ProductionBatchServlet extends HttpServlet {
         }
     }
 
-    // Add new production batch
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // Complete production batch
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
@@ -167,67 +176,33 @@ public class ProductionBatchServlet extends HttpServlet {
             JSONObject json_data = new JSONObject(requestBody.toString());
 
             // Retrieve arrays as JSONArrays
-            JSONArray requestsArray = json_data.getJSONArray("requests");
-            JSONArray amountsArray = json_data.getJSONArray("amounts");
-            JSONArray productsArray = json_data.getJSONArray("products");
-            JSONArray actualArray = json_data.getJSONArray("actual");
-            JSONArray daysArray = json_data.getJSONArray("days");
+            JSONArray countArray = json_data.getJSONArray("count");
+            int batch_id = json_data.getInt("id");
 
             // Convert JSONArrays to String arrays
-            int[] requests = new int[requestsArray.length()];
-            int[] amounts = new int[requestsArray.length()];
-            int[] actual = new int[requestsArray.length()];
-            int[] days = new int[requestsArray.length()];
-            int[] products = new int[productsArray.length()];
-            int total_amount = 0;
+            int[] products_count = new int[countArray.length()];
 
-            ProductionDAO productionDAO = new ProductionDAO();
-
-            for (int i = 0; i < requestsArray.length(); i++) {
-                requests[i] = requestsArray.getInt(i);
-                days[i] = daysArray.getInt(i);
-                amounts[i] = amountsArray.getInt(i);
-                actual[i] = actualArray.getInt(i);
-                if (amounts[i] < actual[i]) {
-                    actual[i] = actual[i] - amounts[i];
-                    productionDAO.updateActualAmount(requests[i], actual[i]);
-                } else if (amounts[i] == actual[i]) {
-                    actual[i] = 0;
-                    productionDAO.updateActualAmount(requests[i], actual[i]);
-                    productionDAO.updateProductionRequestStatus(requests[i], 4);
-                } else {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    out.write("{\"message\": \"Production batch is not created\"}");
-                    System.out.println("Production batch is not created");
-                    return;
-                }
-                total_amount += amounts[i];
+            for (int i = 0; i < countArray.length(); i++) {
+                products_count[i] = countArray.getInt(i);
             }
 
-            for (int i = 0; i < productsArray.length(); i++) {
-                products[i] = productsArray.getInt(i);
-            }
-
-            String requests_string = intArrayToString(requests);
-            String amounts_string = intArrayToString(amounts);
-            String days_string = intArrayToString(days);
-            String products_string = intArrayToString(products);
-
-            BatchModel batchModel = new BatchModel(total_amount, amounts_string, requests_string, products_string, days_string);
+            String products_count_string = intArrayToString(products_count);
 
             UserDAO userDAO = new UserDAO();
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
                 if (user.getRole().equals("production-manager")) {
-                    if (batchModel.createBatch() != 0) {
+
+                    BatchDAO batchDAO = new BatchDAO();
+                    if (batchDAO.completeBatch(batch_id,products_count_string)) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"message\": \"Production batch created successfully\"}");
-                        System.out.println("Production batch created successfully");
+                        out.write("{\"message\": \"Production batch completed successfully\"}");
+                        System.out.println("Production batch completed successfully");
                     } else {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.write("{\"message\": \"Production batch is not created\"}");
-                        System.out.println("Production batch is not created");
+                        out.write("{\"message\": \"Production batch is not completed\"}");
+                        System.out.println("Production batch is not completed");
                     }
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
