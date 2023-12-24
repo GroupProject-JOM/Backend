@@ -413,7 +413,8 @@ public class SupplyDAO {
         try {
             connection = connectionPool.dataSource.getConnection();
             String sql = "SELECT \n" +
-                    "    u.first_name AS Name,\n" +
+                    "    u.first_name AS First_Name,\n" +
+                    "    u.last_name AS Last_Name,\n" +
                     "    e.id AS Employee_ID,\n" +
                     "    COALESCE(COUNT(p.id), 0) AS Row_Count\n" +
                     "FROM\n" +
@@ -434,10 +435,11 @@ public class SupplyDAO {
 
             while (resultSet.next()) {
                 String name = resultSet.getString(1);
-                int employee_id = resultSet.getInt(2);
-                int count = resultSet.getInt(3);
+                String last_name = resultSet.getString(2);
+                int employee_id = resultSet.getInt(3);
+                int count = resultSet.getInt(4);
 
-                CollectorModel collector = new CollectorModel(employee_id, name, count);
+                CollectorModel collector = new CollectorModel(employee_id, name, count,last_name);
                 collectors.add(collector);
             }
 

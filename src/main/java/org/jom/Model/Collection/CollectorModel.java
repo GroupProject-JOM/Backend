@@ -10,10 +10,11 @@ public class CollectorModel {
     private int today_total;
     private int row_count;
 
-    public CollectorModel(int employee_id, String name, int row_count) {
+    public CollectorModel(int employee_id, String name, int row_count, String last_name) {
         this.employee_id = employee_id;
         this.name = name;
         this.row_count = row_count;
+        this.last_name = last_name;
     }
 
     public CollectorModel(int user_id, String name, String last_name, String phone, int collection_count, int today_total) {
