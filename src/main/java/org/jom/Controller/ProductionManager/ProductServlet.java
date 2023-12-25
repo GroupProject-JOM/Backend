@@ -76,6 +76,8 @@ public class ProductServlet extends HttpServlet {
             if (user.getId() != 0) {
                 if (user.getRole().equals("production-manager") || user.getRole().equals("admin") || user.getRole().equals("sales-manager")) {
 
+                    if (!user.getRole().equals("production-manager")) product.setStatus(1);
+
                     ProductsDAO productsDAO = new ProductsDAO();
 
                     if (productsDAO.addProduct(product) != 0) {
@@ -245,6 +247,8 @@ public class ProductServlet extends HttpServlet {
 
             if (user.getId() != 0) {
                 if (user.getRole().equals("production-manager") || user.getRole().equals("admin") || user.getRole().equals("sales-manager")) {
+
+                    if (!user.getRole().equals("production-manager")) product.setStatus(1);
 
                     if (productsDAO.updateProduct(product)) {
                         response.setStatus(HttpServletResponse.SC_OK);

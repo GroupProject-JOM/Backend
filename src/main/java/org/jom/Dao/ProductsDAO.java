@@ -61,11 +61,12 @@ public class ProductsDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "INSERT INTO products (type,category,price) VALUES (?,?,?)";
+            String sql = "INSERT INTO products (type,category,price,status) VALUES (?,?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1,product.getType());
             preparedStatement.setString(2,product.getCategory());
             preparedStatement.setString(3,product.getPrice());
+            preparedStatement.setInt(4,product.getStatus());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
@@ -159,12 +160,13 @@ public class ProductsDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE products p SET p.type=?,p.category=?,p.price=? WHERE p.id = ? ";
+            String sql = "UPDATE products p SET p.type=?,p.category=?,p.price=?,p.status=? WHERE p.id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1,product.getType());
             preparedStatement.setString(2,product.getCategory());
             preparedStatement.setString(3,product.getPrice());
-            preparedStatement.setInt(4,product.getId());
+            preparedStatement.setInt(4,product.getStatus());
+            preparedStatement.setInt(5,product.getId());
 
             int x = preparedStatement.executeUpdate();
             if(x !=0){
