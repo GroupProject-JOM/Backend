@@ -52,7 +52,8 @@ public class CollectorDAO {
             String sql = "UPDATE\n" +
                     " collectors \n" +
                     "SET\n" +
-                    " today_amount = today_amount + ? \n" +
+                    " today_amount = today_amount + ? ,\n" +
+                    " collections = collections + 1 \n" +
                     "WHERE\n" +
                     " u_id = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -91,7 +92,8 @@ public class CollectorDAO {
                     "    u.last_name,\n" +
                     "    u.phone,\n" +
                     "    COALESCE(c.collection_count, 0) AS collection_count,\n" +
-                    "    COALESCE(col.today_total_amount, 0) AS today_total_amount\n" +
+                    "    COALESCE(col.today_total_amount, 0) AS today_total_amount,\n" +
+                    "    COALESCE(col.collections, 0) AS collections\n" +
                     "FROM\n" +
                     "    users u\n" +
                     "        LEFT JOIN\n" +
@@ -107,7 +109,8 @@ public class CollectorDAO {
                     "        LEFT JOIN\n" +
                     "    (SELECT \n" +
                     "        u.id AS user_id,\n" +
-                    "            COALESCE(SUM(col.today_amount), 0) AS today_total_amount\n" +
+                    "            COALESCE(SUM(col.today_amount), 0) AS today_total_amount,\n" +
+                    "            COALESCE(SUM(col.collections), 0) AS collections\n" +
                     "    FROM\n" +
                     "        users u\n" +
                     "    LEFT JOIN collectors col ON col.u_id = u.id\n" +
@@ -126,8 +129,9 @@ public class CollectorDAO {
                 String phone = resultSet.getString(4);
                 int count = resultSet.getInt(5);
                 int total = resultSet.getInt(6);
+                int collections = resultSet.getInt(7);
 
-                CollectorModel collector = new CollectorModel(id, fName, lName, phone, count, total);
+                CollectorModel collector = new CollectorModel(id, fName, lName, phone, count, total, collections);
                 collectors.add(collector);
             }
 
