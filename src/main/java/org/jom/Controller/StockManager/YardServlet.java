@@ -3,6 +3,7 @@ package org.jom.Controller.StockManager;
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
 import org.jom.Dao.BatchDAO;
+import org.jom.Dao.CollectorDAO;
 import org.jom.Dao.UserDAO;
 import org.jom.Dao.YardDAO;
 import org.jom.Model.ProductionModel;
@@ -166,6 +167,8 @@ public class YardServlet extends HttpServlet {
             JSONArray dayArray = json_data.getJSONArray("days");
             JSONArray amountArray = json_data.getJSONArray("amounts");
             int yard = json_data.getInt("yard");
+            int collector = json_data.getInt("collector");
+            int final_amount = -json_data.getInt("final_amount");
 
             // Convert JSONArrays to String arrays
             int[] blocks = new int[blockArray.length()];
@@ -193,7 +196,9 @@ public class YardServlet extends HttpServlet {
                         if (!status) break;
                     }
 
-                    if (status) {
+                    CollectorDAO collectorDAO = new CollectorDAO();
+
+                    if (status && collectorDAO.updateTodayAmount(final_amount, collector)) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"Yard updated successfully\"}");
                         System.out.println("Yard updated successfully");
