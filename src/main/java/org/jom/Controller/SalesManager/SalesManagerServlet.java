@@ -3,6 +3,7 @@ package org.jom.Controller.SalesManager;
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
 import org.jom.Dao.EmployeeDAO;
+import org.jom.Dao.ProductsDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
 import org.jom.Dao.UserDAO;
@@ -49,7 +50,8 @@ public class SalesManagerServlet extends HttpServlet {
                     break;  // No need to continue checking if "jwt" cookie is found
                 }
             }
-        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             out.write("{\"message\": \"UnAuthorized\"}");
             System.out.println("No cookies found in the request.");
             return;
@@ -72,9 +74,10 @@ public class SalesManagerServlet extends HttpServlet {
             if (user.getId() != 0) {
                 if (user.getRole().equals("sales-manager")) {
                     CollectionDAO collectionDAO = new CollectionDAO();
+                    ProductsDAO productsDAO = new ProductsDAO();
 
                     response.setStatus(HttpServletResponse.SC_OK);
-                    out.write("{\"payouts\":" + collectionDAO.rowCount(5) + "}");
+                    out.write("{\"payouts\":" + collectionDAO.rowCount(5) + ",\"unverified\":" + productsDAO.checkUnverified() + "}");
                     System.out.println("Send dashboard content");
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
