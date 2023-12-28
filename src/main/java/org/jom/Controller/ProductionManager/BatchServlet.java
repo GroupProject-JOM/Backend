@@ -77,7 +77,7 @@ public class BatchServlet extends HttpServlet {
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getRole().equals("production-manager")) {
+                if (user.getRole().equals("production-manager") || user.getRole().equals("sales-manager")) {
 
                     BatchDAO batchDAO = new BatchDAO();
                     BatchModel batchModel = batchDAO.getBatch(batch_id);
@@ -181,12 +181,15 @@ public class BatchServlet extends HttpServlet {
 
             // Convert JSONArrays to String arrays
             int[] products_count = new int[countArray.length()];
+            int[] distribution_count = new int[countArray.length()];
 
             for (int i = 0; i < countArray.length(); i++) {
                 products_count[i] = countArray.getInt(i);
+                distribution_count[i]=0;
             }
 
             String products_count_string = intArrayToString(products_count);
+            String distribution_count_string = intArrayToString(distribution_count);
 
             UserDAO userDAO = new UserDAO();
             UserModel user = userDAO.getUserById(user_id);
@@ -195,7 +198,7 @@ public class BatchServlet extends HttpServlet {
                 if (user.getRole().equals("production-manager")) {
 
                     BatchDAO batchDAO = new BatchDAO();
-                    if (batchDAO.completeBatch(batch_id,products_count_string)) {
+                    if (batchDAO.completeBatch(batch_id,products_count_string,distribution_count_string)) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"Production batch completed successfully\"}");
                         System.out.println("Production batch completed successfully");

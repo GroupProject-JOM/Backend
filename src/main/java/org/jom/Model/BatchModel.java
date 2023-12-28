@@ -13,6 +13,7 @@ public class BatchModel {
     private String days;
     private String products_count;
     private String end_date;
+    private String distribution;
 
     public BatchModel() {
     }
@@ -126,5 +127,13 @@ public class BatchModel {
 
     public void setEnd_date(String end_date) {
         this.end_date = end_date;
+    }
+
+    public String getDistribution() {
+        return distribution;
+    }
+
+    public void setDistribution(String distribution) {
+        this.distribution = distribution;
     }
 }

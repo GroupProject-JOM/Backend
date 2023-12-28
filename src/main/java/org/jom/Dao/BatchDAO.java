@@ -155,6 +155,7 @@ public class BatchDAO {
                 batchModel.setDays(resultSet.getString(8));
                 batchModel.setProducts_count(resultSet.getString(9));
                 batchModel.setEnd_date(resultSet.getString(10));
+                batchModel.setDistribution(resultSet.getString(11));
             }
 
             resultSet.close();
@@ -172,17 +173,18 @@ public class BatchDAO {
     }
 
     // Complete production batch
-    public boolean completeBatch(int id, String count) {
+    public boolean completeBatch(int id, String count, String distribution) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE batches b SET b.products_count=?,b.status=2,end_date=NOW() WHERE b.id = ? ";
+            String sql = "UPDATE batches b SET b.products_count=?,b.status=2,end_date=NOW(),distribution=? WHERE b.id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, count);
-            preparedStatement.setInt(2, id);
+            preparedStatement.setString(2, distribution);
+            preparedStatement.setInt(3, id);
 
             int x = preparedStatement.executeUpdate();
             if (x != 0) {
