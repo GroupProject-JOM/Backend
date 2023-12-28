@@ -12,6 +12,7 @@ public class BatchModel {
     private int status;
     private String days;
     private String products_count;
+    private String end_date;
 
     public BatchModel() {
     }
@@ -24,12 +25,13 @@ public class BatchModel {
         this.days = days;
     }
 
-    public BatchModel(int id, int amount, String products, String create_date, int status) {
+    public BatchModel(int id, int amount, String products, String create_date, int status, String end_date) {
         this.id = id;
         this.amount = amount;
         this.products = products;
         this.create_date = create_date;
         this.status = status;
+        this.end_date = end_date;
     }
 
     public BatchModel(int id, int amount, int status, String amount_by, String requests, String products) {
@@ -116,5 +118,13 @@ public class BatchModel {
 
     public void setProducts_count(String products_count) {
         this.products_count = products_count;
+    }
+
+    public String getEnd_date() {
+        return end_date;
+    }
+
+    public void setEnd_date(String end_date) {
+        this.end_date = end_date;
     }
 }
