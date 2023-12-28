@@ -2,8 +2,6 @@ package org.jom.Dao;
 
 import org.jom.Database.ConnectionPool;
 import org.jom.Model.BatchModel;
-import org.jom.Model.ProductModel;
-import org.jom.Model.ProductionModel;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -56,7 +54,7 @@ public class BatchDAO {
         try {
             connection = connectionPool.dataSource.getConnection();
             String sql = "SELECT \n" +
-                    "    id, amount, products, created_date, status\n" +
+                    "    id, amount, products, created_date, status, end_date\n" +
                     "FROM\n" +
                     "    jom_db.batches ORDER BY id DESC;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -68,8 +66,9 @@ public class BatchDAO {
                 String products = resultSet.getString(3);
                 String created_by = resultSet.getString(4);
                 int status = resultSet.getInt(5);
+                String end_date = resultSet.getString(6);
 
-                BatchModel batchModel = new BatchModel(id, amount, products, created_by, status);
+                BatchModel batchModel = new BatchModel(id, amount, products, created_by, status, end_date);
                 batches.add(batchModel);
             }
 
@@ -97,7 +96,7 @@ public class BatchDAO {
         try {
             connection = connectionPool.dataSource.getConnection();
             String sql = "SELECT \n" +
-                    "    id, amount, products, created_date, status\n" +
+                    "    id, amount, products, created_date, status, end_date\n" +
                     "FROM\n" +
                     "    jom_db.batches\n" +
                     "WHERE\n" +
@@ -111,8 +110,9 @@ public class BatchDAO {
                 String products = resultSet.getString(3);
                 String created_by = resultSet.getString(4);
                 int status = resultSet.getInt(5);
+                String end_date = resultSet.getString(6);
 
-                BatchModel batchModel = new BatchModel(id, amount, products, created_by, status);
+                BatchModel batchModel = new BatchModel(id, amount, products, created_by, status, end_date);
                 batches.add(batchModel);
             }
 
@@ -154,6 +154,8 @@ public class BatchDAO {
                 batchModel.setStatus(resultSet.getInt(7));
                 batchModel.setDays(resultSet.getString(8));
                 batchModel.setProducts_count(resultSet.getString(9));
+                batchModel.setEnd_date(resultSet.getString(10));
+                batchModel.setDistribution(resultSet.getString(11));
             }
 
             resultSet.close();
@@ -171,17 +173,18 @@ public class BatchDAO {
     }
 
     // Complete production batch
-    public boolean completeBatch(int id, String count) {
+    public boolean completeBatch(int id, String count, String distribution) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE batches b SET b.products_count=?,b.status=2 WHERE b.id = ? ";
+            String sql = "UPDATE batches b SET b.products_count=?,b.status=2,end_date=NOW(),distribution=? WHERE b.id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, count);
-            preparedStatement.setInt(2, id);
+            preparedStatement.setString(2, distribution);
+            preparedStatement.setInt(3, id);
 
             int x = preparedStatement.executeUpdate();
             if (x != 0) {

@@ -75,7 +75,7 @@ public class BatchesServlet extends HttpServlet {
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getRole().equals("production-manager")) {
+                if (user.getRole().equals("production-manager") || user.getRole().equals("sales-manager")) {
 
                     BatchDAO batchDAO = new BatchDAO();
                     List<BatchModel> batchModels = batchDAO.getAllBatches();
