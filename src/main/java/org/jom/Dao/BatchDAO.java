@@ -202,4 +202,35 @@ public class BatchDAO {
         }
         return status;
     }
+
+    // Update batch distribution
+    public boolean UpdateDistribution(int stat, String distribution, int id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE batches b SET b.status=?,distribution=? WHERE b.id = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, stat);
+            preparedStatement.setString(2, distribution);
+            preparedStatement.setInt(3, id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
+    }
 }
