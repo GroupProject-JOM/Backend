@@ -82,11 +82,11 @@ public class ProductsServlet extends HttpServlet {
                     if (products.size() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"size\": " + products.size() + ",\"list\":" + objectArray + "}");
-                        System.out.println("View all Outlets");
+                        System.out.println("View all Products");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
                         out.write("{\"size\": \"0\"}");
-                        System.out.println("No Outlet");
+                        System.out.println("No Products");
                     }
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

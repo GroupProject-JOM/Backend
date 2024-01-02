@@ -2,10 +2,7 @@ package org.jom.Controller;
 
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
-import org.jom.Dao.CollectorDAO;
-import org.jom.Dao.EmployeeDAO;
-import org.jom.Dao.OutletDAO;
-import org.jom.Dao.UserDAO;
+import org.jom.Dao.*;
 import org.jom.Email.SendEmail;
 import org.jom.Model.*;
 import org.json.JSONObject;
@@ -186,6 +183,11 @@ public class EmployeeServlet extends HttpServlet {
                         CollectorDAO collectorDAO = new CollectorDAO();
                         if (collectorDAO.register(employee.getId())) {
                             System.out.println("Collector added successfully");
+                        }
+                    }else if(employee.getRole().equals("distributor")){
+                        DistributorDAO distributorDAO = new DistributorDAO();
+                        if (distributorDAO.register(employee.getId())) {
+                            System.out.println("Distributor added successfully");
                         }
                     }
 
