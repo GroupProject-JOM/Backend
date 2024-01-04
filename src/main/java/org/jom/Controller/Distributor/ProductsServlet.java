@@ -1,14 +1,10 @@
-package org.jom.Controller.ProductionManager;
+package org.jom.Controller.Distributor;
 
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
-import org.jom.Dao.OutletDAO;
-import org.jom.Dao.ProductionDAO;
 import org.jom.Dao.ProductsDAO;
 import org.jom.Dao.UserDAO;
-import org.jom.Model.OutletModel;
 import org.jom.Model.ProductModel;
-import org.jom.Model.ProductionModel;
 import org.jom.Model.UserModel;
 import org.json.JSONObject;
 
@@ -17,14 +13,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet("/products")
+@WebServlet("/accepted-products")
 public class ProductsServlet extends HttpServlet {
-    // Get all products
+    // Get all accepted products
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -71,9 +66,9 @@ public class ProductsServlet extends HttpServlet {
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getRole().equals("production-manager") || user.getRole().equals("admin") || user.getRole().equals("sales-manager")) {
+                if (user.getRole().equals("distributor")) {
                     ProductsDAO productsDAO = new ProductsDAO();
-                    List<ProductModel> products = productsDAO.getProducts();
+                    List<ProductModel> products = productsDAO.getAcceptedProducts();
 
                     Gson gson = new Gson();
                     // Object array to json
@@ -81,7 +76,7 @@ public class ProductsServlet extends HttpServlet {
 
                     if (products.size() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"size\": " + products.size() + ",\"list\":" + objectArray + "}");
+                        out.write("{\"list\":" + objectArray + "}");
                         System.out.println("View all Products");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
