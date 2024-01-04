@@ -91,4 +91,54 @@ public class DistributionDAO {
         }
         return status;
     }
+
+    // Distributor's products remaining amount
+    public List<DistributionModel> DistributorsRemaining(int distributor) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<DistributionModel> distributions = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    pd.id, pd.product_id, p.type, p.category, pd.quantity\n" +
+                    "FROM\n" +
+                    "    product_distribution pd\n" +
+                    "        INNER JOIN\n" +
+                    "    products p ON pd.product_id = p.id\n" +
+                    "        INNER JOIN\n" +
+                    "    distributors d ON d.id = pd.distributor_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = d.user_id\n" +
+                    "WHERE\n" +
+                    "    u.id = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, distributor);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                int product = resultSet.getInt(2);
+                String type = resultSet.getString(3);
+                String category = resultSet.getString(4);
+                int remaining = resultSet.getInt(5);
+
+                DistributionModel distribution = new DistributionModel(id, remaining, type, category, product);
+                distributions.add(distribution);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return distributions;
+    }
 }
