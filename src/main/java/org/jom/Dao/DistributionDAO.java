@@ -141,4 +141,54 @@ public class DistributionDAO {
         }
         return distributions;
     }
+
+    // Distributor's products remaining (Only remaining)
+    public List<DistributionModel> DistributorsOnlyRemaining(int distributor) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<DistributionModel> distributions = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    pd.product_id, p.category, p.type, pd.quantity, p.price\n" +
+                    "FROM\n" +
+                    "    jom_db.product_distribution pd\n" +
+                    "        INNER JOIN\n" +
+                    "    products p ON p.id = pd.product_id\n" +
+                    "        INNER JOIN\n" +
+                    "    distributors d ON d.id = pd.distributor_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = d.user_id\n" +
+                    "WHERE\n" +
+                    "    u.id = ? AND pd.quantity <> 0;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, distributor);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int product = resultSet.getInt(1);
+                String category = resultSet.getString(2);
+                String type = resultSet.getString(3);
+                int remaining = resultSet.getInt(4);
+                String price = resultSet.getString(5);
+
+                DistributionModel distribution = new DistributionModel(remaining, type, category, product, price);
+                distributions.add(distribution);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return distributions;
+    }
 }
