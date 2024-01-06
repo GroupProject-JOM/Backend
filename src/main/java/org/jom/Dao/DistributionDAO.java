@@ -191,4 +191,47 @@ public class DistributionDAO {
         }
         return distributions;
     }
+
+    //get accepted product count allocated to distributor
+    public int allocatedAcceptedProductCount(int distributor) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int count = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    COUNT(*) AS Row_Count\n" +
+                    "FROM\n" +
+                    "    product_distribution pd\n" +
+                    "        INNER JOIN\n" +
+                    "    distributors d ON d.id = pd.distributor_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = d.user_id\n" +
+                    "        INNER JOIN\n" +
+                    "    products p ON p.id = pd.product_id\n" +
+                    "WHERE\n" +
+                    "    u.id = ? AND pd.quantity <> 0\n" +
+                    "        AND p.status = 1;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, distributor);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return count;
+    }
 }

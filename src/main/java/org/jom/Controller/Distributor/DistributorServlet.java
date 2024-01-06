@@ -77,13 +77,15 @@ public class DistributorServlet extends HttpServlet {
                     // Object array to json
                     String objectArray = gson.toJson(products);
 
+                    ProductsDAO productsDAO = new ProductsDAO();
+
                     if (products.size() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"list\":" + objectArray + "}");
+                        out.write("{\"list\":" + objectArray + ",\"accepted\":" + productsDAO.acceptedProductCount() + ",\"allocated\":" + distributionDAO.allocatedAcceptedProductCount(user_id) + "}");
                         System.out.println("View all remaining Products");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": \"0\"}");
+                        out.write("{\"size\": 0,\"accepted\":" + productsDAO.acceptedProductCount() + ",\"allocated\":" + distributionDAO.allocatedAcceptedProductCount(user_id) + "}");
                         System.out.println("No remaining Products");
                     }
                 } else {

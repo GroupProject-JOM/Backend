@@ -309,4 +309,34 @@ public class ProductsDAO {
         }
         return products;
     }
+
+    //get accepted product count
+    public int acceptedProductCount() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int count = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT COUNT(*) AS Row_Count FROM products WHERE status=1;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return count;
+    }
 }
