@@ -242,7 +242,7 @@ public class ProductionDAO {
     }
 
     // update status production request
-    public boolean updateProductionRequestStatus(int id,int st) {
+    public boolean updateProductionRequestStatus(int id, int st) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
@@ -272,7 +272,7 @@ public class ProductionDAO {
     }
 
     // accept status production request
-    public boolean acceptProductionRequestStatus(int id,int st,int days) {
+    public boolean acceptProductionRequestStatus(int id, int st, int days) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
@@ -359,7 +359,7 @@ public class ProductionDAO {
                 int actual = resultSet.getInt(9);
                 int days = resultSet.getInt(10);
 
-                ProductionModel productionModel = new ProductionModel(id, yard, block, amount, status, date, actual,days);
+                ProductionModel productionModel = new ProductionModel(id, yard, block, amount, status, date, actual, days);
                 productionModels.add(productionModel);
             }
 
@@ -378,7 +378,7 @@ public class ProductionDAO {
     }
 
     // update actual amount of production request
-    public boolean updateActualAmount(int id,int amount) {
+    public boolean updateActualAmount(int id, int amount) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;

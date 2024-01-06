@@ -8,6 +8,7 @@ public class DistributionModel {
     private String type;
     private String category;
     private int product;
+    private String price;
 
     public DistributionModel(int id, String first_name, String last_name, int remaining) {
         this.id = id;
@@ -22,5 +23,13 @@ public class DistributionModel {
         this.type = type;
         this.category = category;
         this.product = product;
+    }
+
+    public DistributionModel(int remaining, String type, String category, int product, String price) {
+        this.remaining = remaining;
+        this.type = type;
+        this.category = category;
+        this.product = product;
+        this.price = price;
     }
 }
