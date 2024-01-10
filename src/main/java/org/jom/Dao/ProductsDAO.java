@@ -195,7 +195,7 @@ public class ProductsDAO {
             connection = connectionPool.dataSource.getConnection();
 
             // Construct the SQL query with the appropriate number of placeholders
-            StringBuilder sqlBuilder = new StringBuilder("SELECT p.id, p.type, p.category FROM jom_db.products p WHERE p.delete = 0 AND p.id IN (");
+            StringBuilder sqlBuilder = new StringBuilder("SELECT p.id, p.type, p.category FROM jom_db.products p WHERE p.id IN (");
             for (int i = 0; i < idList.size(); i++) {
                 sqlBuilder.append("?");
                 if (i < idList.size() - 1) {
