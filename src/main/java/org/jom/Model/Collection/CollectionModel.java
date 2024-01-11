@@ -13,16 +13,40 @@ public class CollectionModel {
     private int status;
     // 0 - Request not completed
     // 1 - pending approval
-    // 2 - Ready to pick-up
-    // 3 - reject
-    // 4 - pending payment
-    // 5 - paid
+    // 2 - accepted
+    // 3 - Ready to pick-up
+    //   - waiting for verification
+    // 4 - reject
+    // 5 - pending payment
+    // 6 - paid
+    private int account;
+    private int estate;
+    private String date;
+    private String time;
 
-    public CollectionModel(int supplier_id, int initial_amount, String payment_method, String supply_method) {
-        this.supplier_id = supplier_id;
+    public CollectionModel(int initial_amount, String payment_method, String supply_method) {
         this.initial_amount = initial_amount;
         this.payment_method = payment_method;
         this.supply_method = supply_method;
+    }
+
+    public CollectionModel(int final_amount, int value, String payment_method, String supply_method, String date) {
+        this.final_amount = final_amount;
+        this.value = value;
+        this.payment_method = payment_method;
+        this.supply_method = supply_method;
+        this.date = date;
+    }
+
+    public CollectionModel(int id, int initial_amount, String payment_method, String supply_method, int account, int estate, String date, String time) {
+        this.id = id;
+        this.initial_amount = initial_amount;
+        this.payment_method = payment_method;
+        this.supply_method = supply_method;
+        this.account = account;
+        this.estate = estate;
+        this.date = date;
+        this.time = time;
     }
 
     public int getId() {
@@ -89,7 +113,39 @@ public class CollectionModel {
         this.status = status;
     }
 
-    public void addCollection(){
+    public int getAccount() {
+        return account;
+    }
+
+    public void setAccount(int account) {
+        this.account = account;
+    }
+
+    public int getEstate() {
+        return estate;
+    }
+
+    public void setEstate(int estate) {
+        this.estate = estate;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public void addCollection() {
         CollectionDAO collectionDAO = new CollectionDAO();
         this.id = collectionDAO.addCollection(this);
     }

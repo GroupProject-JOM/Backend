@@ -1,12 +1,16 @@
 package org.jom.Controller;
 
 import com.google.gson.Gson;
+import org.jom.Auth.JwtUtils;
 import org.jom.Dao.Supplier.SupplierDAO;
+import org.jom.Model.EmployeeModel;
 import org.jom.Model.LoginModel;
 import org.jom.Model.SupplierModel;
 import org.jom.Model.UserModel;
+import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,41 +32,61 @@ public class LoginServlet extends HttpServlet {
             LoginModel login = gson.fromJson(bufferedReader, LoginModel.class);
             UserModel user = login.getUser();
 
-            System.out.println(login.getUsername());
-            System.out.println(login.getPassword());
-            System.out.println();
-            System.out.println(user.getId());
-            System.out.println(user.getEmail());
-            System.out.println(user.getPassword());
-
-            if(user.getId() != 0){
-                if(user.getValidity() != 0) {
+            if (user.getId() != 0) {
+                if (user.getValidity() != 0) {
                     if (user.getPassword().equals(login.getPassword())) {
-                        if(user.getRole().equals("supplier")){
+                        int sId = 0;
+                        if (user.getRole().equals("supplier")) {
                             SupplierModel supplier = new SupplierModel(user.getId());
                             supplier.getSupplier();
-                        response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"message\": \"Login successfully\",\"page\":\"" + user.getRole() + "\",\"name\":\"" + user.getFirst_name() + "\",\"sId\":\""+ supplier.getId() +"\"}");
-                        System.out.println("Login successful");
+                            sId = supplier.getId();
+                        } else {
+                            EmployeeModel employee = new EmployeeModel(user.getId(), 0);
+                            employee.getEIdById();
+                            sId = employee.geteId();
                         }
+
+                        JSONObject payload = new JSONObject();
+                        payload.put("user", user.getId());
+                        payload.put("name", user.getFirst_name());
+                        payload.put("page", user.getRole());
+                        payload.put("sId", sId);
+
+                        JwtUtils jwtUtils = new JwtUtils(payload);
+                        String token = jwtUtils.generateJwt();
+
+                        Cookie cookie = new Cookie("jwt", token);
+                        cookie.setPath("/");
+                        cookie.setSecure(true); // For HTTPS
+                        cookie.setHttpOnly(false);
+
+                        // Set the cookie to expire after one day (in seconds)
+                        int oneDayInSeconds = 24 * 60 * 60;
+                        cookie.setMaxAge(oneDayInSeconds);
+
+                        response.addCookie(cookie);
+
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"message\": \"Login successfully\"}");
+                        System.out.println("Login successful");
+
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
                         out.write("{\"message\": \"password\"}");
                         System.out.println("Wrong password");
                     }
-                }else{
+                } else {
                     // TODO hadle
                     System.out.println("User not validated");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     out.write("{\"message\": \"validate\"}");
                     System.out.println("Login incorrect");
                 }
-            }else{
+            } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.write("{\"message\": \"username\"}");
                 System.out.println("Login incorrect");
             }
-
 
         } catch (Exception e) {
             e.printStackTrace();

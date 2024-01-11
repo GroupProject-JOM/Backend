@@ -1,10 +1,9 @@
 package org.jom.Controller;
 
-import org.jom.Dao.OTPDAO;
 import org.jom.Dao.UserDAO;
+import org.jom.Email.SendEmail;
 import org.jom.Model.OTPModel;
 import org.jom.Model.UserModel;
-import org.jom.OTP.SendEmailOTP;
 import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
@@ -35,13 +34,14 @@ public class SendEmailOTPServlet extends HttpServlet {
         String email = jsonObject.getString("email");
         int id = jsonObject.getInt("id");
         UserDAO userDAO = new UserDAO();
-        UserModel user = UserDAO.getUserById(id);
+        UserModel user = userDAO.getUserById(id);
 
         //check if emails are correct
         if(user.getEmail().equals(email)) {
             try {
-                SendEmailOTP sendEmailOTP = new SendEmailOTP();
-                int otp = SendEmailOTP.SendOTP(email);
+                SendEmail sendEmail = new SendEmail();
+                String subject = "Email Verification";
+                int otp = SendEmail.SendOTP(email,subject);
                 System.out.println(otp);
 
                 OTPModel record = new OTPModel(id,email,otp);
@@ -51,7 +51,8 @@ public class SendEmailOTPServlet extends HttpServlet {
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.write("{\"message\": \"OTP Sent\",\"oId\":\""+ record.getId() +"\"}");
                 }else {
-                    // TODO handle otp record unsuccess
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    out.write("{\"message\": \"OTP not Sent\"}");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -60,7 +61,8 @@ public class SendEmailOTPServlet extends HttpServlet {
                 out.close();
             }
         } else{
-            // TODO handle error wrong email
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"Invalid User\"}");
         }
 
     }

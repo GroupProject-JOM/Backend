@@ -16,7 +16,7 @@ public class EstateDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM estates WHERE supplier_id = ? AND id = ?";
+            String sql = "SELECT * FROM estates WHERE supplier_id = ? AND id = ? AND jom_db.estates.delete=0";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,sId);
             preparedStatement.setInt(2,id);
@@ -25,9 +25,10 @@ public class EstateDAO {
             while (resultSet.next()) {
                 estate.setId(resultSet.getInt(1));
                 estate.setEstate_name(resultSet.getString(2));
-                estate.setEstate_location(resultSet.getString(3));
-                estate.setArea(resultSet.getString(4));
-                estate.setSupplier_id(resultSet.getInt(5));
+                estate.setEstate_address(resultSet.getString(3));
+                estate.setEstate_location(resultSet.getString(4));
+                estate.setArea(resultSet.getString(5));
+                estate.setSupplier_id(resultSet.getInt(7));
             }
 
             resultSet.close();
@@ -51,12 +52,13 @@ public class EstateDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "INSERT INTO estates (name,location,area,supplier_id) VALUES (?,?,?,?)";
+            String sql = "INSERT INTO estates (name,address,location,area,supplier_id) VALUES (?,?,?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1,estate.getEstate_name());
-            preparedStatement.setString(2,estate.getEstate_location());
-            preparedStatement.setString(3,estate.getArea());
-            preparedStatement.setInt(4,estate.getSupplier_id());
+            preparedStatement.setString(2,estate.getEstate_address());
+            preparedStatement.setString(3,estate.getEstate_location());
+            preparedStatement.setString(4,estate.getArea());
+            preparedStatement.setInt(5,estate.getSupplier_id());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
@@ -87,7 +89,7 @@ public class EstateDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM estates WHERE supplier_id = ?";
+            String sql = "SELECT * FROM estates WHERE supplier_id = ? AND jom_db.estates.delete=0";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -95,11 +97,11 @@ public class EstateDAO {
             while (resultSet.next()) {
                 int estate_id = resultSet.getInt(1);
                 String estate_name = resultSet.getString(2);
-                String estate_location = resultSet.getString(3);
-                String estate_area = resultSet.getString(4);
-                int supplier_id = resultSet.getInt(5);
+                String estate_address = resultSet.getString(3);
+                String estate_location = resultSet.getString(4);
+                String estate_area = resultSet.getString(5);
 
-                EstateModel estate = new EstateModel(estate_id,estate_name,estate_location,estate_area,supplier_id);
+                EstateModel estate = new EstateModel(estate_id,estate_name,estate_location,estate_address,estate_area);
                 estates.add(estate);
             }
 
@@ -124,13 +126,14 @@ public class EstateDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE estates SET name=?,location=?,area=? WHERE supplier_id = ? AND id = ? ";
+            String sql = "UPDATE estates SET name=?,address=?,location=?,area=? WHERE supplier_id = ? AND id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1,estate.getEstate_name());
-            preparedStatement.setString(2,estate.getEstate_location());
-            preparedStatement.setString(3,estate.getArea());
-            preparedStatement.setInt(4,estate.getSupplier_id());
-            preparedStatement.setInt(5,estate.getId());
+            preparedStatement.setString(2,estate.getEstate_address());
+            preparedStatement.setString(3,estate.getEstate_location());
+            preparedStatement.setString(4,estate.getArea());
+            preparedStatement.setInt(5,estate.getSupplier_id());
+            preparedStatement.setInt(6,estate.getId());
 
             int x = preparedStatement.executeUpdate();
             if(x !=0){
@@ -156,7 +159,7 @@ public class EstateDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "DELETE FROM estates WHERE supplier_id = ? AND id = ? ";
+            String sql = "UPDATE estates SET jom_db.estates.delete=1 WHERE supplier_id = ? AND id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,sId);
             preparedStatement.setInt(2,id);

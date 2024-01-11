@@ -17,7 +17,7 @@ public class OutletDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "INSERT INTO outlets (name,email,phone,address1,street,city) VALUES (?,?,?,?,?,?)";
+            String sql = "INSERT INTO outlets (name,email,phone,address1,street,city,registerd_by) VALUES (?,?,?,?,?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1,outlet.getName());
             preparedStatement.setString(2,outlet.getEmail());
@@ -25,6 +25,7 @@ public class OutletDAO {
             preparedStatement.setString(4,outlet.getAddress1());
             preparedStatement.setString(5,outlet.getStreet());
             preparedStatement.setString(6,outlet.getCity());
+            preparedStatement.setInt(7,outlet.getUser());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
@@ -54,7 +55,7 @@ public class OutletDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM outlets";
+            String sql = "SELECT * FROM outlets WHERE jom_db.outlets.delete=0";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -93,7 +94,7 @@ public class OutletDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT * FROM outlets WHERE id = ?";
+            String sql = "SELECT * FROM outlets WHERE id = ? AND jom_db.outlets.delete=0";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -163,7 +164,7 @@ public class OutletDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "DELETE FROM outlets WHERE id = ?";
+            String sql = "UPDATE outlets SET jom_db.outlets.delete=1 WHERE id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1,id);
 
@@ -182,5 +183,34 @@ public class OutletDAO {
             }
         }
         return status;
+    }
+
+    public int rowCount(){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int count = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT COUNT(*) AS Row_Count FROM outlets WHERE  jom_db.outlets.delete=0; ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);;
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return count;
     }
 }

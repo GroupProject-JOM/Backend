@@ -15,8 +15,35 @@ public class UserModel {
     private String add_line_3;
     private String role;
     private int validity;
+    private int delete;
 
     public UserModel() {
+    }
+
+    public UserModel(int id) {
+        this.id = id;
+    }
+
+    public UserModel(int id, String email) {
+        this.id = id;
+        this.email = email;
+    }
+
+    public UserModel(int id, String first_name, String last_name, String phone) {
+        this.id = id;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.phone = phone;
+    }
+
+    public UserModel(String first_name, String last_name, String phone, String add_line_1, String add_line_2, String add_line_3, String role) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.phone = phone;
+        this.add_line_1 = add_line_1;
+        this.add_line_2 = add_line_2;
+        this.add_line_3 = add_line_3;
+        this.role = role;
     }
 
     public UserModel(int id, String first_name, String phone, String add_line_3, String role) {
@@ -129,6 +156,14 @@ public class UserModel {
         this.password = password;
     }
 
+    public int getDelete() {
+        return delete;
+    }
+
+    public void setDelete(int delete) {
+        this.delete = delete;
+    }
+
     public void Register(){
         UserDAO userDAO = new UserDAO();
         this.id = userDAO.register(this);
@@ -157,6 +192,10 @@ public class UserModel {
         UserDAO userDAO = new UserDAO();
         userDAO.updateValidity(this.id);
         this.setValidity(1);
+    }
+    public boolean updateEmail(){
+        UserDAO userDAO = new UserDAO();
+        return userDAO.updateEmail(this.email,this.id);
     }
 
 }

@@ -70,4 +70,71 @@ public class SupplierDAO {
         }
         return supplier_id;
     }
+
+    public int rowCount(){
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int count = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT COUNT(*) AS Row_Count FROM users WHERE validity=1 AND role=\"supplier\" ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);;
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return count;
+    }
+
+    public String getRole(int id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        String role = null;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    u.role\n" +
+                    "FROM\n" +
+                    "    jom_db.users u\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.user_id = u.id\n" +
+                    "WHERE\n" +
+                    "    u.id = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                role = resultSet.getString(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return role;
+    }
 }

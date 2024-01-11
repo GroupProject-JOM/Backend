@@ -3,15 +3,12 @@ package org.jom.Controller;
 import org.jom.Model.SupplierModel;
 import org.jom.Model.UserModel;
 import com.google.gson.Gson;
-import org.jom.OTP.SendEmailOTP;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,7 +70,7 @@ public class RegisterServlet extends HttpServlet {
             }
 
             // Email validation
-            String regex = "[a-z0-9]+@[a-z]+\\.[a-z]{2,3}";
+            String regex = "[a-z0-9\\.\\-]+@[a-z]+\\.[a-z]{2,3}";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(user.getEmail());
             if(!matcher.matches()){

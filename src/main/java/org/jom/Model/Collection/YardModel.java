@@ -11,18 +11,19 @@ public class YardModel {
     private int collection_id;
     private int account_id;
 
-    public YardModel(String date, String time, int supplier_id, int collection_id, int account_id) {
+    public YardModel() {
+    }
+
+    public YardModel(String date, String time, int collection_id, int account_id) {
         this.date = date;
         this.time = time;
-        this.supplier_id = supplier_id;
         this.collection_id = collection_id;
         this.account_id = account_id;
     }
 
-    public YardModel(String date, String time, int supplier_id, int collection_id) {
+    public YardModel(String date, String time, int collection_id) {
         this.date = date;
         this.time = time;
-        this.supplier_id = supplier_id;
         this.collection_id = collection_id;
     }
 
