@@ -2,11 +2,9 @@ package org.jom.Dao;
 
 import org.jom.Database.ConnectionPool;
 import org.jom.Model.DistributionModel;
+import org.jom.Model.ProductModel;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -233,5 +231,72 @@ public class DistributionDAO {
             }
         }
         return count;
+    }
+
+    // Add record for distributions table
+    public int addDistributionRecord(DistributionModel distribution) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int distributionId = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "INSERT INTO distributions (product,distributor,quantity,price,outlet) VALUES (?,?,?,?,?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, distribution.getProduct());
+            preparedStatement.setInt(2, distribution.getDistributor());
+            preparedStatement.setInt(3, distribution.getRemaining());
+            preparedStatement.setString(4, distribution.getPrice());
+            preparedStatement.setInt(5, distribution.getOutlet());
+
+            preparedStatement.execute();
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+            if (resultSet.next()) {
+                distributionId = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return distributionId;
+    }
+
+    // Decrement distributor distributed product amount
+    public boolean decrementDistributorAmount(int quantity, int product, int distributor) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean status = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE product_distribution pd inner join distributors d on d.id=pd.distributor_id SET pd.quantity = quantity - ? WHERE pd.product_id = ? AND d.user_id=? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, quantity);
+            preparedStatement.setInt(2, product);
+            preparedStatement.setInt(3, distributor);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                status = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return status;
     }
 }
