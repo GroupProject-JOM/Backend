@@ -50,3 +50,27 @@ Here's a breakdown of the backend's folder structure, ensuring clarity and maint
     - **WEB-INF:** Contains web application configuration files and resources.
       - **web.xml:** The deployment descriptor for the servlet application, defining servlet mappings and other configurations.
 
+## License
+
+This project is licensed under the [GNU General Public License v3.0](LICENSE).
+
+---
+
+
+<p align="center">
+    <a href="https://github.com/GroupProject-JOM/Backend/blob/main/LICENSE">
+      <img alt="License: GNU" src="https://img.shields.io/badge/License-GPLv3-blue.svg">
+   </a>
+    <a href="https://github.com/GroupProject-JOM/Backend">
+      <img alt="Hits" src="https://hits.sh/github.com/GroupProject-JOM/Backend.svg?label=Views"/>
+    </a>
+    <a href="https://github.com/GroupProject-JOM/Backend/graphs/contributors">
+      <img alt="GitHub Contributors" src="https://img.shields.io/github/contributors/GroupProject-JOM/Backend" />
+    </a>
+    <a href="https://github.com/GroupProject-JOM/Backend/issues">
+      <img alt="Issues" src="https://img.shields.io/github/issues/GroupProject-JOM/Backend?color=0088ff" />
+    </a>
+    <a href="https://github.com/GroupProject-JOM/Backend/pulls">
+      <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/GroupProject-JOM/Backend?color=0088ff" />
+    </a>
+  </p>
