@@ -50,4 +50,3 @@ Here's a breakdown of the backend's folder structure, ensuring clarity and maint
     - **WEB-INF:** Contains web application configuration files and resources.
       - **web.xml:** The deployment descriptor for the servlet application, defining servlet mappings and other configurations.
 
-Feel free to customize this template further based on your project's specific details. Add links to images, guides, and licenses where applicable. Good luck with your project!
