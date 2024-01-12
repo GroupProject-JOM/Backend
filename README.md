@@ -27,28 +27,27 @@ Here's a breakdown of the backend's folder structure, ensuring clarity and maint
 
 ### Root Directory
 
-- **src:** Houses the source code for the backend application.
-- **.gitignore:** Specifies files and folders to be excluded from Git version control.
-- **pom.xml:** The Maven project configuration file, defining dependencies and build settings.
-- **README.md:** This file, providing an overview of the project structure and setup.
-- **.idea:** Contains project-specific settings for IntelliJ IDEA (or other compatible IDEs).
+- **[src](https://github.com/GroupProject-JOM/Backend/tree/main/src):** Houses the source code for the backend application.
+- **[.gitignore](https://github.com/GroupProject-JOM/Backend/blob/main/.gitignore):** Specifies files and folders to be excluded from Git version control.
+- **[pom.xml](https://github.com/GroupProject-JOM/Backend/blob/main/pom.xml):** The Maven project configuration file, defining dependencies and build settings.
+- **[README.md](https://github.com/GroupProject-JOM/Backend/blob/main/README.md):** This file, providing an overview of the project structure and setup.
 
 ### Source Code Directory (src)
 
-- **main:** Contains the primary application code.
+- **[main](https://github.com/GroupProject-JOM/Backend/tree/main/src/main):** Contains the primary application code.
   - **java:**
-    - **org.jom:** The root package for the application's Java classes.
-      - **Auth:** Houses classes responsible for user authentication and authorization logic.
-      - **Controller:** Contains servlet classes that handle incoming HTTP requests and responses.
-      - **Dao:** Encapsulates data access object classes for interacting with the database.
-      - **Database:** Potential utility classes for database-related operations.
-      - **Email:** Classes for handling email functionality.
-      - **Filter:** Holds servlet filters for request preprocessing and postprocessing.
-      - **Model:** Represents data model classes, defining the structure of entities in the system.
-      - **Socket:** Classes for WebSocket-based communication.
-  - **webapp:**
-    - **WEB-INF:** Contains web application configuration files and resources.
-      - **web.xml:** The deployment descriptor for the servlet application, defining servlet mappings and other configurations.
+    - **[org.jom](https://github.com/GroupProject-JOM/Backend/tree/main/src/main/java/org/jom):** The root package for the application's Java classes.
+      - **[Auth](https://github.com/GroupProject-JOM/Backend/tree/main/src/main/java/org/jom/Auth):** Houses classes responsible for user authentication and authorization logic.
+      - **[Controller](https://github.com/GroupProject-JOM/Backend/tree/main/src/main/java/org/jom/Controller):** Contains servlet classes that handle incoming HTTP requests and responses.
+      - **[Dao](https://github.com/GroupProject-JOM/Backend/tree/main/src/main/java/org/jom/Dao):** Encapsulates data access object classes for interacting with the database.
+      - **[Database](https://github.com/GroupProject-JOM/Backend/tree/main/src/main/java/org/jom/Database):** Potential utility classes for database-related operations.
+      - **[Email](https://github.com/GroupProject-JOM/Backend/tree/main/src/main/java/org/jom/Email):** Classes for handling email functionality.
+      - **[Filter](https://github.com/GroupProject-JOM/Backend/tree/main/src/main/java/org/jom/Filter):** Holds servlet filters for request preprocessing and postprocessing.
+      - **[Model](https://github.com/GroupProject-JOM/Backend/tree/main/src/main/java/org/jom/Model):** Represents data model classes, defining the structure of entities in the system.
+      - **[Socket](https://github.com/GroupProject-JOM/Backend/tree/main/src/main/java/org/jom/Socket):** Classes for WebSocket-based communication.
+  - **[webapp](https://github.com/GroupProject-JOM/Backend/tree/main/src/main/webapp):**
+    - **[WEB-INF](https://github.com/GroupProject-JOM/Backend/tree/main/src/main/webapp/WEB-INF):** Contains web application configuration files and resources.
+      - **[web.xml](https://github.com/GroupProject-JOM/Backend/blob/main/src/main/webapp/WEB-INF/web.xml):** The deployment descriptor for the servlet application, defining servlet mappings and other configurations.
 
 ## License
 
