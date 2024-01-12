@@ -299,4 +299,85 @@ public class DistributionDAO {
         }
         return status;
     }
+
+    // Distribution records since year
+    public List<DistributionModel> DistributionRecordsFromYear(int distributor) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<DistributionModel> distributions = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    DATE(date) AS visit_date,\n" +
+                    "    COUNT(DISTINCT outlet) AS total_visits\n" +
+                    "FROM\n" +
+                    "    distributions\n" +
+                    "WHERE\n" +
+                    "    distributor = ?\n" +
+                    "        AND DATE(date) BETWEEN CURDATE() - INTERVAL 1 YEAR AND CURDATE()\n" +
+                    "GROUP BY distributor , visit_date";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, distributor);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String date = resultSet.getString(1);
+                int count = resultSet.getInt(2);
+
+                DistributionModel distribution = new DistributionModel(date, count);
+                distributions.add(distribution);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return distributions;
+    }
+
+    // Get today distribution count via distributor's user id
+    public int todayDistributionCount(int distributor) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int count = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    COUNT(DISTINCT outlet) AS total_visits\n" +
+                    "FROM\n" +
+                    "    distributions\n" +
+                    "WHERE\n" +
+                    "    distributor = ?\n" +
+                    "        AND DATE(date) = CURDATE();";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, distributor);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return count;
+    }
 }

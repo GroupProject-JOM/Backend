@@ -11,6 +11,13 @@ public class DistributionModel {
     private String price;
     private int outlet;
     private int distributor;
+    private String date;
+    private int distributions;
+
+    public DistributionModel(String date, int distributions) {
+        this.date = date;
+        this.distributions = distributions;
+    }
 
     public DistributionModel(int id, String first_name, String last_name, int remaining) {
         this.id = id;
@@ -121,5 +128,21 @@ public class DistributionModel {
 
     public void setDistributor(int distributor) {
         this.distributor = distributor;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public int getDistributions() {
+        return distributions;
+    }
+
+    public void setDistributions(int distributions) {
+        this.distributions = distributions;
     }
 }
