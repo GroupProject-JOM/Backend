@@ -13,10 +13,18 @@ public class DistributionModel {
     private int distributor;
     private String date;
     private int distributions;
+    private String day;
+    private int visits;
 
     public DistributionModel(String date, int distributions) {
         this.date = date;
         this.distributions = distributions;
+    }
+
+    public DistributionModel(String date, String day, int visits) {
+        this.date = date;
+        this.day = day;
+        this.visits = visits;
     }
 
     public DistributionModel(int id, String first_name, String last_name, int remaining) {
