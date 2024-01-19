@@ -380,4 +380,56 @@ public class DistributionDAO {
         }
         return count;
     }
+
+    // Get last seven days visits count
+    public List<DistributionModel> lastSevenDaysVisits(int distributor) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<DistributionModel> visits = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    generated_dates.date AS date,\n" +
+                    "    DAYNAME(generated_dates.date) AS day,\n" +
+                    "    COUNT(DISTINCT d.outlet) AS total_visits_last_seven_days\n" +
+                    "FROM\n" +
+                    "    (SELECT \n" +
+                    "        CURDATE() - INTERVAL seq DAY AS date\n" +
+                    "    FROM\n" +
+                    "        (SELECT 0 AS seq UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6) AS seq_table) AS generated_dates\n" +
+                    "        LEFT JOIN\n" +
+                    "    distributions d ON DATE(d.date) = generated_dates.date\n" +
+                    "        AND d.distributor = ?\n" +
+                    "        AND generated_dates.date >= CURDATE() - INTERVAL 7 DAY\n" +
+                    "GROUP BY generated_dates.date , DAYNAME(generated_dates.date)\n" +
+                    "ORDER BY generated_dates.date;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, distributor);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String date = resultSet.getString(1);
+                String day = resultSet.getString(2);
+                int count = resultSet.getInt(3);
+
+                DistributionModel visit = new DistributionModel(date, day, count);
+                visits.add(visit);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return visits;
+    }
+
 }
