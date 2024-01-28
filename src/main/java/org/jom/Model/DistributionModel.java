@@ -15,6 +15,7 @@ public class DistributionModel {
     private int distributions;
     private String day;
     private int visits;
+    private String phone;
 
     public DistributionModel(String date, int distributions) {
         this.date = date;
@@ -40,6 +41,16 @@ public class DistributionModel {
         this.price = price;
         this.outlet = outlet;
         this.distributor = distributor;
+    }
+
+    public DistributionModel(int id, String first_name, String last_name, int product, String price, int visits, String phone) {
+        this.id = id;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.product = product;
+        this.price = price;
+        this.visits = visits;
+        this.phone = phone;
     }
 
     public DistributionModel(int id, int remaining, String type, String category, int product) {
