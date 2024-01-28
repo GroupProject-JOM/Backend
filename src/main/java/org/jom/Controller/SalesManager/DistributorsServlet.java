@@ -3,6 +3,7 @@ package org.jom.Controller.SalesManager;
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
 import org.jom.Dao.DistributionDAO;
+import org.jom.Dao.DistributorDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
 import org.jom.Dao.UserDAO;
 import org.jom.Model.Collection.SupplyModel;
@@ -72,7 +73,8 @@ public class DistributorsServlet extends HttpServlet {
             if (user.getId() != 0) {
                 if (user.getRole().equals("sales-manager")) {
 
-                    List<UserModel> distributors = userDAO.getDistributors();
+                    DistributorDAO distributorDAO = new DistributorDAO();
+                    List<DistributionModel> distributors = distributorDAO.getDistributors();
 
                     Gson gson = new Gson();
                     String objectArray = gson.toJson(distributors); // Object array to json
@@ -182,6 +184,111 @@ public class DistributorsServlet extends HttpServlet {
                         out.write("{\"allocated\": \"0\"}");
                         System.out.println("No allocated");
                     }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"message\": \"Invalid User\"}");
+                    System.out.println("Invalid User");
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"Invalid User\"}");
+                System.out.println("Invalid User");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+
+    }
+
+    // Update distributor cash (Collect by the sales manager)
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        // Get all cookies from the request
+        Cookie[] cookies = request.getCookies();
+        JSONObject jsonObject = new JSONObject();
+        int user_id = 0;
+        boolean jwtCookieFound = false;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
+                    if (!jwtUtils.verifyJwtAuthentication()) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        out.write("{\"message\": \"UnAuthorized\"}");
+                        System.out.println("UnAuthorized1");
+                        return;
+                    }
+                    jsonObject = jwtUtils.getAuthPayload();
+                    jwtCookieFound = true;
+                    break;  // No need to continue checking if "jwt" cookie is found
+                }
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized\"}");
+            System.out.println("No cookies found in the request.");
+            return;
+        }
+
+        // If "jwt" cookie is not found, respond with unauthorized status
+        if (!jwtCookieFound) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
+            System.out.println("UnAuthorized - JWT cookie not found");
+            return;
+        }
+
+        user_id = (int) jsonObject.get("user");
+
+        try {
+            StringBuilder requestBody = new StringBuilder();
+
+            try (BufferedReader reader = request.getReader()) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    requestBody.append(line);
+                }
+            }
+
+            JSONObject jsonData = new JSONObject(requestBody.toString());
+            int cash = jsonData.getInt("cash");
+            int distributor = jsonData.getInt("distributor");
+
+            UserDAO userDAO = new UserDAO();
+            UserModel user = userDAO.getUserById(user_id);
+
+            if (user.getId() != 0) {
+                if (user.getRole().equals("sales-manager")) {
+
+                    DistributorDAO distributorDAO = new DistributorDAO();
+                    int onHnad = distributorDAO.getCashAmount(distributor);
+
+                    if (onHnad >= cash) {
+                        if (distributorDAO.updateCashAmount(-cash, distributor)) {
+                            onHnad = distributorDAO.getCashAmount(distributor);
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            out.write("{\"message\":\"Money Collected Successfully\",\"cash\":" + onHnad + "}");
+                            System.out.println("Money Collected Successfully");
+                        } else {
+                            onHnad = distributorDAO.getCashAmount(distributor);
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            out.write("{\"message\": \"Money Collection is nt Success\",\"cash\":" + onHnad + "}");
+                            System.out.println("Money Collection is not Success");
+                        }
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.write("{\"message\": \"Money Collection is nt Success\",\"cash\":" + onHnad + "}");
+                        System.out.println("Money Collection is not Success");
+                    }
+
+
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     out.write("{\"message\": \"Invalid User\"}");
