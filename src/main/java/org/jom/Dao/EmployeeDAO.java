@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeDAO {
-    public int register(EmployeeModel employee){
+    public int register(EmployeeModel employee) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         int employeeId = 0;
@@ -20,10 +20,10 @@ public class EmployeeDAO {
             connection = connectionPool.dataSource.getConnection();
             String sql = "INSERT INTO employees (dob,nic,gender,user_id_) VALUES (?,?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1,employee.getDob());
-            preparedStatement.setString(2,employee.getNic());
-            preparedStatement.setString(3,employee.getGender());
-            preparedStatement.setInt(4,employee.getId());
+            preparedStatement.setString(1, employee.getDob());
+            preparedStatement.setString(2, employee.getNic());
+            preparedStatement.setString(3, employee.getGender());
+            preparedStatement.setInt(4, employee.getId());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
@@ -57,6 +57,7 @@ public class EmployeeDAO {
             String sql = "SELECT \n" +
                     "    e.id,\n" +
                     "    u.first_name,\n" +
+                    "    u.last_name,\n" +
                     "    u.role,\n" +
                     "    u.phone,\n" +
                     "    u.add_line_3\n" +
@@ -73,11 +74,12 @@ public class EmployeeDAO {
             while (resultSet.next()) {
                 int id = resultSet.getInt(1);
                 String first_name = resultSet.getString(2);
-                String role = resultSet.getString(3);
-                String phone = resultSet.getString(4);
-                String city = resultSet.getString(5);
+                String last_name = resultSet.getString(3);
+                String role = resultSet.getString(4);
+                String phone = resultSet.getString(5);
+                String city = resultSet.getString(6);
 
-                EmployeeModel employee = new EmployeeModel(id,first_name,phone,city,role);
+                EmployeeModel employee = new EmployeeModel(id, first_name, last_name, phone, city, role);
                 employees.add(employee);
             }
 
@@ -107,6 +109,7 @@ public class EmployeeDAO {
             String sql = "SELECT \n" +
                     "    e.id,\n" +
                     "    u.first_name,\n" +
+                    "    u.last_name,\n" +
                     "    u.role,\n" +
                     "    u.phone,\n" +
                     "    u.add_line_3\n" +
@@ -123,11 +126,12 @@ public class EmployeeDAO {
             while (resultSet.next()) {
                 int id = resultSet.getInt(1);
                 String first_name = resultSet.getString(2);
-                String role = resultSet.getString(3);
-                String phone = resultSet.getString(4);
-                String city = resultSet.getString(5);
+                String last_name = resultSet.getString(3);
+                String role = resultSet.getString(4);
+                String phone = resultSet.getString(5);
+                String city = resultSet.getString(6);
 
-                EmployeeModel employee = new EmployeeModel(id,first_name,phone,city,role);
+                EmployeeModel employee = new EmployeeModel(id, first_name,last_name, phone, city, role);
                 employees.add(employee);
             }
 
@@ -174,7 +178,7 @@ public class EmployeeDAO {
                     "WHERE\n" +
                     "    u.id = e.user_id_ AND e.id = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -207,7 +211,7 @@ public class EmployeeDAO {
         return employee;
     }
 
-    public boolean updateEmployee(EmployeeModel employee){
+    public boolean updateEmployee(EmployeeModel employee) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
@@ -216,13 +220,13 @@ public class EmployeeDAO {
             connection = connectionPool.dataSource.getConnection();
             String sql = "UPDATE employees SET dob=?,nic=?,gender=? WHERE user_id_=?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1,employee.getDob());
-            preparedStatement.setString(2,employee.getNic());
-            preparedStatement.setString(3,employee.getGender());
-            preparedStatement.setInt(4,employee.getId());
+            preparedStatement.setString(1, employee.getDob());
+            preparedStatement.setString(2, employee.getNic());
+            preparedStatement.setString(3, employee.getGender());
+            preparedStatement.setInt(4, employee.getId());
 
             int x = preparedStatement.executeUpdate();
-            if(x !=0){
+            if (x != 0) {
                 status = true;
             }
             preparedStatement.close();
@@ -238,7 +242,7 @@ public class EmployeeDAO {
         return status;
     }
 
-    public int getUserId(int id){
+    public int getUserId(int id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
 
@@ -248,11 +252,11 @@ public class EmployeeDAO {
             connection = connectionPool.dataSource.getConnection();
             String sql = "SELECT user_id_ FROM employees where id = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                userId =  resultSet.getInt(1);
+                userId = resultSet.getInt(1);
             }
 
             resultSet.close();
@@ -269,7 +273,7 @@ public class EmployeeDAO {
         return userId;
     }
 
-    public boolean deleteUser(int id){
+    public boolean deleteUser(int id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
@@ -277,10 +281,10 @@ public class EmployeeDAO {
             connection = connectionPool.dataSource.getConnection();
             String sql = "UPDATE users u SET u.delete=1 WHERE id=?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(1, id);
 
             int x = preparedStatement.executeUpdate();
-            if(x !=0){
+            if (x != 0) {
                 status = true;
             }
             preparedStatement.close();
@@ -296,7 +300,7 @@ public class EmployeeDAO {
         return status;
     }
 
-    public boolean nicExists(String nic){
+    public boolean nicExists(String nic) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         boolean status = false;
@@ -305,7 +309,7 @@ public class EmployeeDAO {
             connection = connectionPool.dataSource.getConnection();
             String sql = "SELECT nic FROM employees WHERE nic = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1,nic);
+            preparedStatement.setString(1, nic);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
@@ -326,7 +330,7 @@ public class EmployeeDAO {
         return status;
     }
 
-    public int getEId(String nic){
+    public int getEId(String nic) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         int eId = 0;
@@ -335,11 +339,12 @@ public class EmployeeDAO {
             connection = connectionPool.dataSource.getConnection();
             String sql = "SELECT id FROM employees WHERE nic = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1,nic);
+            preparedStatement.setString(1, nic);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                eId = resultSet.getInt(1);;
+                eId = resultSet.getInt(1);
+                ;
             }
 
             resultSet.close();
@@ -356,7 +361,7 @@ public class EmployeeDAO {
         return eId;
     }
 
-    public int rowCount(){
+    public int rowCount() {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         int count = 0;
@@ -368,7 +373,8 @@ public class EmployeeDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                count = resultSet.getInt(1);;
+                count = resultSet.getInt(1);
+                ;
             }
 
             resultSet.close();
@@ -385,7 +391,7 @@ public class EmployeeDAO {
         return count;
     }
 
-    public int getEIdById(int userId){
+    public int getEIdById(int userId) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
         int employeeId = 0;
@@ -394,11 +400,12 @@ public class EmployeeDAO {
             connection = connectionPool.dataSource.getConnection();
             String sql = "SELECT id FROM employees WHERE user_id_ = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,userId);
+            preparedStatement.setInt(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                employeeId = resultSet.getInt(1);;
+                employeeId = resultSet.getInt(1);
+                ;
             }
 
             resultSet.close();
@@ -454,7 +461,7 @@ public class EmployeeDAO {
                     "WHERE\n" +
                     "    u.id = ?;\n";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
