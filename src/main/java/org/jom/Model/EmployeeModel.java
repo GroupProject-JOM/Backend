@@ -4,7 +4,7 @@ import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.Supplier.SupplierDAO;
 import org.jom.Dao.UserDAO;
 
-public class EmployeeModel extends UserModel{
+public class EmployeeModel extends UserModel {
     private int eId;
     private String dob;
     private String nic;
@@ -24,8 +24,8 @@ public class EmployeeModel extends UserModel{
         this.eId = eId;
     }
 
-    public EmployeeModel(int id, String first_name, String phone, String add_line_3, String role) {
-        super(id, first_name, phone, add_line_3, role);
+    public EmployeeModel(int id, String first_name, String last_name, String phone, String add_line_3, String role) {
+        super(id, first_name, last_name, phone, add_line_3, role);
     }
 
     public EmployeeModel(String first_name, String last_name, String phone, String add_line_1, String add_line_2, String add_line_3, String role, int eId, String dob, String nic, String gender, int emp) {
@@ -100,28 +100,28 @@ public class EmployeeModel extends UserModel{
     }
 
     @Override
-    public boolean updateEmployee(){
+    public boolean updateEmployee() {
         EmployeeDAO employeeDAO = new EmployeeDAO();
         return employeeDAO.updateEmployee(this);
     }
 
-    public void getUserId(){
+    public void getUserId() {
         EmployeeDAO employeeDAO = new EmployeeDAO();
         this.setId(employeeDAO.getUserId(this.eId));
     }
 
-    public boolean NICExists(){
+    public boolean NICExists() {
         EmployeeDAO employeeDAO = new EmployeeDAO();
         boolean status = employeeDAO.nicExists(this.nic);
-        return  status;
+        return status;
     }
 
-    public int getEId(){
+    public int getEId() {
         EmployeeDAO employeeDAO = new EmployeeDAO();
         return employeeDAO.getEId(this.nic);
     }
 
-    public void getEIdById(){
+    public void getEIdById() {
         EmployeeDAO employeeDAO = new EmployeeDAO();
         this.eId = employeeDAO.getEIdById(this.getId());
     }
