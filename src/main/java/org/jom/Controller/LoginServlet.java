@@ -67,7 +67,7 @@ public class LoginServlet extends HttpServlet {
                         response.addCookie(cookie);
 
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"message\": \"Login successfully\"}");
+                        out.write("{\"message\": \"Login successfully\",\"jwt\": \"" + token + "\"}");
                         System.out.println("Login successful");
 
                     } else {
