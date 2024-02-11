@@ -475,7 +475,8 @@ public class SupplyDAO {
                     "    u.phone,\n" +
                     "    e.location,\n" +
                     "    e.area,\n" +
-                    "    c.init_amount\n" +
+                    "    c.init_amount,\n" +
+                    "    c.p_method\n" +
                     "FROM\n" +
                     "    jom_db.pickups p\n" +
                     "        INNER JOIN\n" +
@@ -489,7 +490,7 @@ public class SupplyDAO {
                     "    estates e ON e.id = p.estate_id\n" +
                     "WHERE\n" +
                     "    p.pickup_date = ?\n" +
-                    "        AND p.collector = ?;        ";
+                    "        AND p.collector = ?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, pickup_date);
             preparedStatement.setInt(2, collector);
@@ -505,8 +506,9 @@ public class SupplyDAO {
                 String location = resultSet.getString(7);
                 String area = resultSet.getString(8);
                 int initial_amount = resultSet.getInt(9);
+                String payment_method = resultSet.getString(10);
 
-                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, phone, location, area);
+                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, phone, location, area, payment_method);
                 supplies.add(supply);
             }
 
@@ -542,7 +544,8 @@ public class SupplyDAO {
                     "    u.phone,\n" +
                     "    e.location,\n" +
                     "    e.area,\n" +
-                    "    c.init_amount\n" +
+                    "    c.init_amount,\n" +
+                    "    c.p_method\n" +
                     "FROM\n" +
                     "    jom_db.pickups p\n" +
                     "        INNER JOIN\n" +
@@ -573,8 +576,9 @@ public class SupplyDAO {
                 String location = resultSet.getString(7);
                 String area = resultSet.getString(8);
                 int initial_amount = resultSet.getInt(9);
+                String payment_method = resultSet.getString(10);
 
-                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, phone, location, area);
+                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, phone, location, area, payment_method);
                 supplies.add(supply);
             }
 

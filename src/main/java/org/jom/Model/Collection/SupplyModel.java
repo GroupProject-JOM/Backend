@@ -114,7 +114,7 @@ public class SupplyModel {
         this.status = status;
     }
 
-    public SupplyModel(int id, String date, String time, int amount, String name, String last_name, String phone, String location, String area) {
+    public SupplyModel(int id, String date, String time, int amount, String name, String last_name, String phone, String location, String area, String payment_method) {
         this.id = id;
         this.date = date;
         this.time = time;
@@ -124,6 +124,7 @@ public class SupplyModel {
         this.phone = phone;
         this.location = location;
         this.area = area;
+        this.payment_method = payment_method;
     }
 
     public int getId() {
