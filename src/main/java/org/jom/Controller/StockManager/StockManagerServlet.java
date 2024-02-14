@@ -101,22 +101,11 @@ public class StockManagerServlet extends HttpServlet {
 
                     String today_array = gson.toJson(today_supplies);
                     String production_array = gson.toJson(production_requests);
+                    String request_array = gson.toJson(supply_requests);
 
-                    if (supply_requests.size() > 4) {
-                        List<SupplyModel> firstFour = new ArrayList<>(supply_requests.subList(0, 4));
-                        String request_array = gson.toJson(firstFour); // Object array to json
-                        response.setStatus(HttpServletResponse.SC_OK);
-
-                        out.write("{\"size\": " + supply_requests.size() + ",\"list\":" + request_array + ",\"today_size\":" + today_supplies.size() + ",\"today\":" + today_array + ",\"completed\":" + today_completed_count + ",\"remaining\":" + today_remaining_count + ",\"p_request\":" + production_requests.size() + ",\"production\":" + production_array + "}");
-                        System.out.println("Stock manager dashboard tables contents");
-                    } else {
-                        String request_array = gson.toJson(supply_requests); // Object array to json
-                        response.setStatus(HttpServletResponse.SC_OK);
-
-                        out.write("{\"size\": " + supply_requests.size() + ",\"list\":" + request_array + ",\"today_size\":" + today_supplies.size() + ",\"today\":" + today_array + ",\"completed\":" + today_completed_count + ",\"remaining\":" + today_remaining_count + ",\"p_request\":" + production_requests.size() + ",\"production\":" + production_array + "}");
-                        System.out.println("Stock manager dashboard tables contents");
-                    }
-
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out.write("{\"size\": " + supply_requests.size() + ",\"list\":" + request_array + ",\"today_size\":" + today_supplies.size() + ",\"today\":" + today_array + ",\"completed\":" + today_completed_count + ",\"remaining\":" + today_remaining_count + ",\"p_request\":" + production_requests.size() + ",\"production\":" + production_array + "}");
+                    System.out.println("Stock manager dashboard tables contents");
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     out.write("{\"message\": \"Invalid User\"}");
