@@ -653,10 +653,25 @@ public class SupplyDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "SELECT c.id,u.first_name,u.last_name,u.phone,p.pickup_date,p.pickup_time ,c.init_amount,c.p_method,e.address,e.location,e.area\n" +
-                    "                    FROM collections c\n" +
-                    "                    INNER JOIN pickups p ON c.id = p.collection_id INNER JOIN suppliers s ON c.sup_id = s.id INNER JOIN users u ON u.id=s.user_id INNER JOIN estates e ON e.id=p.estate_id\n" +
-                    "                    WHERE c.delete=0 AND c.status=3 AND c.id=?\n;";
+            String sql = "SELECT c.id,\n" +
+                    "   u.first_name,\n" +
+                    "   u.last_name,\n" +
+                    "   u.phone,\n" +
+                    "   p.pickup_date,\n" +
+                    "   p.pickup_time ,\n" +
+                    "   c.init_amount,\n" +
+                    "   c.p_method,\n" +
+                    "   e.address,\n" +
+                    "   e.location,\n" +
+                    "   e.area,\n" +
+                    "   c.final_amount,\n" +
+                    "   p.collected_date\n" +
+                    "FROM collections c \n" +
+                    "   INNER JOIN pickups p ON c.id = p.collection_id " +
+                    "   INNER JOIN suppliers s ON c.sup_id = s.id " +
+                    "   INNER JOIN users u ON u.id=s.user_id " +
+                    "   INNER JOIN estates e ON e.id=p.estate_id\n" +
+                    "WHERE c.delete=0 AND (c.status=3 OR c.status=5 OR c.status=6) AND c.id=?\n;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, collection_id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -673,6 +688,8 @@ public class SupplyDAO {
                 supply.setAddress(resultSet.getString(9));
                 supply.setLocation(resultSet.getString(10));
                 supply.setArea(resultSet.getString(11));
+                supply.setFinal_amount(resultSet.getInt(12));
+                supply.setCollected_date(resultSet.getString(13));
             }
 
             resultSet.close();
@@ -1385,5 +1402,123 @@ public class SupplyDAO {
             }
         }
         return count;
+    }
+
+    // all upcoming collections for relevant collector
+    public List<SupplyModel> getAllUpcomingCollections(int collector) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    p.pickup_date,\n" +
+                    "    p.pickup_time,\n" +
+                    "    p.collection_id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    e.area,\n" +
+                    "    c.init_amount\n" +
+                    "FROM\n" +
+                    "    jom_db.pickups p\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id = p.s_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON s.user_id = u.id\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON p.collection_id = c.id AND c.delete = 0\n" +
+                    "        AND c.status = 3\n" +
+                    "        INNER JOIN\n" +
+                    "    estates e ON e.id = p.estate_id\n" +
+                    "WHERE\n" +
+                    "    p.pickup_date > CURRENT_DATE AND p.collector = ?;        ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collector);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String date = resultSet.getString(1);
+                String time = resultSet.getString(2);
+                int collection_id = resultSet.getInt(3);
+                String fist_name = resultSet.getString(4);
+                String last_name = resultSet.getString(5);
+                String area = resultSet.getString(6);
+                int initial_amount = resultSet.getInt(7);
+
+                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, area);
+                supplies.add(supply);
+            }
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
+    }
+
+    // all past collections for relevant collector
+    public List<SupplyModel> getAllPastCollections(int collector) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    DATE(p.collected_date) AS collected_date,\n" +
+                    "    TIME(p.collected_date) AS collected_time,\n" +
+                    "    p.collection_id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    e.area,\n" +
+                    "    c.final_amount\n" +
+                    "FROM\n" +
+                    "    jom_db.pickups p\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id = p.s_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON s.user_id = u.id\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON p.collection_id = c.id AND c.delete = 0\n" +
+                    "        AND (c.status = 5 OR c.status = 6)\n" +
+                    "        INNER JOIN\n" +
+                    "    estates e ON e.id = p.estate_id\n" +
+                    "WHERE\n" +
+                    "    p.collector = ? ORDER BY collected_date DESC;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collector);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String date = resultSet.getString(1);
+                String time = resultSet.getString(2);
+                int collection_id = resultSet.getInt(3);
+                String fist_name = resultSet.getString(4);
+                String last_name = resultSet.getString(5);
+                String area = resultSet.getString(6);
+                int final_amount = resultSet.getInt(7);
+
+                SupplyModel supply = new SupplyModel(collection_id, date, time, final_amount, fist_name, last_name, area);
+                supplies.add(supply);
+            }
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
     }
 }
