@@ -46,7 +46,7 @@ public class SupplyModel {
         this.value = value;
     }
 
-    public SupplyModel(int id, String date, String time, int amount, String name, String last_name, String area) {
+    public SupplyModel(int id, String date, String time, int amount, String name, String last_name, String area, String payment_method) {
         this.id = id;
         this.date = date;
         this.time = time;
@@ -54,6 +54,7 @@ public class SupplyModel {
         this.name = name;
         this.last_name = last_name;
         this.area = area;
+        this.payment_method = payment_method;
     }
 
     public SupplyModel(int id, int status, int value, String name, String last_name, String payment_method) {

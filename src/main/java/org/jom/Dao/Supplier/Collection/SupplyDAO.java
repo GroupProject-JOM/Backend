@@ -1423,7 +1423,8 @@ public class SupplyDAO {
                     "    u.first_name,\n" +
                     "    u.last_name,\n" +
                     "    e.area,\n" +
-                    "    c.init_amount\n" +
+                    "    c.init_amount,\n" +
+                    "    c.p_method\n" +
                     "FROM\n" +
                     "    jom_db.pickups p\n" +
                     "        INNER JOIN\n" +
@@ -1449,8 +1450,9 @@ public class SupplyDAO {
                 String last_name = resultSet.getString(5);
                 String area = resultSet.getString(6);
                 int initial_amount = resultSet.getInt(7);
+                String payment = resultSet.getString(8);
 
-                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, area);
+                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, area, payment);
                 supplies.add(supply);
             }
             resultSet.close();
@@ -1482,7 +1484,8 @@ public class SupplyDAO {
                     "    u.first_name,\n" +
                     "    u.last_name,\n" +
                     "    e.area,\n" +
-                    "    c.final_amount\n" +
+                    "    c.final_amount,\n" +
+                    "    c.p_method\n" +
                     "FROM\n" +
                     "    jom_db.pickups p\n" +
                     "        INNER JOIN\n" +
@@ -1508,8 +1511,9 @@ public class SupplyDAO {
                 String last_name = resultSet.getString(5);
                 String area = resultSet.getString(6);
                 int final_amount = resultSet.getInt(7);
+                String payment = resultSet.getString(8);
 
-                SupplyModel supply = new SupplyModel(collection_id, date, time, final_amount, fist_name, last_name, area);
+                SupplyModel supply = new SupplyModel(collection_id, date, time, final_amount, fist_name, last_name, area, payment);
                 supplies.add(supply);
             }
             resultSet.close();
@@ -1541,7 +1545,8 @@ public class SupplyDAO {
                     "    u.first_name,\n" +
                     "    u.last_name,\n" +
                     "    e.area,\n" +
-                    "    c.init_amount\n" +
+                    "    c.init_amount,\n" +
+                    "    c.p_method\n" +
                     "FROM\n" +
                     "    jom_db.pickups p\n" +
                     "        INNER JOIN\n" +
@@ -1567,8 +1572,9 @@ public class SupplyDAO {
                 String last_name = resultSet.getString(5);
                 String area = resultSet.getString(6);
                 int initial_amount = resultSet.getInt(7);
+                String payment = resultSet.getString(8);
 
-                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, area);
+                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, area, payment);
                 supplies.add(supply);
             }
             resultSet.close();

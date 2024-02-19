@@ -282,7 +282,7 @@ public class CollectorServlet extends HttpServlet {
                         System.out.println("Send all upcoming collections");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"message\": \"No past collections\"}");
+                        out.write("{\"message\": \"No upcoming collections\"}");
                         System.out.println("No upcoming collections");
                     }
                 } else {
