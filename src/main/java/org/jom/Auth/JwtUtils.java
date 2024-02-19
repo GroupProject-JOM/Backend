@@ -21,21 +21,16 @@ import java.util.Date;
 
 
 public class JwtUtils {
-    private int user;
-    private String page;
-    private String authorizationHeader;
+    private String token;
     private static final String SECRET_KEY = System.getenv("SECRET_KEY");
     private JSONObject payload;
-
-    public JwtUtils() {
-    }
 
     public JwtUtils(JSONObject payload) {
         this.payload = payload;
     }
 
-    public JwtUtils(String authorizationHeader) {
-        this.authorizationHeader = authorizationHeader;
+    public JwtUtils(String token) {
+        this.token = token;
     }
 
     public String generateJwt() {
@@ -106,7 +101,7 @@ public class JwtUtils {
     }
 
     public boolean verifyJwtAuthentication() {
-        String[] jwtSegments = getJwtSegmentsFromAuthHeader();
+        String[] jwtSegments = getJwtSegmentsFromCookie();
 
         if (jwtSegments != null && jwtSegments.length == 3) {
             String header = new String(Base64.getUrlDecoder().decode(jwtSegments[0]));
@@ -132,16 +127,16 @@ public class JwtUtils {
     }
 
     public JSONObject getAuthPayload() {
-        String[] jwtSegments = getJwtSegmentsFromAuthHeader();
+        String[] jwtSegments = getJwtSegmentsFromCookie();
 
         return new JSONObject(new String(Base64.getUrlDecoder().decode(jwtSegments[1])));
     }
 
 
-    private String[] getJwtSegmentsFromAuthHeader() {
+    private String[] getJwtSegmentsFromCookie() {
         String[] jwtSegments = null;
-        if (authorizationHeader != null)
-            jwtSegments = authorizationHeader.split("\\.");
+        if (token != null)
+            jwtSegments = token.split("\\.");
 
         return jwtSegments;
     }

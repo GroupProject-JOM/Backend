@@ -46,9 +46,10 @@ public class UserModel {
         this.role = role;
     }
 
-    public UserModel(int id, String first_name, String phone, String add_line_3, String role) {
+    public UserModel(int id, String first_name, String last_name, String phone, String add_line_3, String role) {
         this.id = id;
         this.first_name = first_name;
+        this.last_name = last_name;
         this.phone = phone;
         this.add_line_3 = add_line_3;
         this.role = role;
@@ -164,13 +165,13 @@ public class UserModel {
         this.delete = delete;
     }
 
-    public void Register(){
+    public void Register() {
         UserDAO userDAO = new UserDAO();
         this.id = userDAO.register(this);
         EmployeeRegister();
     }
 
-    public boolean updateUser(){
+    public boolean updateUser() {
         UserDAO userDAO = new UserDAO();
         updateEmployee();
         return userDAO.updateUser(this);
@@ -179,23 +180,25 @@ public class UserModel {
     public void EmployeeRegister() {
     }
 
-    public boolean updateEmployee(){
-        return true;}
-
-    public boolean EmailExists(){
-        UserDAO userDAO = new UserDAO();
-        boolean status = userDAO.emailExists(this.email);
-        return  status;
+    public boolean updateEmployee() {
+        return true;
     }
 
-    public void updateValidity(int validity){
+    public boolean EmailExists() {
+        UserDAO userDAO = new UserDAO();
+        boolean status = userDAO.emailExists(this.email);
+        return status;
+    }
+
+    public void updateValidity(int validity) {
         UserDAO userDAO = new UserDAO();
         userDAO.updateValidity(this.id);
         this.setValidity(1);
     }
-    public boolean updateEmail(){
+
+    public boolean updateEmail() {
         UserDAO userDAO = new UserDAO();
-        return userDAO.updateEmail(this.email,this.id);
+        return userDAO.updateEmail(this.email, this.id);
     }
 
 }

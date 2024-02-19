@@ -26,6 +26,7 @@ public class SupplyModel {
     private String c_lName;
     private String c_phone;
     private String collected_date;
+    private String collected_time;
     private String reason;
     private int supplier_id;
     private String ename;
@@ -43,6 +44,17 @@ public class SupplyModel {
         this.status = status;
         this.final_amount = final_amount;
         this.value = value;
+    }
+
+    public SupplyModel(int id, String date, String time, int amount, String name, String last_name, String area, String payment_method) {
+        this.id = id;
+        this.date = date;
+        this.time = time;
+        this.amount = amount;
+        this.name = name;
+        this.last_name = last_name;
+        this.area = area;
+        this.payment_method = payment_method;
     }
 
     public SupplyModel(int id, int status, int value, String name, String last_name, String payment_method) {
@@ -114,7 +126,7 @@ public class SupplyModel {
         this.status = status;
     }
 
-    public SupplyModel(int id, String date, String time, int amount, String name, String last_name, String phone, String location, String area) {
+    public SupplyModel(int id, String date, String time, int amount, String name, String last_name, String phone, String location, String area, String payment_method) {
         this.id = id;
         this.date = date;
         this.time = time;
@@ -124,6 +136,7 @@ public class SupplyModel {
         this.phone = phone;
         this.location = location;
         this.area = area;
+        this.payment_method = payment_method;
     }
 
     public int getId() {
@@ -340,5 +353,13 @@ public class SupplyModel {
 
     public void setAccount_id(int account_id) {
         this.account_id = account_id;
+    }
+
+    public String getCollected_time() {
+        return collected_time;
+    }
+
+    public void setCollected_time(String collected_time) {
+        this.collected_time = collected_time;
     }
 }

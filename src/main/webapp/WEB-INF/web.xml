@@ -3,16 +3,5 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-  <display-name>Archetype Created Web Application</display-name>
-
-  <filter>
-    <filter-name>CorsFilter</filter-name>
-    <filter-class>org.jom.Filter.CorsFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>CorsFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-
-
+  <display-name>JOM Business and Manufacturing Process Management System</display-name>
 </web-app>

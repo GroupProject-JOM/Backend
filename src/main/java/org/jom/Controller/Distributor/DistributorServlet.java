@@ -3,6 +3,7 @@ package org.jom.Controller.Distributor;
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
 import org.jom.Dao.DistributionDAO;
+import org.jom.Dao.OutletDAO;
 import org.jom.Dao.ProductsDAO;
 import org.jom.Dao.UserDAO;
 import org.jom.Model.DistributionModel;
@@ -72,20 +73,26 @@ public class DistributorServlet extends HttpServlet {
                 if (user.getRole().equals("distributor")) {
                     DistributionDAO distributionDAO = new DistributionDAO();
                     List<DistributionModel> products = distributionDAO.DistributorsOnlyRemaining(user_id);
+                    List<DistributionModel> distributions = distributionDAO.DistributionRecordsFromYear(user_id);
+                    List<DistributionModel> visitsArray = distributionDAO.lastSevenDaysVisits(user_id);
+                    int visits = distributionDAO.todayDistributionCount(user_id);
 
                     Gson gson = new Gson();
                     // Object array to json
                     String objectArray = gson.toJson(products);
+                    String distributionsArray = gson.toJson(distributions);
+                    String visitsStringArray = gson.toJson(visitsArray);
 
                     ProductsDAO productsDAO = new ProductsDAO();
+                    OutletDAO outletDAO = new OutletDAO();
 
                     if (products.size() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"list\":" + objectArray + ",\"accepted\":" + productsDAO.acceptedProductCount() + ",\"allocated\":" + distributionDAO.allocatedAcceptedProductCount(user_id) + "}");
+                        out.write("{\"list\":" + objectArray + ",\"accepted\":" + productsDAO.acceptedProductCount() + ",\"allocated\":" + distributionDAO.allocatedAcceptedProductCount(user_id) + ",\"distributions\":" + distributionsArray + ",\"visits\":" + visits + ",\"outlets\":" + outletDAO.rowCount() + ",\"last_seven\":" + visitsStringArray + "}");
                         System.out.println("View all remaining Products");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": 0,\"accepted\":" + productsDAO.acceptedProductCount() + ",\"allocated\":" + distributionDAO.allocatedAcceptedProductCount(user_id) + "}");
+                        out.write("{\"size\": 0,\"accepted\":" + productsDAO.acceptedProductCount() + ",\"allocated\":" + distributionDAO.allocatedAcceptedProductCount(user_id) + ",\"distributions\":" + distributionsArray + ",\"visits\":" + visits + ",\"outlets\":" + outletDAO.rowCount() + ",\"last_seven\":" + visitsStringArray + "}");
                         System.out.println("No remaining Products");
                     }
                 } else {
