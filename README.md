@@ -1,7 +1,7 @@
 # JOM Business and Manufacturing Process Management System
 
 
-Presenting the backend of a web application designed to manage and automate the business and manufacturing processes of Jayasinghe Oil Mills Pvt. Ltd., a local virgin coconut oil manufacturer. This backend, developed using Java Servlets, powers the core functionality of the system, enabling seamless data management, communication, and business logic execution.
+Presenting the backend of web and mobile applications designed to manage and automate the business and manufacturing processes of Jayasinghe Oil Mills Pvt. Ltd., a local virgin coconut oil manufacturer. This backend, developed using Java Servlets, powers the core functionality of the system, enabling seamless data management, communication, and business logic execution.
 
 ## Key Features
 
@@ -30,7 +30,7 @@ Here's a breakdown of the backend's folder structure, ensuring clarity and maint
 - **[src](https://github.com/GroupProject-JOM/Backend/tree/main/src):** Houses the source code for the backend application.
 - **[.gitignore](https://github.com/GroupProject-JOM/Backend/blob/main/.gitignore):** Specifies files and folders to be excluded from Git version control.
 - **[pom.xml](https://github.com/GroupProject-JOM/Backend/blob/main/pom.xml):** The Maven project configuration file, defining dependencies and build settings.
-- **[README.md](https://github.com/GroupProject-JOM/Backend/blob/main/README.md):** This file, providing an overview of the project structure and setup.
+- **[README.md](https://github.com/GroupProject-JOM/Backend/blob/main/README.md):** This file, provides an overview of the project structure and setup.
 
 ### Source Code Directory (src)
 
