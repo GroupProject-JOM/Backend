@@ -439,7 +439,7 @@ public class SupplyDAO {
                 int employee_id = resultSet.getInt(3);
                 int count = resultSet.getInt(4);
 
-                CollectorModel collector = new CollectorModel(employee_id, name, count,last_name);
+                CollectorModel collector = new CollectorModel(employee_id, name, count, last_name);
                 collectors.add(collector);
             }
 
@@ -644,7 +644,7 @@ public class SupplyDAO {
         return count;
     }
 
-    //get relevant collection
+    //get relevant pickup collection
     public SupplyModel getCollection(int collection_id) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
@@ -665,7 +665,9 @@ public class SupplyDAO {
                     "   e.location,\n" +
                     "   e.area,\n" +
                     "   c.final_amount,\n" +
-                    "   p.collected_date\n" +
+                    "   DATE(p.collected_date) AS collected_date,\n" +
+                    "   TIME(p.collected_date) AS collected_time,\n" +
+                    "   c.status\n" +
                     "FROM collections c \n" +
                     "   INNER JOIN pickups p ON c.id = p.collection_id " +
                     "   INNER JOIN suppliers s ON c.sup_id = s.id " +
@@ -690,6 +692,8 @@ public class SupplyDAO {
                 supply.setArea(resultSet.getString(11));
                 supply.setFinal_amount(resultSet.getInt(12));
                 supply.setCollected_date(resultSet.getString(13));
+                supply.setCollected_time(resultSet.getString(14));
+                supply.setStatus(resultSet.getInt(15));
             }
 
             resultSet.close();
@@ -1506,6 +1510,65 @@ public class SupplyDAO {
                 int final_amount = resultSet.getInt(7);
 
                 SupplyModel supply = new SupplyModel(collection_id, date, time, final_amount, fist_name, last_name, area);
+                supplies.add(supply);
+            }
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
+    }
+
+    // all missed collections for relevant collector
+    public List<SupplyModel> getAllMissedCollections(int collector) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    p.pickup_date,\n" +
+                    "    p.pickup_time,\n" +
+                    "    p.collection_id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    e.area,\n" +
+                    "    c.init_amount\n" +
+                    "FROM\n" +
+                    "    jom_db.pickups p\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id = p.s_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON s.user_id = u.id\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON p.collection_id = c.id AND c.delete = 0\n" +
+                    "        AND c.status = 3\n" +
+                    "        INNER JOIN\n" +
+                    "    estates e ON e.id = p.estate_id\n" +
+                    "WHERE\n" +
+                    "    p.pickup_date < CURRENT_DATE AND p.collector = ?;        ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, collector);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String date = resultSet.getString(1);
+                String time = resultSet.getString(2);
+                int collection_id = resultSet.getInt(3);
+                String fist_name = resultSet.getString(4);
+                String last_name = resultSet.getString(5);
+                String area = resultSet.getString(6);
+                int initial_amount = resultSet.getInt(7);
+
+                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, area);
                 supplies.add(supply);
             }
             resultSet.close();
