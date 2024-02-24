@@ -20,11 +20,11 @@ public class Backup implements ServletContextListener {
     private boolean backupStatus = true;
     final private LocalTime fixedAtMidnight = LocalTime.of(0, 0, 0);
 
-    final private String ip = "localhost";
-    final private String port = "3306";
-    final private String database = "jom_db";
-    final private String user = "root";
-    final private String password = "zaq123";
+    final private String ip = System.getenv("DB_SERVER");
+    final private String port = System.getenv("DB_PORT");
+    final private String database = System.getenv("DB");
+    final private String user = System.getenv("DB_USER");
+    final private String password = System.getenv("DB_PASSWORD");
 
     public void contextInitialized(ServletContextEvent contextEvent) {
         scheduler = Executors.newScheduledThreadPool(1);
@@ -45,9 +45,9 @@ public class Backup implements ServletContextListener {
         try {
             if (backupStatus) {
                 backupStatus = false;
-                String projectFolderPath = "C:\\Users\\CHAMA COMPUTERS\\Desktop\\Campus\\Backup\\";
+                String projectFolderPath = "./";
                 LocalDateTime now = LocalDateTime.now();
-                String path = projectFolderPath + "eduClickDbBackup" + now.getYear() + now.getMonthValue() + now.getDayOfMonth() + ".sql";
+                String path = projectFolderPath + "jomDbBackup" + now.getYear() + now.getMonthValue() + now.getDayOfMonth() + ".sql";
                 String dumpCommand = "mysqldump " + database + " -h " + ip + " -u " + user + " -p" + password;
                 Runtime runtime = Runtime.getRuntime();
                 File databaseFile = new File(path);
