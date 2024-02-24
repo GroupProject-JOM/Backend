@@ -25,40 +25,23 @@ public class OptionalVerificationServlet extends HttpServlet {
 
         // Get all cookies from the request
         Cookie[] cookies = request.getCookies();
-        JSONObject jsonObject = new JSONObject();
-        int user_id = 0;
-        boolean jwtCookieFound = false;
+        JwtUtils jwtUtils = new JwtUtils();
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
-                    if (!jwtUtils.verifyJwtAuthentication()) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        out.write("{\"message\": \"UnAuthorized\"}");
-                        System.out.println("UnAuthorized1");
-                        return;
-                    }
-                    jsonObject = jwtUtils.getAuthPayload();
-                    jwtCookieFound = true;
-                    break;  // No need to continue checking if "jwt" cookie is found
-                }
+        if (!jwtUtils.CheckJWT(cookies)) {
+            if (jwtUtils.CheckRefresh(cookies))
+                response.addCookie(jwtUtils.getNewJWT(cookies));
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                return;
             }
-        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized\"}");
-            System.out.println("No cookies found in the request.");
-            return;
         }
 
-        // If "jwt" cookie is not found, respond with unauthorized status
-        if (!jwtCookieFound) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
-            System.out.println("UnAuthorized - JWT cookie not found");
-            return;
-        }
-
-        user_id = (int) jsonObject.get("user");
+        // get auth payload data
+        JSONObject jsonObject = jwtUtils.getAuthPayload();
+        int user_id = (int) jsonObject.get("user");
+        String role = (String) jsonObject.get("page");
+        String email = (String) jsonObject.get("email");
 
         StringBuilder requestBody = new StringBuilder();
 
@@ -73,11 +56,7 @@ public class OptionalVerificationServlet extends HttpServlet {
         int final_amount = json_data.getInt("amount");
         int collection_id = json_data.getInt("id");
 
-        UserDAO userDAO = new UserDAO();
-        UserModel user = userDAO.getUserById(user_id);
-
-        //check if emails are correct
-        if(user.getRole().equals("collector") || user.getRole().equals("admin")) {
+        if(role.equals("collector") || role.equals("admin")) {
 
             CollectionDAO collectionDAO = new CollectionDAO();
             String supplier_email = collectionDAO.getSupplierEmail(collection_id,user_id);
@@ -88,7 +67,7 @@ public class OptionalVerificationServlet extends HttpServlet {
                 int otp = sendEmail.optionalVerification(supplier_email,final_amount,supplier_name);
                 System.out.println(otp);
 
-                OTPModel record = new OTPModel(user_id,user.getEmail(),otp);
+                OTPModel record = new OTPModel(user_id,email,otp);
                 record.saveOTP();
 
                 if(record.getId() != 0) {

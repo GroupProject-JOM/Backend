@@ -46,10 +46,12 @@ public class LoginServlet extends HttpServlet {
                             sId = employee.geteId();
                         }
 
+                        // create jwt
                         JSONObject payload = new JSONObject();
                         payload.put("user", user.getId());
                         payload.put("name", user.getFirst_name());
                         payload.put("page", user.getRole());
+                        payload.put("email", user.getEmail());
                         payload.put("sId", sId);
 
                         JwtUtils jwtUtils = new JwtUtils(payload);
@@ -66,8 +68,28 @@ public class LoginServlet extends HttpServlet {
 
                         response.addCookie(cookie);
 
+                        // create refresh token
+                        JSONObject refreshPayload = new JSONObject();
+                        refreshPayload.put("username", user.getEmail());
+                        refreshPayload.put("id", user.getId());
+                        refreshPayload.put("page", user.getRole());
+
+                        jwtUtils.setRefreshPayload(refreshPayload);
+                        String refresh = jwtUtils.generateRefresh();
+
+                        Cookie refreshCookie = new Cookie("refresh", refresh);
+                        refreshCookie.setPath("/");
+                        refreshCookie.setSecure(true); // For HTTPS
+                        refreshCookie.setHttpOnly(false);
+
+                        // Set the cookie to expire after six months (in seconds)
+                        int oneSixMonthsInSeconds = 24 * 60 * 60 * 180;
+                        refreshCookie.setMaxAge(oneSixMonthsInSeconds);
+
+                        response.addCookie(refreshCookie);
+
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"message\": \"Login successfully\",\"jwt\": \"" + token + "\"}");
+                        out.write("{\"message\": \"Login successfully\",\"jwt\": \"" + token + "\",\"refresh\":\"" + refresh + "\"}");
                         System.out.println("Login successful");
 
                     } else {
@@ -76,11 +98,9 @@ public class LoginServlet extends HttpServlet {
                         System.out.println("Wrong password");
                     }
                 } else {
-                    // TODO hadle
-                    System.out.println("User not validated");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     out.write("{\"message\": \"validate\"}");
-                    System.out.println("Login incorrect");
+                    System.out.println("User not validated");
                 }
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
