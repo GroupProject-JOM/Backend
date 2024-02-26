@@ -2,10 +2,11 @@ package org.jom.Controller.StockManager;
 
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
-import org.jom.Dao.BatchDAO;
-import org.jom.Dao.CollectorDAO;
-import org.jom.Dao.UserDAO;
-import org.jom.Dao.YardDAO;
+import org.jom.Dao.*;
+import org.jom.Dao.Supplier.Collection.CollectionDAO;
+import org.jom.Dao.Supplier.Collection.SupplyDAO;
+import org.jom.Model.CocoModel;
+import org.jom.Model.Collection.SupplyModel;
 import org.jom.Model.ProductionModel;
 import org.jom.Model.UserModel;
 import org.jom.Model.YardModel;
@@ -21,6 +22,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+
+import static java.lang.Float.parseFloat;
 
 @WebServlet("/yard-data")
 public class YardServlet extends HttpServlet {
@@ -128,6 +131,7 @@ public class YardServlet extends HttpServlet {
             int yard = json_data.getInt("yard");
             int collector = json_data.getInt("collector");
             int final_amount = -json_data.getInt("final_amount");
+            int id = json_data.getInt("id");
 
             // Convert JSONArrays to String arrays
             int[] blocks = new int[blockArray.length()];
@@ -153,15 +157,101 @@ public class YardServlet extends HttpServlet {
                     }
 
                     CollectorDAO collectorDAO = new CollectorDAO();
+                    CollectionDAO collectionDAO = new CollectionDAO();
 
-                    if (status && collectorDAO.updateTodayAmount(final_amount, collector)) {
+                    System.out.println(collector);
+
+                    if (collector < 1) {
+                        if (status && collectionDAO.updateFinalAmount(id, -final_amount)) {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            out.write("{\"message\": \"Yard updated successfully\"}");
+                            System.out.println("Yard updated successfully");
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            out.write("{\"message\": \"Yard is not updated\"}");
+                            System.out.println("Yard is not updated");
+                        }
+                    } else {
+                        if (status && collectorDAO.updateTodayAmount(final_amount, collector)) {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            out.write("{\"message\": \"Yard updated successfully\"}");
+                            System.out.println("Yard updated successfully");
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            out.write("{\"message\": \"Yard is not updated\"}");
+                            System.out.println("Yard is not updated");
+                        }
+                    }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    out.write("{\"message\": \"Invalid User\"}");
+                    System.out.println("Invalid User");
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"Invalid User\"}");
+                System.out.println("Invalid User");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            out.close();
+        }
+    }
+
+    // complete yard collection
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        // Get all cookies from the request
+        Cookie[] cookies = request.getCookies();
+        JwtUtils jwtUtils = new JwtUtils();
+
+        if (!jwtUtils.CheckJWT(cookies)) {
+            if (jwtUtils.CheckRefresh(cookies))
+                response.addCookie(jwtUtils.getNewJWT(cookies));
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                return;
+            }
+        }
+
+        // get auth payload data
+        JSONObject jsonObject = jwtUtils.getAuthPayload();
+        int user_id = (int) jsonObject.get("user");
+        String role = (String) jsonObject.get("page");
+
+        int id = Integer.parseInt(request.getParameter("id"));
+
+        try {
+            if (user_id != 0) {
+                if (role.equals("stock-manager")) {
+
+                    SupplyDAO supplyDAO = new SupplyDAO();
+                    SupplyModel supply = supplyDAO.getSupply(id);
+                    int final_amount = supply.getFinal_amount();
+
+                    CollectionDAO collectionDAO = new CollectionDAO();
+                    org.jom.Dao.Supplier.Collection.YardDAO yardDAO = new org.jom.Dao.Supplier.Collection.YardDAO();
+
+                    String date = collectionDAO.getRequestedDateById(id);
+
+                    CocoRateDAO cocoRateDAO = new CocoRateDAO();
+                    CocoModel cocoRate = cocoRateDAO.getRateByDate(date.substring(0, 10));
+
+                    float value = final_amount * parseFloat(cocoRate.getPrice());
+
+                    if (collectionDAO.updateFinalAmount(final_amount, value, id) && yardDAO.updateDeliveredTime(id)) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"message\": \"Yard updated successfully\"}");
-                        System.out.println("Yard updated successfully");
+                        out.write("{\"message\": \"Collection completed successfully\"}");
+                        System.out.println("Collection completed successfully");
                     } else {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.write("{\"message\": \"Yard is not updated\"}");
-                        System.out.println("Yard is not updated");
+                        out.write("{\"message\": \"Collection is not completed\"}");
+                        System.out.println("Collection is not completed");
                     }
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
