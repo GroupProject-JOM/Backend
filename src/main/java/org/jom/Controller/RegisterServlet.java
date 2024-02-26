@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,47 +27,48 @@ public class RegisterServlet extends HttpServlet {
             UserModel user = gson.fromJson(bufferedReader, UserModel.class);
 
             // Check input field is empty
-            if(user.getFirst_name().isEmpty()){
+            if (user.getFirst_name().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"fname\"}");
-                return ;
-            }if(user.getLast_name().isEmpty()){
+                return;
+            }
+            if (user.getLast_name().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"lname\"}");
                 return;
             }
-            if(user.getEmail().isEmpty()){
+            if (user.getEmail().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"email1\"}");
                 return;
             }
-            if(user.getPassword().isEmpty()){
+            if (user.getPassword().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"password\"}");
                 return;
             }
-            if(user.getPhone().isEmpty()){
+            if (user.getPhone().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"phone\"}");
                 return;
             }
-            if(user.getAdd_line_1().isEmpty()){
+            if (user.getAdd_line_1().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"address1\"}");
                 return;
             }
-            if(user.getAdd_line_2().isEmpty()){
+            if (user.getAdd_line_2().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"address2\"}");
                 return;
             }
-            if(user.getAdd_line_3().isEmpty()){
+            if (user.getAdd_line_3().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"address3\"}");
                 return;
             }
 
-            if(user.getRole() == null){
+            if (user.getRole() == null) {
                 user.setRole("supplier");
             }
 
@@ -73,47 +76,47 @@ public class RegisterServlet extends HttpServlet {
             String regex = "[a-z0-9\\.\\-]+@[a-z]+\\.[a-z]{2,3}";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(user.getEmail());
-            if(!matcher.matches()){
+            if (!matcher.matches()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.write("{\"message\": \"email2\"}");
                 System.out.println("Invalid email");
                 return;
             }
 
-            if(user.EmailExists()){
+            if (user.EmailExists()) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 out.write("{\"message\": \"email3\"}");
                 System.out.println("Email already exists");
                 return;
             }
 
+            user.setPassword(passwordHash(user.getPassword()));
             // All validations are passed then register
             user.Register();
 
-            if(user.getId() != 0){
-                if(user.getRole().equals("supplier")){
+            if (user.getId() != 0) {
+                if (user.getRole().equals("supplier")) {
                     SupplierModel supplier = new SupplierModel(user.getId());
                     supplier.createSupplier();
 
-                    if(supplier.getId() != 0){
+                    if (supplier.getId() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"Registration successfully\",");
-                        out.write("\"id\": \""+ user.getId() + "\",");
-                        out.write("\"sId\": \""+ supplier.getId() + "\",");
-                        out.write("\"email\": \""+ user.getEmail() + "\",");
-                        out.write("\"phone\": \""+ user.getPhone() +"\"}");
+                        out.write("\"id\": \"" + user.getId() + "\",");
+                        out.write("\"sId\": \"" + supplier.getId() + "\",");
+                        out.write("\"email\": \"" + user.getEmail() + "\",");
+                        out.write("\"phone\": \"" + user.getPhone() + "\"}");
                         System.out.println("Registration successful");
-                    }else{
+                    } else {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         out.write("{\"message\": \"Registration unsuccessfully\"}");
                         System.out.println("Registration incorrect");
                     }
-                }
-                else{
+                } else {
                     // TODO other roles as well
                 }
 
-            }else{
+            } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.write("{\"message\": \"Registration unsuccessfully\"}");
                 System.out.println("Registration incorrect");
@@ -124,5 +127,17 @@ public class RegisterServlet extends HttpServlet {
         } finally {
             out.close();
         }
+    }
+
+    public String passwordHash(String password) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA");
+        messageDigest.update(password.getBytes());
+        byte[] rbt = messageDigest.digest();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (byte b : rbt) {
+            stringBuilder.append(String.format("%02x", b));
+        }
+        return stringBuilder.toString();
     }
 }

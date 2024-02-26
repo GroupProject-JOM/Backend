@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,7 +36,8 @@ public class LoginServlet extends HttpServlet {
 
             if (user.getId() != 0) {
                 if (user.getValidity() != 0) {
-                    if (user.getPassword().equals(login.getPassword())) {
+                    String hashedPwd = passwordHash(login.getPassword());
+                    if (user.getPassword().equals(hashedPwd)) {
                         int sId = 0;
                         if (user.getRole().equals("supplier")) {
                             SupplierModel supplier = new SupplierModel(user.getId());
@@ -114,5 +117,17 @@ public class LoginServlet extends HttpServlet {
         } finally {
             out.close();
         }
+    }
+
+    public String passwordHash(String password) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA");
+        messageDigest.update(password.getBytes());
+        byte[] rbt = messageDigest.digest();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (byte b : rbt) {
+            stringBuilder.append(String.format("%02x", b));
+        }
+        return stringBuilder.toString();
     }
 }
