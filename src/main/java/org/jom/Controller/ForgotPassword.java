@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @WebServlet("/forgot-password")
 public class ForgotPassword extends HttpServlet {
@@ -205,13 +207,20 @@ public class ForgotPassword extends HttpServlet {
         // get auth payload data
         JSONObject jsonObject = jwtUtils.getAuthPayload();
         int user_id = (int) jsonObject.get("user");
+
         String password = request.getParameter("password");
+        String hashedPwd = null;
+        try {
+            hashedPwd = passwordHash(password);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
 
         UserDAO userDAO = new UserDAO();
 
         try {
             if (user_id != 0) {
-                if (userDAO.updatePassword(user_id, password)) {
+                if (userDAO.updatePassword(user_id, hashedPwd)) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     out.write("{\"message\": \"Password updated\"}");
                     System.out.println("Password updated");
@@ -232,5 +241,17 @@ public class ForgotPassword extends HttpServlet {
             out.close();
         }
 
+    }
+
+    public String passwordHash(String password) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA");
+        messageDigest.update(password.getBytes());
+        byte[] rbt = messageDigest.digest();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (byte b : rbt) {
+            stringBuilder.append(String.format("%02x", b));
+        }
+        return stringBuilder.toString();
     }
 }

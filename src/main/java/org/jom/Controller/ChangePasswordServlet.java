@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @WebServlet("/change-password")
 public class ChangePasswordServlet extends HttpServlet {
@@ -60,9 +62,10 @@ public class ChangePasswordServlet extends HttpServlet {
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getPassword().equals(cur_password)) {
-
-                    if (userDAO.updatePassword(user_id, new_password)) {
+                String hashedPwd = passwordHash(cur_password);
+                if (user.getPassword().equals(hashedPwd)) {
+                    hashedPwd = passwordHash(new_password);
+                    if (userDAO.updatePassword(user_id, hashedPwd)) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"Password updated\"}");
                         System.out.println("Password updated");
@@ -87,5 +90,17 @@ public class ChangePasswordServlet extends HttpServlet {
         } finally {
             out.close();
         }
+    }
+
+    public String passwordHash(String password) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA");
+        messageDigest.update(password.getBytes());
+        byte[] rbt = messageDigest.digest();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (byte b : rbt) {
+            stringBuilder.append(String.format("%02x", b));
+        }
+        return stringBuilder.toString();
     }
 }
