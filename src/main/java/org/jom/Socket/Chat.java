@@ -26,13 +26,6 @@ public class Chat {
             int authenticatedUser = authenticateUser(session, user);
             if (authenticatedUser != 0) {
                 sessions.put(Integer.toString(authenticatedUser), session);
-//                Queue<String> notifications = pendingMessage.get(Integer.toString(user));
-//                if (notifications != null && !notifications.isEmpty()) {
-//                    for (String notification : notifications) {
-//                        sendMessage(session, notification);
-//                    }
-////                    pendingMessage.remove(Integer.toString(user));
-//                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,11 +45,8 @@ public class Chat {
                 int receiver_id = Integer.parseInt(parts[2].trim());
 
                 Session recipientSession = sessions.get(Integer.toString(receiver_id));
-                if (recipientSession != null) {
-                    sendMessage(recipientSession, content);
-                } else {
-//                    savePendingMessage(Integer.toString(receiver_id), content);
-                }
+                sendMessage(recipientSession, content);
+
                 chatDAO.saveChatMessage(sender_id, receiver_id, content);
             } else if (parts.length == 2) {
                 int sender_id = Integer.parseInt(parts[0].trim());
@@ -64,12 +54,8 @@ public class Chat {
 
                 Session recipientSession = sessions.get("3");
                 content = content + sender_id;
-                if (recipientSession != null) {
-                    sendMessage(recipientSession, content);
-                } else {
-                    userDAO.updateSeen(0, sender_id);
-//                    savePendingMessage("3", content);
-                }
+                sendMessage(recipientSession, content);
+
                 content = content.substring(0, content.length() - 1);
                 chatDAO.saveChatMessage(sender_id, 3, content);
             }
