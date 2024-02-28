@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @WebServlet("/change-password")
 public class ChangePasswordServlet extends HttpServlet {
@@ -26,41 +28,21 @@ public class ChangePasswordServlet extends HttpServlet {
 
         // Get all cookies from the request
         Cookie[] cookies = request.getCookies();
-        JSONObject jsonObject = new JSONObject();
-        int user_id = 0;
-        boolean jwtCookieFound = false;
+        JwtUtils jwtUtils = new JwtUtils();
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
-                    if (!jwtUtils.verifyJwtAuthentication()) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        out.write("{\"message\": \"UnAuthorized\"}");
-                        System.out.println("UnAuthorized1");
-                        return;
-                    }
-                    jsonObject = jwtUtils.getAuthPayload();
-                    jwtCookieFound = true;
-                    break;  // No need to continue checking if "jwt" cookie is found
-                }
+        if (!jwtUtils.CheckJWT(cookies)) {
+            if (jwtUtils.CheckRefresh(cookies))
+                response.addCookie(jwtUtils.getNewJWT(cookies));
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                return;
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized\"}");
-            System.out.println("No cookies found in the request.");
-            return;
         }
 
-        // If "jwt" cookie is not found, respond with unauthorized status
-        if (!jwtCookieFound) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
-            System.out.println("UnAuthorized - JWT cookie not found");
-            return;
-        }
-
-        user_id = (int) jsonObject.get("user");
+        // get auth payload data
+        JSONObject jsonObject = jwtUtils.getAuthPayload();
+        int user_id = (int) jsonObject.get("user");
 
         try {
             StringBuilder requestBody = new StringBuilder();
@@ -80,9 +62,10 @@ public class ChangePasswordServlet extends HttpServlet {
             UserModel user = userDAO.getUserById(user_id);
 
             if (user.getId() != 0) {
-                if (user.getPassword().equals(cur_password)) {
-
-                    if (userDAO.updatePassword(user_id, new_password)) {
+                String hashedPwd = passwordHash(cur_password);
+                if (user.getPassword().equals(hashedPwd)) {
+                    hashedPwd = passwordHash(new_password);
+                    if (userDAO.updatePassword(user_id, hashedPwd)) {
                         response.setStatus(HttpServletResponse.SC_OK);
                         out.write("{\"message\": \"Password updated\"}");
                         System.out.println("Password updated");
@@ -107,5 +90,17 @@ public class ChangePasswordServlet extends HttpServlet {
         } finally {
             out.close();
         }
+    }
+
+    public String passwordHash(String password) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA");
+        messageDigest.update(password.getBytes());
+        byte[] rbt = messageDigest.digest();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (byte b : rbt) {
+            stringBuilder.append(String.format("%02x", b));
+        }
+        return stringBuilder.toString();
     }
 }

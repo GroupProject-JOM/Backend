@@ -496,7 +496,7 @@ public class CollectionDAO {
                     "    c.status = 5\n," +
                     "    c.value = ?\n" +
                     "WHERE\n" +
-                    "    c.id = ? AND c.status = 3\n" +
+                    "    c.id = ? AND (c.status = 3 OR c.status =2)\n" +
                     "        AND c.delete = 0;  ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, amount);
@@ -785,5 +785,35 @@ public class CollectionDAO {
             }
         }
         return collections;
+    }
+
+    //update final amount
+    public boolean updateFinalAmount(int id, int amount) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        boolean isSuccess = false;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "UPDATE collections SET final_amount = final_amount + ? WHERE id = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, amount);
+            preparedStatement.setInt(2, id);
+
+            int x = preparedStatement.executeUpdate();
+            if (x != 0) {
+                isSuccess = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return isSuccess;
     }
 }

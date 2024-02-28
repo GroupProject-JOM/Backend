@@ -8,22 +8,25 @@ public class AccountModel {
     private int supplier_id;
     private String account_number;
     private String bank;
-    private  String name;
+    private String name;
+    private String nickName;
 
     public AccountModel() {
     }
-    public AccountModel(int id, String account_number, String bank, String name) {
+
+    public AccountModel(int id, String account_number, String bank, String name, String nickName) {
         this.id = id;
         this.account_number = account_number;
         this.bank = bank;
         this.name = name;
+        this.nickName = nickName;
     }
 
-    public AccountModel(String account_number, String bank, String name) {
-        this.id = 0;
+    public AccountModel(String account_number, String bank, String name, String nickName) {
         this.account_number = account_number;
         this.bank = bank;
         this.name = name;
+        this.nickName = nickName;
     }
 
     public int getId() {
@@ -66,11 +69,20 @@ public class AccountModel {
         this.name = name;
     }
 
-    public void addAccount(){
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public void addAccount() {
         AccountDAO accountDAO = new AccountDAO();
         this.id = accountDAO.addAccount(this);
     }
-    public boolean updateAccount(){
+
+    public boolean updateAccount() {
         AccountDAO accountDAO = new AccountDAO();
         return accountDAO.updateAccount(this);
     }
