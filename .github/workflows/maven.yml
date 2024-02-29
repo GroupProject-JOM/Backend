@@ -23,12 +23,13 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           architecture: x64
-
-      - name: Run & Compress build
       - run: mvn clean install
+
+      - name: Compress build
       - run: |
           touch build.tar.gz
           tar --exclude=build.tar.gz -zcvf build.tar.gz ./.
+          
       - name: Copy build to server
         uses: nogsantos/scp-deploy@master
         with:
@@ -50,6 +51,7 @@ jobs:
             cd ${{ env.REMOTE_APP_FOLDER }}
             tar xvzf ./build.tar.gz --directory ./
             rm ./build.tar.gz
+            
       - name: SSH Start/Restart Application
         uses: appleboy/ssh-action@master
         with:
