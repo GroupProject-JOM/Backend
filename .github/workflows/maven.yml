@@ -1,9 +1,9 @@
-name: BuildDeploy
+name: Build and Deploy
 
 on:
   push:
     branches:
-      - development
+      - deployment
 
 jobs:
   build:
