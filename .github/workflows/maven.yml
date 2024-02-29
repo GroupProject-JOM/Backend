@@ -14,7 +14,8 @@ jobs:
       - name: Set env vars (common)
         run: |      
           echo "REMOTE_HOST="${{ secrets.SSH_HOST }} >> $GITHUB_ENV
-          echo "REMOTE_APP_FOLDER=/opt/apache-tomcat-9.0.86/webapps/test" >> $GITHUB_ENV
+          echo "REMOTE_BINAY=target" >> $GITHUB_ENV
+          echo "REMOTE_APP_FOLDER=/opt/apache-tomcat-9.0.86/webapps" >> $GITHUB_ENV
           
       - uses: actions/checkout@master
       - name: Set up JDK 11 for x64
@@ -50,6 +51,18 @@ jobs:
             cd ${{ env.REMOTE_APP_FOLDER }}
             tar xvzf ./build.tar.gz --directory ./
             rm ./build.tar.gz
+
+      - name: SSH Decompress
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.REMOTE_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ env.REMOTE_APP_FOLDER }}
+            mv JOM.war JOM.war.BAK
+            cp ./target/JOM.war ./JOM.war
             
       - name: SSH Start/Restart Application
         uses: appleboy/ssh-action@master
