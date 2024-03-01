@@ -131,7 +131,6 @@ public class YardServlet extends HttpServlet {
             int yard = json_data.getInt("yard");
             int collector = json_data.getInt("collector");
             int final_amount = -json_data.getInt("final_amount");
-            int id = json_data.getInt("id");
 
             // Convert JSONArrays to String arrays
             int[] blocks = new int[blockArray.length()];
@@ -162,6 +161,7 @@ public class YardServlet extends HttpServlet {
                     System.out.println(collector);
 
                     if (collector < 1) {
+                        int id = json_data.getInt("id");
                         if (status && collectionDAO.updateFinalAmount(id, -final_amount)) {
                             response.setStatus(HttpServletResponse.SC_OK);
                             out.write("{\"message\": \"Yard updated successfully\"}");
