@@ -107,7 +107,5 @@ public class Chat {
             sendMessage(session, "Invalid user.");
             return 0;
         }
-
-
     }
 }

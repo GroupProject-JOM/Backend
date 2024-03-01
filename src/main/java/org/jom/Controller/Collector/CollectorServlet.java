@@ -68,6 +68,7 @@ public class CollectorServlet extends HttpServlet {
                     SupplyDAO supplyDAO = new SupplyDAO();
 
                     List<SupplyModel> today_collections = supplyDAO.getCollectionByDay(employee_id, today);
+                    List<SupplyModel> missed_collections = supplyDAO.getMissedCollections(employee_id, today);
                     List<SupplyModel> upcoming_collections = supplyDAO.getUpcomingCollections(employee_id, today, day_after_tomorrow);
                     int today_count = supplyDAO.getCollectionCount(employee_id, today);
 
@@ -77,24 +78,25 @@ public class CollectorServlet extends HttpServlet {
                     Gson gson = new Gson();
 
                     String today_collec = gson.toJson(today_collections); // Object array to json
+                    String missed_collec = gson.toJson(missed_collections); // Object array to json
                     String upcoming_collec = gson.toJson(upcoming_collections); // Object array to json
                     String object = gson.toJson(cocoRate);
 
                     if (today_collections.size() != 0 && upcoming_collections.size() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"size\": " + today_collections.size() + ",\"today\":" + today_collec + ",\"upcoming\":" + upcoming_collec + ",\"count\":" + today_count + ",\"rate\": " + object + "}");
+                        out.write("{\"size\": " + today_collections.size() + ",\"today\":" + today_collec + ",\"upcoming\":" + upcoming_collec + ",\"count\":" + today_count + ",\"rate\": " + object + ",\"missed\":" + missed_collec + "}");
                         System.out.println("Collector dashboard tables contents");
                     } else if (today_collections.size() == 0 && upcoming_collections.size() == 0) {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": \"-2\",\"count\":" + today_count + ",\"rate\":" + object + "}");
+                        out.write("{\"size\": \"-2\",\"count\":" + today_count + ",\"rate\":" + object + ",\"missed\":" + missed_collec + "}");
                         System.out.println("No collections");
                     } else if (today_collections.size() == 0) {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": \"-1\",\"upcoming\":" + upcoming_collec + ",\"count\":" + today_count + ",\"rate\": " + object + "}");
+                        out.write("{\"size\": \"-1\",\"upcoming\":" + upcoming_collec + ",\"count\":" + today_count + ",\"rate\": " + object + ",\"missed\":" + missed_collec + "}");
                         System.out.println("No collections today");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": " + today_collections.size() + ",\"today\":" + today_collec + ",\"count\":" + today_count + ",\"rate\": " + object + "}");
+                        out.write("{\"size\": " + today_collections.size() + ",\"today\":" + today_collec + ",\"count\":" + today_count + ",\"rate\": " + object + ",\"missed\":" + missed_collec + "}");
                         System.out.println("No upcoming collections");
                     }
                 } else {
