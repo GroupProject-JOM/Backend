@@ -22,12 +22,12 @@ public class CorsFilter implements Filter {
         // Cast ServletResponse to HttpServletResponse
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String origin = ((HttpServletRequest) request).getHeader("Origin");
-        if (origin != null && Arrays.asList(allowedOrigins).contains(origin))
-            httpResponse.setHeader("Access-Control-Allow-Origin", origin);
+        // String origin = ((HttpServletRequest) request).getHeader("Origin");
+        // if (origin != null && Arrays.asList(allowedOrigins).contains(origin))
+        //     httpResponse.setHeader("Access-Control-Allow-Origin", origin);
 
         // Add CORS headers here
-//        httpResponse.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:5501");
+        httpResponse.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:80");
         httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type");
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
