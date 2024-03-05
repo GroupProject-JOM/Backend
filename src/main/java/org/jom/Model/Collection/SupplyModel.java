@@ -57,8 +57,9 @@ public class SupplyModel {
         this.payment_method = payment_method;
     }
 
-    public SupplyModel(int id, int status, int value, String name, String last_name, String payment_method) {
+    public SupplyModel(int id, String method, int status, int value,  String name, String last_name, String payment_method) {
         this.id = id;
+        this.method = method;
         this.status = status;
         this.value = value;
         this.name = name;

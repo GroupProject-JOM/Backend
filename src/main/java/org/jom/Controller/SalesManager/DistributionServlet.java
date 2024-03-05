@@ -186,7 +186,7 @@ public class DistributionServlet extends HttpServlet {
                         if (productsCountList[i] <= distributedList[i]) count++;
                     }
 
-                    if (count == stringProductsArray.length) status = 3;
+                    if (count == stringProductsArray.length) status = 4;
 
                     String stringDistribution = intArrayToString(distributedList);
 
