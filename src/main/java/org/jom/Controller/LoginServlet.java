@@ -53,6 +53,7 @@ public class LoginServlet extends HttpServlet {
                         JSONObject payload = new JSONObject();
                         payload.put("user", user.getId());
                         payload.put("name", user.getFirst_name());
+                        payload.put("lname", user.getLast_name());
                         payload.put("page", user.getRole());
                         payload.put("email", user.getEmail());
                         payload.put("sId", sId);
