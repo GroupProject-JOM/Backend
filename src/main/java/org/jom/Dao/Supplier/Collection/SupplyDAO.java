@@ -1072,6 +1072,7 @@ public class SupplyDAO {
                     "    sup.last_name,\n" +
                     "    sup.phone,\n" +
                     "    est.area,\n" +
+                    "    est.location,\n" +
                     "    c.final_amount,\n" +
                     "    c.status\n" +
                     "FROM\n" +
@@ -1103,10 +1104,11 @@ public class SupplyDAO {
                 String last_name = resultSet.getString(3);
                 String phone = resultSet.getString(4);
                 String area = resultSet.getString(5);
-                int amount = resultSet.getInt(6);
-                int status = resultSet.getInt(7);
+                String location = resultSet.getString(6);
+                int amount = resultSet.getInt(7);
+                int status = resultSet.getInt(8);
 
-                SupplyModel supply = new SupplyModel(id, amount, status, fist_name, last_name, phone, area);
+                SupplyModel supply = new SupplyModel(id, amount, status, fist_name, last_name, phone, area, location);
                 supplies.add(supply);
             }
 
