@@ -432,4 +432,101 @@ public class DistributionDAO {
         return visits;
     }
 
+    // get distribution activity logs data
+    public List<DistributionModel> getActivityLogs() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<DistributionModel> distributions = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    d.price,\n" +
+                    "    d.quantity,\n" +
+                    "    DATE(d.date) AS distribution_date,\n" +
+                    "    DATE_FORMAT(d.date, '%h:%i %p') AS distribution_time,\n" +
+                    "    p.type,\n" +
+                    "    p.category,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    o.name AS outlet_name,\n" +
+                    "    o.city AS outlet_city\n" +
+                    "FROM\n" +
+                    "    jom_db.distributions d\n" +
+                    "        INNER JOIN\n" +
+                    "    products p ON p.id = d.product\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = d.distributor\n" +
+                    "        INNER JOIN\n" +
+                    "    outlets o ON o.id = d.outlet\n" +
+                    "ORDER BY d.id DESC;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String price = resultSet.getString(1);
+                int quantity = resultSet.getInt(2);
+                String date = resultSet.getString(3);
+                String time = resultSet.getString(4);
+                String type = resultSet.getString(5);
+                String category = resultSet.getString(6);
+                String firstName = resultSet.getString(7);
+                String lastName = resultSet.getString(8);
+                String outletName = resultSet.getString(9);
+                String area = resultSet.getString(10);
+
+                DistributionModel distribution = new DistributionModel(firstName, lastName, type, price, outletName, area, date, time, category, quantity);
+                distributions.add(distribution);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return distributions;
+    }
+
+    // get this month revenue of total distributions
+    public int getThisMonthRevenue() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int revenue = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    SUM(price) AS total_price\n" +
+                    "FROM\n" +
+                    "    jom_db.distributions\n" +
+                    "WHERE\n" +
+                    "    MONTH(date) = MONTH(CURRENT_DATE())\n" +
+                    "        AND YEAR(date) = YEAR(CURRENT_DATE());";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                revenue = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return revenue;
+    }
 }

@@ -10,12 +10,16 @@ public class DistributionModel {
     private int product;
     private String price;
     private int outlet;
+    private String outletName;
+    private String area;
     private int distributor;
     private String date;
+    private String time;
     private int distributions;
     private String day;
     private int visits;
     private String phone;
+    private int quantity;
 
     public DistributionModel(String date, int distributions) {
         this.date = date;
@@ -67,6 +71,19 @@ public class DistributionModel {
         this.category = category;
         this.product = product;
         this.price = price;
+    }
+
+    public DistributionModel(String first_name, String last_name, String type, String price, String outletName, String area, String date, String time, String category, int quantity) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.type = type;
+        this.price = price;
+        this.outletName = outletName;
+        this.area = area;
+        this.date = date;
+        this.time = time;
+        this.category = category;
+        this.quantity = quantity;
     }
 
     public int getId() {

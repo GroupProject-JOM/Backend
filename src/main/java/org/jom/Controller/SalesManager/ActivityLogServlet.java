@@ -2,16 +2,10 @@ package org.jom.Controller.SalesManager;
 
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
+import org.jom.Dao.BatchDAO;
 import org.jom.Dao.DistributionDAO;
-import org.jom.Dao.EmployeeDAO;
-import org.jom.Dao.ProductsDAO;
-import org.jom.Dao.Supplier.Collection.CollectionDAO;
-import org.jom.Dao.Supplier.Collection.SupplyDAO;
-import org.jom.Dao.UserDAO;
-import org.jom.Model.Collection.SupplyModel;
+import org.jom.Model.BatchModel;
 import org.jom.Model.DistributionModel;
-import org.jom.Model.EmployeeModel;
-import org.jom.Model.UserModel;
 import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
@@ -24,9 +18,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/sales-manager")
-public class SalesManagerServlet extends HttpServlet {
-    //Get Dashboard content
+@WebServlet("/activity")
+public class ActivityLogServlet extends HttpServlet {
+    //send distribution data for create distribution
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -53,13 +47,22 @@ public class SalesManagerServlet extends HttpServlet {
         try {
             if (user_id != 0) {
                 if (role.equals("sales-manager")) {
-                    CollectionDAO collectionDAO = new CollectionDAO();
-                    ProductsDAO productsDAO = new ProductsDAO();
-                    DistributionDAO distributionDAO = new DistributionDAO();
 
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    out.write("{\"payouts\":" + collectionDAO.rowCount(5) + ",\"unverified\":" + productsDAO.checkUnverified() + ",\"revenue\":" + distributionDAO.getThisMonthRevenue() + "}");
-                    System.out.println("Send dashboard content");
+                    DistributionDAO distributionDAO = new DistributionDAO();
+                    Gson gson = new Gson();
+
+                    List<DistributionModel> activities = distributionDAO.getActivityLogs();
+                    String object = gson.toJson(activities);
+
+                    if (activities.size() != 0) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        out.write("{\"activity\": " + object + "}");
+                        System.out.println("Send distribution logs");
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                        out.write("{\"message\": \"No distribution logs\"}");
+                        System.out.println("No distribution logs");
+                    }
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     out.write("{\"message\": \"Invalid User\"}");

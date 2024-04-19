@@ -213,7 +213,7 @@ public class DistributorsServlet extends HttpServlet {
                         } else {
                             onHnad = distributorDAO.getCashAmount(distributor);
                             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                            out.write("{\"message\": \"Money Collection is nt Success\",\"cash\":" + onHnad + "}");
+                            out.write("{\"message\": \"Money Collection is not Success\",\"cash\":" + onHnad + "}");
                             System.out.println("Money Collection is not Success");
                         }
                     } else {
