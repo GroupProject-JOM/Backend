@@ -29,6 +29,11 @@ public class DistributionModel {
         this.distributions = distributions;
     }
 
+    public DistributionModel(int quantity, String category) {
+        this.quantity = quantity;
+        this.category = category;
+    }
+
     public DistributionModel(String date, String day, int visits) {
         this.date = date;
         this.day = day;

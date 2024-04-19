@@ -594,4 +594,47 @@ public class DistributionDAO {
         }
         return revenue;
     }
+
+    // get this month sold product count
+    public List<DistributionModel> getThisMonthProducts() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<DistributionModel> products = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    SUM(d.quantity) AS total_quantity, p.category\n" +
+                    "FROM\n" +
+                    "    distributions d\n" +
+                    "        INNER JOIN\n" +
+                    "    products p ON p.id = d.product\n" +
+                    "WHERE\n" +
+                    "    EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE)\n" +
+                    "        AND EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM CURRENT_DATE)\n" +
+                    "GROUP BY product;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int quantity = resultSet.getInt(1);
+                String category = resultSet.getString(2);
+
+                DistributionModel distribution = new DistributionModel(quantity, category);
+                products.add(distribution);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return products;
+    }
 }

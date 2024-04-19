@@ -58,13 +58,15 @@ public class SalesManagerServlet extends HttpServlet {
                     DistributionDAO distributionDAO = new DistributionDAO();
 
                     List<DistributionModel> revenueArray = distributionDAO.getMonthlyRevenue();
+                    List<DistributionModel> productsArray = distributionDAO.getThisMonthProducts();
 
                     Gson gson = new Gson();
                     // Object array to json
                     String monthlyRevenues = gson.toJson(revenueArray);
+                    String monthlyProducts = gson.toJson(productsArray);
 
                     response.setStatus(HttpServletResponse.SC_OK);
-                    out.write("{\"payouts\":" + collectionDAO.rowCount(5) + ",\"unverified\":" + productsDAO.checkUnverified() + ",\"revenue\":" + distributionDAO.getThisMonthRevenue() + ",\"monthly\":" + monthlyRevenues + "}");
+                    out.write("{\"payouts\":" + collectionDAO.rowCount(5) + ",\"unverified\":" + productsDAO.checkUnverified() + ",\"revenue\":" + distributionDAO.getThisMonthRevenue() + ",\"monthly\":" + monthlyRevenues + ",\"products\":" + monthlyProducts + "}");
                     System.out.println("Send dashboard content");
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
