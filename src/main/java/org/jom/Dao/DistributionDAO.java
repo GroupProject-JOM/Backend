@@ -432,4 +432,209 @@ public class DistributionDAO {
         return visits;
     }
 
+    // get distribution activity logs data
+    public List<DistributionModel> getActivityLogs() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<DistributionModel> distributions = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    d.price,\n" +
+                    "    d.quantity,\n" +
+                    "    DATE(d.date) AS distribution_date,\n" +
+                    "    DATE_FORMAT(d.date, '%h:%i %p') AS distribution_time,\n" +
+                    "    p.type,\n" +
+                    "    p.category,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    o.name AS outlet_name,\n" +
+                    "    o.city AS outlet_city\n" +
+                    "FROM\n" +
+                    "    jom_db.distributions d\n" +
+                    "        INNER JOIN\n" +
+                    "    products p ON p.id = d.product\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON u.id = d.distributor\n" +
+                    "        INNER JOIN\n" +
+                    "    outlets o ON o.id = d.outlet\n" +
+                    "ORDER BY d.id DESC;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String price = resultSet.getString(1);
+                int quantity = resultSet.getInt(2);
+                String date = resultSet.getString(3);
+                String time = resultSet.getString(4);
+                String type = resultSet.getString(5);
+                String category = resultSet.getString(6);
+                String firstName = resultSet.getString(7);
+                String lastName = resultSet.getString(8);
+                String outletName = resultSet.getString(9);
+                String area = resultSet.getString(10);
+
+                DistributionModel distribution = new DistributionModel(firstName, lastName, type, price, outletName, area, date, time, category, quantity);
+                distributions.add(distribution);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return distributions;
+    }
+
+    // get this month revenue of total distributions
+    public int getThisMonthRevenue() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        int revenue = 0;
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    SUM(price) AS total_price\n" +
+                    "FROM\n" +
+                    "    jom_db.distributions\n" +
+                    "WHERE\n" +
+                    "    MONTH(date) = MONTH(CURRENT_DATE())\n" +
+                    "        AND YEAR(date) = YEAR(CURRENT_DATE());";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                revenue = resultSet.getInt(1);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return revenue;
+    }
+
+    // get last year and this year monthly distribution revenue totals
+    public List<DistributionModel> getMonthlyRevenue() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<DistributionModel> revenue = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "WITH YearMonth AS (\n" +
+                    "  SELECT EXTRACT(YEAR FROM date) AS year,\n" +
+                    "         EXTRACT(MONTH FROM date) AS month\n" +
+                    "  FROM distributions\n" +
+                    "),\n" +
+                    "ThisYearTotals AS (\n" +
+                    "  SELECT EXTRACT(MONTH FROM date) AS month,\n" +
+                    "         SUM(price) AS total_price_this_year\n" +
+                    "  FROM distributions\n" +
+                    "  WHERE EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE)\n" +
+                    "  GROUP BY EXTRACT(MONTH FROM date)\n" +
+                    "),\n" +
+                    "LastYearTotals AS (\n" +
+                    "  SELECT EXTRACT(MONTH FROM date) AS month,\n" +
+                    "         SUM(price) AS total_price_last_year\n" +
+                    "  FROM distributions\n" +
+                    "  WHERE EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE) - 1\n" +
+                    "  GROUP BY EXTRACT(MONTH FROM date)\n" +
+                    "),\n" +
+                    "AllMonths AS (\n" +
+                    "  SELECT 1 AS month UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL\n" +
+                    "  SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL\n" +
+                    "  SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL\n" +
+                    "  SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12\n" +
+                    ")\n" +
+                    "SELECT COALESCE(AM.month, TYT.month, LYT.month) AS month,\n" +
+                    "       COALESCE(total_price_this_year, 0) AS total_price_this_year,\n" +
+                    "       COALESCE(total_price_last_year, 0) AS total_price_last_year\n" +
+                    "FROM AllMonths AM\n" +
+                    "LEFT JOIN ThisYearTotals TYT ON AM.month = TYT.month\n" +
+                    "LEFT JOIN LastYearTotals LYT ON AM.month = LYT.month\n" +
+                    "ORDER BY month;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int thisYear = resultSet.getInt(2);
+                int lastYear = resultSet.getInt(3);
+
+                DistributionModel distribution = new DistributionModel(thisYear, lastYear);
+                revenue.add(distribution);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return revenue;
+    }
+
+    // get this month sold product count
+    public List<DistributionModel> getThisMonthProducts() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<DistributionModel> products = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    SUM(d.quantity) AS total_quantity, p.category\n" +
+                    "FROM\n" +
+                    "    distributions d\n" +
+                    "        INNER JOIN\n" +
+                    "    products p ON p.id = d.product\n" +
+                    "WHERE\n" +
+                    "    EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE)\n" +
+                    "        AND EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM CURRENT_DATE)\n" +
+                    "GROUP BY product;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int quantity = resultSet.getInt(1);
+                String category = resultSet.getString(2);
+
+                DistributionModel distribution = new DistributionModel(quantity, category);
+                products.add(distribution);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return products;
+    }
 }

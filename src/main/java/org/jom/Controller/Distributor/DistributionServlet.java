@@ -2,13 +2,8 @@ package org.jom.Controller.Distributor;
 
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
-import org.jom.Dao.BatchDAO;
-import org.jom.Dao.DistributionDAO;
-import org.jom.Dao.ProductsDAO;
-import org.jom.Dao.UserDAO;
+import org.jom.Dao.*;
 import org.jom.Model.DistributionModel;
-import org.jom.Model.ProductModel;
-import org.jom.Model.UserModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -126,6 +121,7 @@ public class DistributionServlet extends HttpServlet {
             JSONArray productsArray = json_data.getJSONArray("products");
             JSONArray pricesArray = json_data.getJSONArray("prices");
             int outlet = json_data.getInt("id");
+            int total = 0;
 
             // Convert JSONArrays to String arrays
             int[] amounts = new int[amountsArray.length()];
@@ -138,6 +134,7 @@ public class DistributionServlet extends HttpServlet {
                 products[i] = productsArray.getInt(i);
                 prices[i] = pricesArray.getInt(i);
                 finalPrices[i] = Integer.toString(prices[i] * amounts[i]);
+                total += prices[i] * amounts[i];
             }
 
             if (user_id != 0) {
@@ -150,10 +147,21 @@ public class DistributionServlet extends HttpServlet {
                         DistributionModel distributionModel = new DistributionModel(amounts[i], products[i], finalPrices[i], outlet, user_id);
 
                         if (distributionDAO.addDistributionRecord(distributionModel) != 0) status = true;
-                        else status = false;
+                        else {
+                            status = false;
+                            break;
+                        }
 
                         if (distributionDAO.decrementDistributorAmount(amounts[i], products[i], user_id)) status = true;
-                        else status = false;
+                        else {
+                            status = false;
+                            break;
+                        }
+                    }
+
+                    if (status) {
+                        DistributorDAO distributorDAO = new DistributorDAO();
+                        status = distributorDAO.updateSales(total, user_id);
                     }
 
                     if (status) {
