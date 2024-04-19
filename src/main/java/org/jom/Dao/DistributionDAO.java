@@ -529,4 +529,69 @@ public class DistributionDAO {
         }
         return revenue;
     }
+
+    // get last year and this year monthly distribution revenue totals
+    public List<DistributionModel> getMonthlyRevenue() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        ArrayList<DistributionModel> revenue = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "WITH YearMonth AS (\n" +
+                    "  SELECT EXTRACT(YEAR FROM date) AS year,\n" +
+                    "         EXTRACT(MONTH FROM date) AS month\n" +
+                    "  FROM distributions\n" +
+                    "),\n" +
+                    "ThisYearTotals AS (\n" +
+                    "  SELECT EXTRACT(MONTH FROM date) AS month,\n" +
+                    "         SUM(price) AS total_price_this_year\n" +
+                    "  FROM distributions\n" +
+                    "  WHERE EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE)\n" +
+                    "  GROUP BY EXTRACT(MONTH FROM date)\n" +
+                    "),\n" +
+                    "LastYearTotals AS (\n" +
+                    "  SELECT EXTRACT(MONTH FROM date) AS month,\n" +
+                    "         SUM(price) AS total_price_last_year\n" +
+                    "  FROM distributions\n" +
+                    "  WHERE EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE) - 1\n" +
+                    "  GROUP BY EXTRACT(MONTH FROM date)\n" +
+                    "),\n" +
+                    "AllMonths AS (\n" +
+                    "  SELECT 1 AS month UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL\n" +
+                    "  SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL\n" +
+                    "  SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL\n" +
+                    "  SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12\n" +
+                    ")\n" +
+                    "SELECT COALESCE(AM.month, TYT.month, LYT.month) AS month,\n" +
+                    "       COALESCE(total_price_this_year, 0) AS total_price_this_year,\n" +
+                    "       COALESCE(total_price_last_year, 0) AS total_price_last_year\n" +
+                    "FROM AllMonths AM\n" +
+                    "LEFT JOIN ThisYearTotals TYT ON AM.month = TYT.month\n" +
+                    "LEFT JOIN LastYearTotals LYT ON AM.month = LYT.month\n" +
+                    "ORDER BY month;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int thisYear = resultSet.getInt(2);
+                int lastYear = resultSet.getInt(3);
+
+                DistributionModel distribution = new DistributionModel(thisYear, lastYear);
+                revenue.add(distribution);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return revenue;
+    }
 }

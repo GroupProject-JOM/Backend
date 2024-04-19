@@ -20,6 +20,9 @@ public class DistributionModel {
     private int visits;
     private String phone;
     private int quantity;
+    private int month;
+    private int thisYear;
+    private int lastYear;
 
     public DistributionModel(String date, int distributions) {
         this.date = date;
@@ -30,6 +33,11 @@ public class DistributionModel {
         this.date = date;
         this.day = day;
         this.visits = visits;
+    }
+
+    public DistributionModel(int thisYear, int lastYear) {
+        this.thisYear = thisYear;
+        this.lastYear = lastYear;
     }
 
     public DistributionModel(int id, String first_name, String last_name, int remaining) {
