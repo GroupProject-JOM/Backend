@@ -433,7 +433,7 @@ public class DistributionDAO {
     }
 
     // get distribution activity logs data
-    public List<DistributionModel> getActivityLogs() {
+    public List<DistributionModel> getActivityLogs(String SelectDate) {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
         Connection connection = null;
 
@@ -460,6 +460,8 @@ public class DistributionDAO {
                     "    users u ON u.id = d.distributor\n" +
                     "        INNER JOIN\n" +
                     "    outlets o ON o.id = d.outlet\n" +
+                    "WHERE\n" +
+                    "    DATE(d.date) = '" + SelectDate + "' \n" +
                     "ORDER BY d.id DESC;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
