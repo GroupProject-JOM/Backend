@@ -47,7 +47,7 @@ public class ActivityLogServlet extends HttpServlet {
 
         try {
             if (user_id != 0) {
-                if (role.equals("sales-manager")) {
+                if (role.equals("sales-manager") || role.equals("admin")) {
 
                     DistributionDAO distributionDAO = new DistributionDAO();
                     Gson gson = new Gson();
