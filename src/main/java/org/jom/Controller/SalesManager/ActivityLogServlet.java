@@ -43,6 +43,7 @@ public class ActivityLogServlet extends HttpServlet {
         JSONObject jsonObject = jwtUtils.getAuthPayload();
         int user_id = (int) jsonObject.get("user");
         String role = (String) jsonObject.get("page");
+        String date = request.getParameter("date");
 
         try {
             if (user_id != 0) {
@@ -51,7 +52,7 @@ public class ActivityLogServlet extends HttpServlet {
                     DistributionDAO distributionDAO = new DistributionDAO();
                     Gson gson = new Gson();
 
-                    List<DistributionModel> activities = distributionDAO.getActivityLogs();
+                    List<DistributionModel> activities = distributionDAO.getActivityLogs(date);
                     String object = gson.toJson(activities);
 
                     if (activities.size() != 0) {
