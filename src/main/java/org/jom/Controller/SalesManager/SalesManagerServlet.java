@@ -2,12 +2,14 @@ package org.jom.Controller.SalesManager;
 
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
+import org.jom.Dao.DistributionDAO;
 import org.jom.Dao.EmployeeDAO;
 import org.jom.Dao.ProductsDAO;
 import org.jom.Dao.Supplier.Collection.CollectionDAO;
 import org.jom.Dao.Supplier.Collection.SupplyDAO;
 import org.jom.Dao.UserDAO;
 import org.jom.Model.Collection.SupplyModel;
+import org.jom.Model.DistributionModel;
 import org.jom.Model.EmployeeModel;
 import org.jom.Model.UserModel;
 import org.json.JSONObject;
@@ -31,53 +33,40 @@ public class SalesManagerServlet extends HttpServlet {
 
         // Get all cookies from the request
         Cookie[] cookies = request.getCookies();
-        JSONObject jsonObject = new JSONObject();
-        int user_id = 0;
-        boolean jwtCookieFound = false;
+        JwtUtils jwtUtils = new JwtUtils();
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
-                    if (!jwtUtils.verifyJwtAuthentication()) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        out.write("{\"message\": \"UnAuthorized\"}");
-                        System.out.println("UnAuthorized1");
-                        return;
-                    }
-                    jsonObject = jwtUtils.getAuthPayload();
-                    jwtCookieFound = true;
-                    break;  // No need to continue checking if "jwt" cookie is found
-                }
+        if (!jwtUtils.CheckJWT(cookies)) {
+            if (jwtUtils.CheckRefresh(cookies))
+                response.addCookie(jwtUtils.getNewJWT(cookies));
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                return;
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized\"}");
-            System.out.println("No cookies found in the request.");
-            return;
         }
 
-        // If "jwt" cookie is not found, respond with unauthorized status
-        if (!jwtCookieFound) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
-            System.out.println("UnAuthorized - JWT cookie not found");
-            return;
-        }
-
-        user_id = (int) jsonObject.get("user");
+        // get auth payload data
+        JSONObject jsonObject = jwtUtils.getAuthPayload();
+        int user_id = (int) jsonObject.get("user");
+        String role = (String) jsonObject.get("page");
 
         try {
-            UserDAO userDAO = new UserDAO();
-            UserModel user = userDAO.getUserById(user_id);
-
-            if (user.getId() != 0) {
-                if (user.getRole().equals("sales-manager")) {
+            if (user_id != 0) {
+                if (role.equals("sales-manager")) {
                     CollectionDAO collectionDAO = new CollectionDAO();
                     ProductsDAO productsDAO = new ProductsDAO();
+                    DistributionDAO distributionDAO = new DistributionDAO();
+
+                    List<DistributionModel> revenueArray = distributionDAO.getMonthlyRevenue();
+                    List<DistributionModel> productsArray = distributionDAO.getThisMonthProducts();
+
+                    Gson gson = new Gson();
+                    // Object array to json
+                    String monthlyRevenues = gson.toJson(revenueArray);
+                    String monthlyProducts = gson.toJson(productsArray);
 
                     response.setStatus(HttpServletResponse.SC_OK);
-                    out.write("{\"payouts\":" + collectionDAO.rowCount(5) + ",\"unverified\":" + productsDAO.checkUnverified() + "}");
+                    out.write("{\"payouts\":" + collectionDAO.rowCount(5) + ",\"unverified\":" + productsDAO.checkUnverified() + ",\"revenue\":" + distributionDAO.getThisMonthRevenue() + ",\"monthly\":" + monthlyRevenues + ",\"products\":" + monthlyProducts + "}");
                     System.out.println("Send dashboard content");
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

@@ -35,49 +35,28 @@ public class DistributionServlet extends HttpServlet {
 
         // Get all cookies from the request
         Cookie[] cookies = request.getCookies();
-        JSONObject jsonObject = new JSONObject();
-        int user_id = 0;
-        boolean jwtCookieFound = false;
+        JwtUtils jwtUtils = new JwtUtils();
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
-                    if (!jwtUtils.verifyJwtAuthentication()) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        out.write("{\"message\": \"UnAuthorized\"}");
-                        System.out.println("UnAuthorized1");
-                        return;
-                    }
-                    jsonObject = jwtUtils.getAuthPayload();
-                    jwtCookieFound = true;
-                    break;  // No need to continue checking if "jwt" cookie is found
-                }
+        if (!jwtUtils.CheckJWT(cookies)) {
+            if (jwtUtils.CheckRefresh(cookies))
+                response.addCookie(jwtUtils.getNewJWT(cookies));
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                return;
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized\"}");
-            System.out.println("No cookies found in the request.");
-            return;
         }
 
-        // If "jwt" cookie is not found, respond with unauthorized status
-        if (!jwtCookieFound) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
-            System.out.println("UnAuthorized - JWT cookie not found");
-            return;
-        }
+        // get auth payload data
+        JSONObject jsonObject = jwtUtils.getAuthPayload();
+        int user_id = (int) jsonObject.get("user");
+        String role = (String) jsonObject.get("page");
 
-        user_id = (int) jsonObject.get("user");
         int batch_id = Integer.parseInt(request.getParameter("id"));
 
         try {
-            UserDAO userDAO = new UserDAO();
-            UserModel user = userDAO.getUserById(user_id);
-
-            if (user.getId() != 0) {
-                if (user.getRole().equals("sales-manager")) {
+            if (user_id != 0) {
+                if (role.equals("sales-manager")) {
 
                     BatchDAO batchDAO = new BatchDAO();
                     BatchModel batchModel = batchDAO.getBatch(batch_id);
@@ -135,41 +114,22 @@ public class DistributionServlet extends HttpServlet {
 
         // Get all cookies from the request
         Cookie[] cookies = request.getCookies();
-        JSONObject jsonObject = new JSONObject();
-        int user_id = 0;
-        boolean jwtCookieFound = false;
+        JwtUtils jwtUtils = new JwtUtils();
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
-                    if (!jwtUtils.verifyJwtAuthentication()) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        out.write("{\"message\": \"UnAuthorized\"}");
-                        System.out.println("UnAuthorized1");
-                        return;
-                    }
-                    jsonObject = jwtUtils.getAuthPayload();
-                    jwtCookieFound = true;
-                    break;  // No need to continue checking if "jwt" cookie is found
-                }
+        if (!jwtUtils.CheckJWT(cookies)) {
+            if (jwtUtils.CheckRefresh(cookies))
+                response.addCookie(jwtUtils.getNewJWT(cookies));
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                return;
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized\"}");
-            System.out.println("No cookies found in the request.");
-            return;
         }
 
-        // If "jwt" cookie is not found, respond with unauthorized status
-        if (!jwtCookieFound) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
-            System.out.println("UnAuthorized - JWT cookie not found");
-            return;
-        }
-
-        user_id = (int) jsonObject.get("user");
+        // get auth payload data
+        JSONObject jsonObject = jwtUtils.getAuthPayload();
+        int user_id = (int) jsonObject.get("user");
+        String role = (String) jsonObject.get("page");
 
         StringBuilder requestBody = new StringBuilder();
         try {
@@ -201,11 +161,8 @@ public class DistributionServlet extends HttpServlet {
                 distributors[i] = distributorsArray.getInt(i);
             }
 
-            UserDAO userDAO = new UserDAO();
-            UserModel user = userDAO.getUserById(user_id);
-
-            if (user.getId() != 0) {
-                if (user.getRole().equals("sales-manager")) {
+            if (user_id != 0) {
+                if (role.equals("sales-manager")) {
 
                     BatchDAO batchDAO = new BatchDAO();
                     BatchModel batchModel = batchDAO.getBatch(batch_id);
@@ -229,7 +186,7 @@ public class DistributionServlet extends HttpServlet {
                         if (productsCountList[i] <= distributedList[i]) count++;
                     }
 
-                    if (count == stringProductsArray.length) status = 3;
+                    if (count == stringProductsArray.length) status = 4;
 
                     String stringDistribution = intArrayToString(distributedList);
 

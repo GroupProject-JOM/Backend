@@ -57,8 +57,9 @@ public class SupplyModel {
         this.payment_method = payment_method;
     }
 
-    public SupplyModel(int id, int status, int value, String name, String last_name, String payment_method) {
+    public SupplyModel(int id, String method, int status, int value, String name, String last_name, String payment_method) {
         this.id = id;
+        this.method = method;
         this.status = status;
         this.value = value;
         this.name = name;
@@ -66,7 +67,7 @@ public class SupplyModel {
         this.payment_method = payment_method;
     }
 
-    public SupplyModel(int id, int amount, int status, String name, String last_name, String phone, String area) {
+    public SupplyModel(int id, int amount, int status, String name, String last_name, String phone, String area, String location) {
         this.id = id;
         this.amount = amount;
         this.status = status;
@@ -74,6 +75,7 @@ public class SupplyModel {
         this.last_name = last_name;
         this.phone = phone;
         this.area = area;
+        this.location = location;
     }
 
     public SupplyModel(int id, int amount, String name, String last_name, String c_fName, String c_lName, String time) {

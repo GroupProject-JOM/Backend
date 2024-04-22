@@ -1,13 +1,11 @@
-package org.jom.Controller;
+package org.jom.Controller.SalesManager;
 
 import com.google.gson.Gson;
 import org.jom.Auth.JwtUtils;
-import org.jom.Dao.EmployeeDAO;
-import org.jom.Dao.OutletDAO;
-import org.jom.Dao.Supplier.AccountDAO;
-import org.jom.Dao.Supplier.EstateDAO;
-import org.jom.Dao.UserDAO;
-import org.jom.Model.*;
+import org.jom.Dao.BatchDAO;
+import org.jom.Dao.DistributionDAO;
+import org.jom.Model.BatchModel;
+import org.jom.Model.DistributionModel;
 import org.json.JSONObject;
 
 import javax.servlet.annotation.WebServlet;
@@ -17,11 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/outlets")
-public class OutletsServlet extends HttpServlet {
-    // Get all outlets
+@WebServlet("/activity")
+public class ActivityLogServlet extends HttpServlet {
+    //send distribution data for create distribution
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -44,25 +43,26 @@ public class OutletsServlet extends HttpServlet {
         JSONObject jsonObject = jwtUtils.getAuthPayload();
         int user_id = (int) jsonObject.get("user");
         String role = (String) jsonObject.get("page");
+        String date = request.getParameter("date");
 
         try {
             if (user_id != 0) {
-                if (role.equals("distributor") || role.equals("admin") || role.equals("sales-manager")) {
-                    OutletDAO outletDAO = new OutletDAO();
-                    List<OutletModel> outlets = outletDAO.getAll();
+                if (role.equals("sales-manager") || role.equals("admin")) {
 
+                    DistributionDAO distributionDAO = new DistributionDAO();
                     Gson gson = new Gson();
-                    // Object array to json
-                    String objectArray = gson.toJson(outlets);
 
-                    if (outlets.size() != 0) {
+                    List<DistributionModel> activities = distributionDAO.getActivityLogs(date);
+                    String object = gson.toJson(activities);
+
+                    if (activities.size() != 0) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        out.write("{\"size\": " + outlets.size() + ",\"list\":" + objectArray + "}");
-                        System.out.println("View all Outlets");
+                        out.write("{\"activity\": " + object + "}");
+                        System.out.println("Send distribution logs");
                     } else {
                         response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        out.write("{\"size\": \"0\"}");
-                        System.out.println("No Outlet");
+                        out.write("{\"message\": \"No distribution logs\"}");
+                        System.out.println("No distribution logs");
                     }
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

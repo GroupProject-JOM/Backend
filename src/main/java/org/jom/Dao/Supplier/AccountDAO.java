@@ -16,12 +16,13 @@ public class AccountDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "INSERT INTO accounts (account_num,bank,name,supplier_id_) VALUES (?,?,?,?)";
+            String sql = "INSERT INTO accounts (account_num,bank,name,supplier_id_,nickName) VALUES (?,?,?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1,account.getAccount_number());
             preparedStatement.setString(2,account.getBank());
             preparedStatement.setString(3,account.getName());
             preparedStatement.setInt(4,account.getSupplier_id());
+            preparedStatement.setString(5,account.getNickName());
 
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
@@ -62,8 +63,9 @@ public class AccountDAO {
                 String holder_name = resultSet.getString(2);
                 String account_number = resultSet.getString(3);
                 String bank = resultSet.getString(4);
+                String nickName = resultSet.getString(5);
 
-                AccountModel account = new AccountModel(account_id,account_number,bank,holder_name);
+                AccountModel account = new AccountModel(account_id,account_number,bank,holder_name,nickName);
                 accounts.add(account);
             }
 
@@ -100,7 +102,8 @@ public class AccountDAO {
                 account.setName(resultSet.getString(2));
                 account.setAccount_number(resultSet.getString(3));
                 account.setBank(resultSet.getString(4));
-                account.setSupplier_id(resultSet.getInt(5));
+                account.setNickName(resultSet.getString(5));
+                account.setSupplier_id(resultSet.getInt(6));
             }
 
             resultSet.close();
@@ -124,13 +127,14 @@ public class AccountDAO {
 
         try {
             connection = connectionPool.dataSource.getConnection();
-            String sql = "UPDATE accounts SET name=?,account_num=?,bank=? WHERE supplier_id_ = ? AND id = ? ";
+            String sql = "UPDATE accounts SET name=?,account_num=?,bank=?,nickName=? WHERE supplier_id_ = ? AND id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1,account.getName());
             preparedStatement.setString(2,account.getAccount_number());
             preparedStatement.setString(3,account.getBank());
-            preparedStatement.setInt(4,account.getSupplier_id());
-            preparedStatement.setInt(5,account.getId());
+            preparedStatement.setString(4,account.getNickName());
+            preparedStatement.setInt(5,account.getSupplier_id());
+            preparedStatement.setInt(6,account.getId());
 
             int x = preparedStatement.executeUpdate();
             if(x !=0){

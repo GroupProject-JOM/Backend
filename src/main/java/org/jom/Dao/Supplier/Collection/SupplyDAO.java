@@ -821,6 +821,7 @@ public class SupplyDAO {
                     "    c.id,\n" +
                     "    u.first_name,\n" +
                     "    u.last_name,\n" +
+                    "    c.s_method,\n" +
                     "    c.p_method,\n" +
                     "    c.value,\n" +
                     "    c.status\n" +
@@ -840,11 +841,12 @@ public class SupplyDAO {
                 int id = resultSet.getInt(1);
                 String fName = resultSet.getString(2);
                 String lName = resultSet.getString(3);
-                String payment = resultSet.getString(4);
-                int value = resultSet.getInt(5);
-                int status = resultSet.getInt(6);
+                String method = resultSet.getString(4);
+                String payment = resultSet.getString(5);
+                int value = resultSet.getInt(6);
+                int status = resultSet.getInt(7);
 
-                SupplyModel supply = new SupplyModel(id, status, value, fName, lName, payment);
+                SupplyModel supply = new SupplyModel(id, method, status, value, fName, lName, payment);
                 supplies.add(supply);
             }
 
@@ -1070,6 +1072,7 @@ public class SupplyDAO {
                     "    sup.last_name,\n" +
                     "    sup.phone,\n" +
                     "    est.area,\n" +
+                    "    est.location,\n" +
                     "    c.final_amount,\n" +
                     "    c.status\n" +
                     "FROM\n" +
@@ -1101,10 +1104,11 @@ public class SupplyDAO {
                 String last_name = resultSet.getString(3);
                 String phone = resultSet.getString(4);
                 String area = resultSet.getString(5);
-                int amount = resultSet.getInt(6);
-                int status = resultSet.getInt(7);
+                String location = resultSet.getString(6);
+                int amount = resultSet.getInt(7);
+                int status = resultSet.getInt(8);
 
-                SupplyModel supply = new SupplyModel(id, amount, status, fist_name, last_name, phone, area);
+                SupplyModel supply = new SupplyModel(id, amount, status, fist_name, last_name, phone, area, location);
                 supplies.add(supply);
             }
 
@@ -1577,6 +1581,75 @@ public class SupplyDAO {
                 SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, area, payment);
                 supplies.add(supply);
             }
+            resultSet.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) try {
+                connection.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return supplies;
+    }
+
+    //get missed collections
+    public List<SupplyModel> getMissedCollections(int collector, String pickup_date) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+
+        ArrayList<SupplyModel> supplies = new ArrayList<>();
+
+        try {
+            connection = connectionPool.dataSource.getConnection();
+            String sql = "SELECT \n" +
+                    "    p.pickup_date,\n" +
+                    "    p.pickup_time,\n" +
+                    "    p.collection_id,\n" +
+                    "    u.first_name,\n" +
+                    "    u.last_name,\n" +
+                    "    u.phone,\n" +
+                    "    e.location,\n" +
+                    "    e.area,\n" +
+                    "    c.init_amount,\n" +
+                    "    c.p_method\n" +
+                    "FROM\n" +
+                    "    jom_db.pickups p\n" +
+                    "        INNER JOIN\n" +
+                    "    suppliers s ON s.id = p.s_id\n" +
+                    "        INNER JOIN\n" +
+                    "    users u ON s.user_id = u.id\n" +
+                    "        INNER JOIN\n" +
+                    "    collections c ON p.collection_id = c.id AND c.delete = 0\n" +
+                    "        AND c.status = 3\n" +
+                    "        INNER JOIN\n" +
+                    "    estates e ON e.id = p.estate_id\n" +
+                    "WHERE\n" +
+                    "    p.pickup_date < ?\n" +
+                    "        AND p.collector = ?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, pickup_date);
+            preparedStatement.setInt(2, collector);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String date = resultSet.getString(1);
+                String time = resultSet.getString(2);
+                int collection_id = resultSet.getInt(3);
+                String fist_name = resultSet.getString(4);
+                String last_name = resultSet.getString(5);
+                String phone = resultSet.getString(6);
+                String location = resultSet.getString(7);
+                String area = resultSet.getString(8);
+                int initial_amount = resultSet.getInt(9);
+                String payment_method = resultSet.getString(10);
+
+                SupplyModel supply = new SupplyModel(collection_id, date, time, initial_amount, fist_name, last_name, phone, location, area, payment_method);
+                supplies.add(supply);
+            }
+
             resultSet.close();
             preparedStatement.close();
 

@@ -27,40 +27,22 @@ public class EmployeeServlet extends HttpServlet {
 
         // Get all cookies from the request
         Cookie[] cookies = request.getCookies();
-        JSONObject jsonObject = new JSONObject();
-        int user_id = 0;
-        boolean jwtCookieFound = false;
+        JwtUtils jwtUtils = new JwtUtils();
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
-                    if (!jwtUtils.verifyJwtAuthentication()) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        out.write("{\"message\": \"UnAuthorized\"}");
-                        System.out.println("UnAuthorized1");
-                        return;
-                    }
-                    jsonObject = jwtUtils.getAuthPayload();
-                    jwtCookieFound = true;
-                    break;  // No need to continue checking if "jwt" cookie is found
-                }
+        if (!jwtUtils.CheckJWT(cookies)) {
+            if (jwtUtils.CheckRefresh(cookies))
+                response.addCookie(jwtUtils.getNewJWT(cookies));
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                return;
             }
-        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized\"}");
-            System.out.println("No cookies found in the request.");
-            return;
         }
 
-        // If "jwt" cookie is not found, respond with unauthorized status
-        if (!jwtCookieFound) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
-            System.out.println("UnAuthorized - JWT cookie not found");
-            return;
-        }
-
-        user_id = (int) jsonObject.get("user");
+        // get auth payload data
+        JSONObject jsonObject = jwtUtils.getAuthPayload();
+        int user_id = (int) jsonObject.get("user");
+        String role = (String) jsonObject.get("page");
 
         try {
             Gson gson = new Gson();
@@ -69,11 +51,8 @@ public class EmployeeServlet extends HttpServlet {
             EmployeeModel employee = gson.fromJson(bufferedReader, EmployeeModel.class);
             employee.setEmp(user_id);
 
-            UserDAO userDAO = new UserDAO();
-            UserModel user = userDAO.getUserById(employee.getEmp());
-
-            if (user.getId() != 0) {
-                if (user.getRole().equals("admin")) {
+            if (user_id != 0) {
+                if (role.equals("admin")) {
 
                     // Check input field is empty
                     if (employee.getFirst_name().isEmpty()) {
@@ -119,8 +98,8 @@ public class EmployeeServlet extends HttpServlet {
 
                     int count = 0;
                     String roles[] = {"collector", "distributor", "stock-manager", "production-manager", "sales-manager"};
-                    for (String role : roles) {
-                        if (!employee.getRole().equals(role)) {
+                    for (String r : roles) {
+                        if (!employee.getRole().equals(r)) {
                             count++;
                         } else break;
                         if (count >= 5) {
@@ -184,7 +163,7 @@ public class EmployeeServlet extends HttpServlet {
                         if (collectorDAO.register(employee.getId())) {
                             System.out.println("Collector added successfully");
                         }
-                    }else if(employee.getRole().equals("distributor")){
+                    } else if (employee.getRole().equals("distributor")) {
                         DistributorDAO distributorDAO = new DistributorDAO();
                         if (distributorDAO.register(employee.getId())) {
                             System.out.println("Distributor added successfully");
@@ -222,50 +201,31 @@ public class EmployeeServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
+
         // Get all cookies from the request
         Cookie[] cookies = request.getCookies();
-        JSONObject jsonObject = new JSONObject();
-        int user_id = 0;
-        boolean jwtCookieFound = false;
+        JwtUtils jwtUtils = new JwtUtils();
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
-                    if (!jwtUtils.verifyJwtAuthentication()) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        out.write("{\"message\": \"UnAuthorized\"}");
-                        System.out.println("UnAuthorized1");
-                        return;
-                    }
-                    jsonObject = jwtUtils.getAuthPayload();
-                    jwtCookieFound = true;
-                    break;  // No need to continue checking if "jwt" cookie is found
-                }
+        if (!jwtUtils.CheckJWT(cookies)) {
+            if (jwtUtils.CheckRefresh(cookies))
+                response.addCookie(jwtUtils.getNewJWT(cookies));
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                return;
             }
-        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized\"}");
-            System.out.println("No cookies found in the request.");
-            return;
         }
 
-        // If "jwt" cookie is not found, respond with unauthorized status
-        if (!jwtCookieFound) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
-            System.out.println("UnAuthorized - JWT cookie not found");
-            return;
-        }
+        // get auth payload data
+        JSONObject jsonObject = jwtUtils.getAuthPayload();
+        int user_id = (int) jsonObject.get("user");
+        String role = (String) jsonObject.get("page");
 
-        user_id = (int) jsonObject.get("user");
         int employee_id = Integer.parseInt(request.getParameter("id"));
 
         try {
-            UserDAO userDAO = new UserDAO();
-            UserModel user = userDAO.getUserById(user_id);
-
-            if (user.getId() != 0) {
-                if (user.getRole().equals("admin")) {
+            if (user_id != 0) {
+                if (role.equals("admin")) {
 
                     EmployeeDAO employeeDAO = new EmployeeDAO();
                     EmployeeModel employee = employeeDAO.getEmployee(employee_id);
@@ -309,40 +269,22 @@ public class EmployeeServlet extends HttpServlet {
 
         // Get all cookies from the request
         Cookie[] cookies = request.getCookies();
-        JSONObject jsonObject = new JSONObject();
-        int user_id = 0;
-        boolean jwtCookieFound = false;
+        JwtUtils jwtUtils = new JwtUtils();
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
-                    if (!jwtUtils.verifyJwtAuthentication()) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        out.write("{\"message\": \"UnAuthorized\"}");
-                        System.out.println("UnAuthorized1");
-                        return;
-                    }
-                    jsonObject = jwtUtils.getAuthPayload();
-                    jwtCookieFound = true;
-                    break;  // No need to continue checking if "jwt" cookie is found
-                }
+        if (!jwtUtils.CheckJWT(cookies)) {
+            if (jwtUtils.CheckRefresh(cookies))
+                response.addCookie(jwtUtils.getNewJWT(cookies));
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                return;
             }
-        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized\"}");
-            System.out.println("No cookies found in the request.");
-            return;
         }
 
-        // If "jwt" cookie is not found, respond with unauthorized status
-        if (!jwtCookieFound) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
-            System.out.println("UnAuthorized - JWT cookie not found");
-            return;
-        }
-
-        user_id = (int) jsonObject.get("user");
+        // get auth payload data
+        JSONObject jsonObject = jwtUtils.getAuthPayload();
+        int user_id = (int) jsonObject.get("user");
+        String role = (String) jsonObject.get("page");
 
         try {
             Gson gson = new Gson();
@@ -354,8 +296,8 @@ public class EmployeeServlet extends HttpServlet {
             UserDAO userDAO = new UserDAO();
             UserModel user = userDAO.getUserById(employee.getEmp());
 
-            if (user.getId() != 0) {
-                if (user.getRole().equals("admin")) {
+            if (user_id != 0) {
+                if (role.equals("admin")) {
 
                     // Check input field is empty
                     if (employee.getFirst_name().isEmpty()) {
@@ -396,8 +338,8 @@ public class EmployeeServlet extends HttpServlet {
 
                     int count = 0;
                     String roles[] = {"collector", "distributor", "stock-manager", "production-manager", "sales-manager"};
-                    for (String role : roles) {
-                        if (!employee.getRole().equals(role)) {
+                    for (String r : roles) {
+                        if (!employee.getRole().equals(r)) {
                             count++;
                         } else break;
                         if (count >= 5) {
@@ -463,48 +405,31 @@ public class EmployeeServlet extends HttpServlet {
 
         // Get all cookies from the request
         Cookie[] cookies = request.getCookies();
-        JSONObject jsonObject = new JSONObject();
-        int user_id = 0;
-        boolean jwtCookieFound = false;
+        JwtUtils jwtUtils = new JwtUtils();
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    JwtUtils jwtUtils = new JwtUtils(cookie.getValue());
-                    if (!jwtUtils.verifyJwtAuthentication()) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        out.write("{\"message\": \"UnAuthorized\"}");
-                        System.out.println("UnAuthorized1");
-                        return;
-                    }
-                    jsonObject = jwtUtils.getAuthPayload();
-                    jwtCookieFound = true;
-                    break;  // No need to continue checking if "jwt" cookie is found
-                }
+        if (!jwtUtils.CheckJWT(cookies)) {
+            if (jwtUtils.CheckRefresh(cookies))
+                response.addCookie(jwtUtils.getNewJWT(cookies));
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                out.write("{\"message\": \"UnAuthorized\"}");
+                return;
             }
-        } else {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized\"}");
-            System.out.println("No cookies found in the request.");
-            return;
         }
 
-        // If "jwt" cookie is not found, respond with unauthorized status
-        if (!jwtCookieFound) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            out.write("{\"message\": \"UnAuthorized - JWT cookie not found\"}");
-            System.out.println("UnAuthorized - JWT cookie not found");
-            return;
-        }
+        // get auth payload data
+        JSONObject jsonObject = jwtUtils.getAuthPayload();
+        int user_id = (int) jsonObject.get("user");
+        String role = (String) jsonObject.get("page");
 
-        user_id = (int) jsonObject.get("user");
         int employeeId = Integer.parseInt(request.getParameter("id"));
 
         try {
             UserDAO userDAO = new UserDAO();
             UserModel user = userDAO.getUserById(user_id);
 
-            if (user.getId() != 0) {
-                if (user.getRole().equals("admin")) {
+            if (user_id != 0) {
+                if (role.equals("admin")) {
 
                     EmployeeDAO employeeDAO = new EmployeeDAO();
                     EmployeeModel employee = new EmployeeModel(employeeId);
